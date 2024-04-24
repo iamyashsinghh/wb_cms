@@ -89,6 +89,7 @@ class ApiController extends Controller
         return $response;
     }
 
+
     public function get_json_reviews($place_id)
     {
         $yash = Storage::get('public/uploads/all_reviews/' . $place_id . '_reviews.json');
@@ -370,7 +371,7 @@ class ApiController extends Controller
                 $data['vendor'] = $vendor;
                 $data['similar_vendors'] = $similar_vendors;
                 $tag = "vendor";
-                $city = City::where('id', $venue->city_id)->first();
+                $city = City::where('id', $vendor->city_id)->first();
             }
 
             $response = [
