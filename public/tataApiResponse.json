@@ -1,0 +1,22 @@
+{
+    "uuid": "$uuid",
+    "call_to_number": "$call_to_number",
+    "caller_id_number": "$caller_id_number",
+    "start_stamp": "$start_stamp",
+    "answer_stamp": "$answer_stamp",
+    "end_stamp": "$end_stamp",
+    "hangup_cause": "$hangup_cause",
+    "billsec": "$billsec",
+    "digits_dialed": "$digits_dialed",
+    "direction": "$direction",
+    "duration": "$duration",
+    "answered_agent": "$answered_agent",
+    "missed_agent": "$missed_agent",
+    "call_flow": "$call_flow",
+    "broadcast_lead_fields": "$broadcast_lead_fields",
+    "recording_url": "$recording_url",
+    "call_id": "$call_id",
+    "outbound_sec": "$outbound_sec",
+    "agent_ring_time": "$agent_ring_time",
+    "billing_circle": "$billing_circle"
+}

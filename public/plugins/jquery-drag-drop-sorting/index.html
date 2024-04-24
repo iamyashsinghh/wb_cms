@@ -1,0 +1,310 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Bootstrap HTML5 Sortable jQuery Plugin Examples</title>
+    <!-- Latest compiled and minified CSS -->
+    <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<style>
+    body { background-color:#fafafa;}
+        .table-sortable {
+            position: relative;
+        }
+        .table-sortable .sortable-placeholder {
+            height: 37px;
+        }
+        .table-sortable .sortable-placeholder:after {
+            position: absolute;
+            z-index: 10;
+            content: " ";
+            height: 37px;
+            background: #f9f9f9;
+            left: 0;
+            right: 0;
+        }
+	</style>
+</head>
+<body><div id="jquery-script-menu">
+<div class="jquery-script-center">
+<ul>
+<li><a href="http://www.jqueryscript.net/other/jQuery-Drag-drop-Sorting-Plugin-For-Bootstrap-html5sortable.html">Download This Plugin</a></li>
+<li><a href="http://www.jqueryscript.net/">Back To jQueryScript.Net</a></li>
+</ul>
+<div class="jquery-script-ads"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-2783044520727903";
+/* jQuery_demo */
+google_ad_slot = "2780937993";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+    <div class="container" style="margin-top:150px;">
+        <header>
+            <h1>Bootstrap HTML5 Sortable jQuery Plugin Examples</h1>
+        </header>
+        <div class="tab-content">
+            <div class="tab-pane fade in active" id="demos">
+                <section>
+                    <h2>Sortable table</h2>
+                    <table class="table table-sortable">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Username</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="glyphicon glyphicon-move"></span> 1</td>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                        </tr>
+                        <tr>
+                            <td><span class="glyphicon glyphicon-move"></span> 2</td>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                        </tr>
+                        <tr>
+                            <td><span class="glyphicon glyphicon-move"></span> 3</td>
+                            <td colspan="2">Larry the Bird</td>
+                            <td>@twitter</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section>
+                    <h2>Sortable Thumbnail</h2>
+                    <div class="row thumbnail-sortable">
+                        <div class="col-sm-6 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Thumbnail label 1</h3>
+                                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Thumbnail label 2</h3>
+                                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Thumbnail label 3</h3>
+                                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Thumbnail label 4</h3>
+                                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Thumbnail label 5</h3>
+                                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Thumbnail label 6</h3>
+                                    <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2>Sortable List Group</h2>
+                    <ul class="list-group list-group-sortable">
+                        <li class="list-group-item">Cras justo odio</li>
+                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                        <li class="list-group-item">Morbi leo risus</li>
+                        <li class="list-group-item">Porta ac consectetur ac</li>
+                        <li class="list-group-item">Vestibulum at eros</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Sortable List Group Exclude</h2>
+                    <ul class="list-group list-group-sortable-exclude">
+                        <li class="list-group-item">Cras justo odio</li>
+                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                        <li class="list-group-item">Morbi leo risus</li>
+                        <li class="list-group-item disabled">Porta ac consectetur ac</li>
+                        <li class="list-group-item disabled">Vestibulum at eros</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Sortable List Group  With Handles</h2>
+                    <ul class="list-group list-group-sortable-handles">
+                        <li class="list-group-item"><span class="glyphicon glyphicon-move"></span> Cras justo odio</li>
+                        <li class="list-group-item"><span class="glyphicon glyphicon-move"></span> Dapibus ac facilisis in</li>
+                        <li class="list-group-item"><span class="glyphicon glyphicon-move"></span> Morbi leo risus</li>
+                        <li class="list-group-item"><span class="glyphicon glyphicon-move"></span> Porta ac consectetur ac</li>
+                        <li class="list-group-item"><span class="glyphicon glyphicon-move"></span> Vestibulum at eros</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Sortable List Group Connected</h2>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="list-group list-group-sortable-connected">
+                                <li class="list-group-item list-group-item-info">Cras justo odio</li>
+                                <li class="list-group-item list-group-item-info">Dapibus ac facilisis in</li>
+                                <li class="list-group-item list-group-item-info">Morbi leo risus</li>
+                                <li class="list-group-item list-group-item-info">Porta ac consectetur ac</li>
+                                <li class="list-group-item list-group-item-info">Vestibulum at eros</li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-6">
+                            <ul class="list-group list-group-sortable-connected">
+                                <li class="list-group-item list-group-item-success">Cras justo odio</li>
+                                <li class="list-group-item list-group-item-success">Dapibus ac facilisis in</li>
+                                <li class="list-group-item list-group-item-success">Morbi leo risus</li>
+                                <li class="list-group-item list-group-item-success">Porta ac consectetur ac</li>
+                                <li class="list-group-item list-group-item-success">Vestibulum at eros</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="tab-pane fade" id="documentation">
+                <section>
+                    <h2>How to use it?</h2>
+                    <p>
+                        Download it from <a href="https://github.com/psfpro/html5sortable/archive/master.zip">here</a>.
+                        Then use it like this:
+                    </p><pre><code class="xml"><span class="tag">&lt;<span class="title">ul</span> <span class="attribute">class</span>=<span class="value">"sortable"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">li</span>&gt;</span>Item 1
+    <span class="tag">&lt;<span class="title">li</span>&gt;</span>Item 2
+    <span class="tag">&lt;<span class="title">li</span>&gt;</span>Item 3
+    <span class="tag">&lt;<span class="title">li</span>&gt;</span>Item 4
+    <span class="tag">&lt;/<span class="title">ul</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"jquery.sortable.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript">
+    $(<span class="string">'.sortable'</span>).sortable();
+</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+                </code></pre>
+                    <p>
+                        Use <code>.sortable-dragging</code> and <code>.sortable-placeholder</code> selectors to change the styles of a dragging item and its placeholder respectively.
+                    </p>
+                    <p>
+                        Use <code>placeholderClass</code> option to create sortable lists with additional class for placeholder.
+                    </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable({
+    placeholderClass: <span class="string">'customPlaceholderClass'</span>
+});
+                </code></pre>
+                    <p>
+                    Use <code>sortupdate</code> event if you want to do something when the order changes (e.g. storing the new order):
+                </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable().bind(<span class="string">'sortupdate'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
+    <span class="comment">//Triggered when the user stopped sorting and the DOM position has changed.</span>
+});
+                </code></pre>
+                    <p>
+                        Use <code>items</code> option to specifiy which items inside the element should be sortable.
+                    </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable({
+    items: <span class="string">':not(.disabled)'</span>
+});
+                </code></pre>
+                    <p>
+                        Use <code>handle</code> option to create sortable lists with handles:
+                    </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable({
+    handle: <span class="string">'.handle'</span>
+});
+                </code></pre>
+                    <p>
+                        Use <code>connectWith</code> option to create connected lists:
+                    </p><pre><code class="javascript">$(<span class="string">'#sortable1, #sortable2'</span>).sortable({
+    connectWith: <span class="string">'.connected'</span>
+});
+                </code></pre>
+                    <p>
+                        To remove the sortable functionality completely:
+                    </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable(<span class="string">'destroy'</span>);
+                </code></pre>
+                    <p>
+                        To disable the sortable temporarily:
+                    </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable(<span class="string">'disable'</span>);
+                </code></pre>
+                    <p>
+                        To enable a disabled sortable:
+                    </p><pre><code class="javascript">$(<span class="string">'.sortable'</span>).sortable(<span class="string">'enable'</span>);
+                </code></pre>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="jquery.sortable.js"></script>
+	<script>
+		$(function() {
+            $('.thumbnail-sortable').sortable({
+                placeholderClass: 'col-sm-6 col-md-4'
+            });
+            $('.table-sortable tbody').sortable({
+                handle: 'span'
+            });
+            $('.list-group-sortable').sortable({
+                placeholderClass: 'list-group-item'
+            });
+            $('.list-group-sortable-exclude').sortable({
+                placeholderClass: 'list-group-item',
+                items: ':not(.disabled)'
+            });
+            $('.list-group-sortable-handles').sortable({
+                placeholderClass: 'list-group-item',
+                handle: 'span'
+            });
+            $('.list-group-sortable-connected').sortable({
+                placeholderClass: 'list-group-item',
+                connectWith: '.connected'
+            });
+		});
+	</script><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>
