@@ -2,7 +2,6 @@
 if(Auth::guard('admin')->check()){
 $auth_user = Auth::guard('admin')->user();
 }
-
 $route = Route::currentRouteName();
 @endphp
 <aside class="main-sidebar sidebar-dark-danger" style="background: var(--wb-dark-red);">
@@ -187,6 +186,14 @@ $route = Route::currentRouteName();
                         <a href="{{route('page_listing_meta.listing_meta.list')}}" class="link_prop w-100">
                             <i class="fas fa-ranking-star nav-icon"></i>
                             <p>Pages Listing Meta</p>
+                        </a>
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link d-flex justify-content-between align-items-center {{$route == "account.list" ? 'active': ''}}">
+                        <a href="{{route('account.list')}}" class="link_prop w-100">
+                            <i class="fas fa-ranking-star nav-icon"></i>
+                            <p>Account Controller</p>
                         </a>
                     </span>
                 </li>

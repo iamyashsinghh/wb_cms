@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExternalApiController;
 use Illuminate\Support\Facades\Route;
@@ -16,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-
-
-
-
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => 'AuthCheck'], function () {
@@ -29,6 +26,14 @@ Route::group(['middleware' => 'AuthCheck'], function () {
 
 Route::group(['middleware' => 'admin'], function () {
     Route::get('dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('account')->group(function () {
+        Route::view('/list', 'account_control.list')->name('account.list');
+        Route::get('/list_ajax', [AccountController::class, 'ajax_list'])->name('account.ajax_list');
+        Route::get('/manage/{account_id?}', [AccountController::class, 'manage'])->name('account.manage');
+        Route::get('/delete/{account_id?}', [AccountController::class, 'delete'])->name('account.delete');
+        Route::post('/manage_process/{account_id?}', [AccountController::class, 'manage_process'])->name('account.manage_process');
+    });
 
     Route::prefix('external_api')->group(function () {
         Route::get('/maps_review', [ExternalApiController::class, 'maps_review'])->name('api.maps_review');
@@ -173,7 +178,7 @@ Route::group(['middleware' => 'admin'], function () {
         Route::get('/delete/{meta_id?}', 'meta_delete')->name('page_listing_meta.listing_meta.delete');
         Route::post('/manage_process/{meta_id?}', 'manage_process')->name('page_listing_meta.listing_meta.manage_process');
         Route::post('/update_faq/{meta_id?}', 'update_faq')->name('page_listing_meta.listing_meta.update_faq');
-        
+
         //Ajax routes
         Route::get('/update_status/{meta_id?}/{status?}', 'update_status')->name('page_listing_meta.listing_meta.update_status');
         Route::get('/fetch_faq/{meta_id?}', 'fetch_faq')->name('page_listing_meta.listing_meta.fetch_faq');

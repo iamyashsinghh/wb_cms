@@ -32,15 +32,15 @@ class AuthController extends Controller
         $authenticate = Auth::guard('admin')->attempt($credentials);
         if ($authenticate) {
             $user = Auth::guard('admin')->user();
-            if ($user->id == 1 || $user->id == 5) {
+            if ($user->is_admin == 1) {
                 return redirect('/dashboard');
             } else {
                 Auth::guard('admin')->logout();
-                return redirect('/login')->withErrors(['email' => 'Invalid credentials']);
+                return redirect('/')->withErrors(['email' => 'Invalid credentials']);
             }
         } else {
             // Authentication failed
-            return redirect('/login')->withErrors(['email' => 'Invalid credentials']);
+            return redirect('/')->withErrors(['email' => 'Invalid credentials']);
         }
     }
 
