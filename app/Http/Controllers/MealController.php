@@ -16,7 +16,7 @@ class MealController extends Controller {
         return view('meal.list', compact('meals'));
     }
 
-    //ajax functions: 
+    //ajax functions:
     public function edit_ajax($meal_id) {
         try {
             $meal = Meal::find($meal_id);

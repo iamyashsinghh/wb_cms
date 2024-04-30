@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\Location;
-
+use App\Models\VendorCategory;
+use App\Models\VendorListingMeta;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class VendorListingMetaController extends Controller {
     public function list() {

@@ -23,11 +23,11 @@
     </div>
     @include('layouts.navbar')
     @include('layouts.sidebar')
-  
+
     <div class="wrapper">
         @section('main')
         @show
-        
+
         <footer class="main-footer text-sm">
             <strong>Copyright &copy; {{date('Y')}} <a href="javascript:void(0);">Wedding Banquets</a>.</strong>
             All rights reserved.
@@ -55,8 +55,8 @@
         }
     @endphp
     @yield('footer-script')
-    
-    <script> 
+
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('meta_title_count').addEventListener('input', function() {
         var textLength = this.value.length;
@@ -111,7 +111,7 @@
                 updateMetaModal.querySelector('input[name=meta_title]').value = meta.meta_title;
                 updateMetaModal.querySelector('textarea[name=meta_description]').value = meta.meta_description;
                 updateMetaModal.querySelector('textarea[name=meta_keywords]').value = meta.meta_keywords;
-                
+
             })
         }
     </script>

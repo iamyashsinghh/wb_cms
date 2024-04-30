@@ -431,7 +431,7 @@ class ApiController extends Controller
             $business_user->address = $request->address;
             $business_user->save();
 
-            $mail_data = ['name' => $request->name, 'email' => $request->email, 'phone' => $request->phone, 'business_name' => $request->business_name, 'business_type' => $request->business_type == 1 ? 'Venue' : 'Vendor', 'business_category' => $business_category->name];
+            $mail_data = ['name' => $request->name, 'email' => $request->email, 'phone' => $request->phone, 'business_name' => $request->business_name, 'business_type' => $request->business_type == 1 ? 'Venue' : 'Vendor', 'business_category' => $business_category->name, 'city' => $city->name];
 
             if (env('MAIL_STATUS') == true) {
                 Mail::to($request->email)->send(new ThanksForSignin($mail_data));

@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
-use App\Models\Location;
-use App\Models\VendorCategory;
 use App\Models\PageListingMeta;
-use App\Models\VendorListingMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 class PageController extends Controller
@@ -30,7 +27,7 @@ class PageController extends Controller
             $meta = PageListingMeta::find($meta_id);
             $parts = explode('/', $meta->slug);
             if (count($parts) > 1) {
-                $meta->type = $parts[1]; 
+                $meta->type = $parts[1];
             }
         } else {
             $page_heading = "Add Meta";
@@ -41,7 +38,8 @@ class PageController extends Controller
                 'meta_title' => '',
                 'meta_description' => '',
                 'meta_keywords' => '',
-                'caption' => ''
+                'caption' => '',
+                'type' => '',
             ]));
         }
         return view('page_listing_meta.manage_listing_meta', compact('meta', 'page_heading', 'cities'));
