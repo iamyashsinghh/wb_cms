@@ -189,6 +189,7 @@ $route = Route::currentRouteName();
                         </a>
                     </span>
                 </li>
+                @if ($auth_user->id == 5)
                 <li class="nav-item">
                     <span class="nav-link d-flex justify-content-between align-items-center {{$route == "account.list" ? 'active': ''}}">
                         <a href="{{route('account.list')}}" class="link_prop w-100">
@@ -197,6 +198,7 @@ $route = Route::currentRouteName();
                         </a>
                     </span>
                 </li>
+                @endif
             </ul>
         </nav>
     </div>
