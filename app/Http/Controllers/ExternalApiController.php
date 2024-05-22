@@ -53,9 +53,9 @@ class ExternalApiController extends Controller
 
     $venues = Venue::select('id', 'city_id', 'location_place_id')
     ->where('city_id', 1)
+    ->whereNull('place_rating')
     ->whereNotNull('location_place_id')
     ->where('location_place_id', '<>', '')
-    ->whereNull('place_rating')
     ->limit(10)
     ->get();
 
@@ -92,7 +92,7 @@ class ExternalApiController extends Controller
             $reviews = $result['result']['reviews'];
             $json_data = json_encode(['place_name' => $place_name, 'place_rating' => $place_rating, 'reviews' => $reviews], JSON_PRETTY_PRINT);
             $file_path = "$directory/{$place_id}_reviews.json";
-            file_put_contents($file_path, $json_data);
+            // file_put_contents($file_path, $json_data);
 
             $venue_id = Venue::select('id')->where('location_place_id', $place_id)->first();
             $venue_id->place_rating = $place_rating;
