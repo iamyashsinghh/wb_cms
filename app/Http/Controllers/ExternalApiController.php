@@ -90,6 +90,7 @@ private function fetchAndSaveReviews($api_key, $place_id, $directory)
 {
     $api_url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$place_id&fields=name,rating,reviews&key=$api_key";
     $response = \Http::get($api_url);
+    Log::info($api_url);
 
     if ($response->successful()) {
         $result = $response->json();
