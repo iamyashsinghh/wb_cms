@@ -55,6 +55,8 @@ class ExternalApiController extends Controller
         ->where('city_id', 1)
         ->whereNotNull('location_place_id')
         ->where('location_place_id', '<>', '')
+        ->whereNull('place_rating')
+        ->limit(10)
         ->get();
 
     foreach ($venues as $venue) {
