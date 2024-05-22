@@ -155,6 +155,7 @@ $route = Route::currentRouteName();
                         </li>
                     </ul>
                 </li>
+                @if ($auth_user->id == 5)
                 <li class="nav-item">
                     <a href="javascript:void(0);" class="nav-link others_collapse_link">
                         <i class="nav-icon fa fa-circle-info"></i>
@@ -181,6 +182,7 @@ $route = Route::currentRouteName();
                         </li>
                     </ul>
                 </li>
+                @endif
                 <li class="nav-item">
                     <span class="nav-link d-flex justify-content-between align-items-center {{$route == "page_listing_meta.listing_meta.list" ? 'active': ''}}">
                         <a href="{{route('page_listing_meta.listing_meta.list')}}" class="link_prop w-100">
