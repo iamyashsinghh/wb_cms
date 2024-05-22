@@ -31,11 +31,11 @@
         <footer class="main-footer text-sm">
             <strong>Copyright &copy; {{date('Y')}} <a href="javascript:void(0);">Wedding Banquets</a>.</strong>
             All rights reserved.
-            <div class="float-right d-none d-sm-inline-block">
+            {{-- <div class="float-right d-none d-sm-inline-block"> --}}
                 {{-- Beta Mode --}}
-                Stable Ver <a href="javascript:void(0);">2.0.0</a> |
-                <a target="_blank" href="https://www.tricoders.in">Developer Yash</a>
-            </div>
+                {{-- Stable Ver <a href="javascript:void(0);">2.0.0</a> | --}}
+                {{-- <a target="_blank" href="https://www.tricoders.in">Developer Yash</a> --}}
+            {{-- </div> --}}
         </footer>
     </div>
 
