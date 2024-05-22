@@ -365,12 +365,14 @@ class ApiController extends Controller
                 $data['similar_packages'] = $similar_packages;
                 $tag = "venue";
                 $city = City::where('id', $venue->city_id)->first();
+                $reviews = Review::where('product_id', $venue->id)->get();
             } else {
                 $vendor = Vendor::where('slug', $slug)->first();
                 $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(",", trim($vendor->similar_vendor_ids)))->get();
                 $data['vendor'] = $vendor;
                 $data['similar_vendors'] = $similar_vendors;
                 $tag = "vendor";
+                $reviews = '';
                 $city = City::where('id', $vendor->city_id)->first();
             }
 
@@ -379,6 +381,7 @@ class ApiController extends Controller
                 'tag' => $tag,
                 'data' => $data,
                 'city' => $city,
+                'reviews' => $reviews,
                 'message' => 'Data fetched succesfully',
             ];
         } catch (\Throwable $th) {
