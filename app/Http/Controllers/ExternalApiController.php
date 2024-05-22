@@ -52,12 +52,12 @@ class ExternalApiController extends Controller
     $success = true;
 
     $venues = Venue::select('id', 'city_id', 'location_place_id')
-        ->where('city_id', 1)
-        ->whereNotNull('location_place_id')
-        ->where('location_place_id', '<>', '')
-        ->whereNull('place_rating')
-        ->limit(10)
-        ->get();
+    ->where('city_id', 1)
+    ->whereNotNull('location_place_id')
+    ->where('location_place_id', '<>', '')
+    ->whereNull('place_rating')
+    ->limit(10)
+    ->get();
 
     foreach ($venues as $venue) {
         $success = $success && $this->fetchAndSaveReviews($api_key, $venue->location_place_id, $directory);
