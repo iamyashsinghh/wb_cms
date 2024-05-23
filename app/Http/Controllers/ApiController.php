@@ -98,7 +98,7 @@ class ApiController extends Controller
 
     public function get_json_reviews_site($product_id)
     {
-        $yash = Review::where('product_id', $product_id)->get();
+        $yash = Review::where('product_id', $product_id)->where('status', 1)->get();
         return $yash;
     }
 
