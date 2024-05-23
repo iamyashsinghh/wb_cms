@@ -94,7 +94,7 @@ private function fetchAndSaveReviews($api_key, $place_id, $directory)
 
     if ($response->successful()) {
         $result = $response->json();
-        if($result['status'] == 'NOT_FOUND' || $result['status'] == 'INVALID_REQUEST'){
+        if($result['status'] == 'NOT_FOUND' || $result['status'] == 'INVALID_REQUEST' || $result['status'] == 'REQUEST_DENIED'){
             return true;
         }
         if ($result && $result['status'] === 'OK') {
