@@ -94,13 +94,19 @@ private function fetchAndSaveReviews($api_key, $place_id, $directory)
 
     if ($response->successful()) {
         $result = $response->json();
-        if($result['status'] == 'NOT_FOUND' || $result['status'] == 'INVALID_REQUEST' || $result['status'] == 'REQUEST_DENIED'){
+        if ($result['status'] == 'NOT_FOUND' || $result['status'] == 'INVALID_REQUEST' || $result['status'] == 'REQUEST_DENIED') {
             return true;
         }
         if ($result && $result['status'] === 'OK') {
             $place_name = $result['result']['name'];
-            $place_rating = $result['result']['rating'];
-            $reviews = $result['result']['reviews'];
+            $place_rating = $result['result']['rating'] ?? null; // Use null coalescing operator
+            $reviews = $result['result']['reviews'] ?? null; // Use null coalescing operator
+
+            if ($place_rating === null || $reviews === null) {
+                Log::info('Rating or reviews not present for place_id: ' . $place_id);
+                return true;
+            }
+
             $json_data = json_encode(['place_name' => $place_name, 'place_rating' => $place_rating, 'reviews' => $reviews], JSON_PRETTY_PRINT);
             $file_path = "$directory/{$place_id}_reviews.json";
             if (file_put_contents($file_path, $json_data) === false) {
@@ -137,5 +143,6 @@ private function fetchAndSaveReviews($api_key, $place_id, $directory)
     }
     return false;
 }
+
 
 }
