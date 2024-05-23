@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Review;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers;
 
@@ -33,6 +34,26 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('get_all_vendors', 'get_all_vendors');
     Route::get('venues_vendor_page_data/{city?}/{type?}', 'venues_vendor_page_data');
 
+
+    Route::get('delete_review', function() {
+        $productIds = Review::select('product_id')
+            ->groupBy('product_id')dnsjdn
+            ->havingRaw('COUNT(*) > 5')
+            ->pluck('product_id');
+
+        foreach ($productIds as $productId) {
+            $reviewsToDelete = Review::where('product_id', $productId)
+                ->orderBy('created_at', 'asc')
+                ->skip(5)
+                ->take(PHP_INT_MAX)
+                ->pluck('id');
+
+            Review::whereIn('id', $reviewsToDelete)->delete();
+        }
+
+        return 'Reviews deleted successfully, leaving the first 5 for each product_id.';
+    });
+
     //For Web Analytcs
     Route::post('click_conversion_handle', 'click_conversion_handle');
 
@@ -63,6 +84,8 @@ Route::controller(Controllers\ApiController::class)->group(function () {
 
     // Route::get('shadab_links', 'shadab_links');
 });
+
+
 
 // Routes for migrate & refactor database.
 // Route::get('/get_common_faqs', [RefactorController::class, 'get_common_faqs']);
