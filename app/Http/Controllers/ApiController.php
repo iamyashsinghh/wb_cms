@@ -158,7 +158,7 @@ class ApiController extends Controller
                 'data' => $data,
                 'message' => 'Data fetched succesfully',
             ];
-        }else{
+        } else {
             $response = [
                 'success' => false,
                 'data' => [],
@@ -184,9 +184,14 @@ class ApiController extends Controller
                 'max_capacity',
                 'veg_price',
                 'nonveg_price',
-                'wb_assured'
-            )->where(['venues.city_id' => $city_id, 'venues.popular' => true])->whereRaw("find_in_set($category_id, venue_category_ids)")->limit(10)->get();
-
+                'wb_assured',
+                'place_rating',
+                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.venue_id = venues.id), 158) as reviews_count')
+            )
+                ->where(['venues.city_id' => $city_id, 'venues.popular' => true])
+                ->whereRaw("FIND_IN_SET(?, venue_category_ids)", [$category_id])
+                ->limit(10)
+                ->get();
             $response = [
                 'success' => true,
                 'data' => $popular_venues,
