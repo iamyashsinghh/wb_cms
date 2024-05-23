@@ -37,7 +37,7 @@ Route::controller(Controllers\ApiController::class)->group(function () {
 
     Route::get('delete_review', function() {
         $productIds = Review::select('product_id')
-            ->groupBy('product_id')dnsjdn
+            ->groupBy('product_id')
             ->havingRaw('COUNT(*) > 5')
             ->pluck('product_id');
 
