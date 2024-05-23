@@ -61,10 +61,10 @@ class ExternalApiController extends Controller
         ->where('city_id', 1)
         ->whereNull('place_rating')
         ->whereNotNull('location_place_id')
-        ->where('location_place_id', '<>', '')
         ->limit(10)
         ->get();
-
+        Log::info($venues);
+        
     foreach ($venues as $venue) {
         Log::info('Fetching reviews for venue ID: ' . $venue->id);
         $success = $success && $this->fetchAndSaveReviews($api_key, $venue->location_place_id, $directory);
