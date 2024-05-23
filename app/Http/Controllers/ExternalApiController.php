@@ -46,28 +46,26 @@ class ExternalApiController extends Controller
     ]);
 
     $api_key = $request->input('place_id_api_key');
-    $directory = storage_path('app/public/uploads/all_reviews');
 
-    if (!file_exists($directory)) {
-        if (!mkdir($directory, 0777, true)) {
-            Log::error('Failed to create directory: ' . $directory);
-            return redirect()->route('api.maps_review')->with('error', 'Failed to create directory.');
-        }
-    }
-
-    $success = true;
-
-    $venues = Venue::select('id', 'city_id', 'location_place_id')
+    $venues = Venue::select('id', 'city_id', 'location_place_id', 'place_rating')
         ->where('city_id', 1)
         ->whereNull('place_rating')
         ->whereNotNull('location_place_id')
+        ->whereNull('review_id')
         ->limit(10)
         ->get();
-        Log::info($venues);
-        
+
+    Log::info($venues);
+
+    $success = true;
     foreach ($venues as $venue) {
         Log::info('Fetching reviews for venue ID: ' . $venue->id);
-        $success = $success && $this->fetchAndSaveReviews($api_key, $venue->location_place_id, $directory);
+        $fetchResult = $this->fetchAndSaveReviews($api_key, $venue->location_place_id, $venue->id);
+        $success = $success && $fetchResult['success'];
+
+        if (!$fetchResult['success']) {
+            Log::error('Error fetching reviews for venue ID: ' . $venue->id . ' Error: ' . $fetchResult['error']);
+        }
     }
 
     $venueCount = $venues->count();
@@ -79,45 +77,48 @@ class ExternalApiController extends Controller
         $msg = 'Reviews fetched and saved successfully.';
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
     } else {
-        $msg = 'Error fetching or saving reviews.';
+        $msg = 'Error fetching or saving some reviews.';
         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $msg]);
     }
 
     return redirect()->route('api.maps_review')->with('success', 'Data submitted successfully.');
 }
 
-private function fetchAndSaveReviews($api_key, $place_id, $directory)
+private function fetchAndSaveReviews($api_key, $place_id, $venue_id)
 {
+    $venue = Venue::find($venue_id);
+            if ($venue) {
+                $venue->review_id = '1';
+                $venue->save();
+            }
     $api_url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$place_id&fields=name,rating,reviews&key=$api_key";
     $response = \Http::get($api_url);
+
     Log::info($api_url);
 
     if ($response->successful()) {
         $result = $response->json();
-        if ($result['status'] == 'NOT_FOUND' || $result['status'] == 'INVALID_REQUEST' || $result['status'] == 'REQUEST_DENIED') {
-            return true;
+
+        if (in_array($result['status'], ['NOT_FOUND', 'INVALID_REQUEST', 'REQUEST_DENIED'])) {
+            return ['success' => true, 'error' => ''];
         }
-        if ($result && $result['status'] === 'OK') {
+
+        if ($result['status'] === 'OK') {
             $place_name = $result['result']['name'];
-            $place_rating = $result['result']['rating'] ?? null; // Use null coalescing operator
-            $reviews = $result['result']['reviews'] ?? null; // Use null coalescing operator
+            $place_rating = $result['result']['rating'] ?? null;
+            $reviews = $result['result']['reviews'] ?? null;
 
             if ($place_rating === null || $reviews === null) {
                 Log::info('Rating or reviews not present for place_id: ' . $place_id);
-                return true;
+                return ['success' => true, 'error' => ''];
             }
 
-            $json_data = json_encode(['place_name' => $place_name, 'place_rating' => $place_rating, 'reviews' => $reviews], JSON_PRETTY_PRINT);
-            $file_path = "$directory/{$place_id}_reviews.json";
-            if (file_put_contents($file_path, $json_data) === false) {
-                Log::error('Failed to write file: ' . $file_path);
-                return false;
-            }
-
-            $venue = Venue::where('location_place_id', $place_id)->first();
+            $venue = Venue::find($venue_id);
             if ($venue) {
                 $venue->place_rating = $place_rating;
+                $venue->review_id = '1';
                 $venue->save();
+
 
                 foreach ($reviews as $review_data) {
                     $review = new Review();
@@ -131,18 +132,22 @@ private function fetchAndSaveReviews($api_key, $place_id, $directory)
                     $review->is_read = '1';
                     $review->save();
                 }
-                return true;
+                return ['success' => true, 'error' => ''];
             } else {
-                Log::error('Venue not found for place_id: ' . $place_id);
+                Log::error('Venue not found for venue_id: ' . $venue_id);
+                return ['success' => false, 'error' => 'Venue not found'];
             }
         } else {
             Log::error('API response status not OK: ' . $result['status']);
+            return ['success' => false, 'error' => 'API response status not OK'];
         }
     } else {
         Log::error('Failed API request: ' . $response->body());
+        return ['success' => false, 'error' => 'Failed API request'];
     }
-    return false;
 }
+
+
 
 
 }

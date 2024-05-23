@@ -39,6 +39,24 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('superb', function() {
         return Venue::select('id', 'name')->whereNull('place_rating')->where('city_id', 1)->count();
     });
+    Route::get('delete_review', function() {
+        $productIds = Review::select('product_id')
+            ->groupBy('product_id')
+            ->havingRaw('COUNT(*) > 5')
+            ->pluck('product_id');
+
+        foreach ($productIds as $productId) {
+            $reviewsToDelete = Review::where('product_id', $productId)
+                ->orderBy('created_at', 'asc')
+                ->skip(5)
+                ->take(PHP_INT_MAX)
+                ->pluck('id');
+
+            Review::whereIn('id', $reviewsToDelete)->delete();
+        }
+
+        return 'Reviews deleted successfully, leaving the first 5 for each product_id.';
+    });
 
     //For Web Analytcs
     Route::post('click_conversion_handle', 'click_conversion_handle');
