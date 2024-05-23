@@ -271,7 +271,9 @@ class ApiController extends Controller
                     'venues.min_capacity',
                     'venues.max_capacity',
                     'venues.popular',
-                    'venues.wb_assured'
+                    'venues.wb_assured',
+                    'venues.place_rating',
+                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count')
                 )->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
                 if ($location != null && $location->is_group == true) {
