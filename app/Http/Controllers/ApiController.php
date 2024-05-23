@@ -186,7 +186,7 @@ class ApiController extends Controller
                 'nonveg_price',
                 'wb_assured',
                 'place_rating',
-                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.venue_id = venues.id), 158) as reviews_count')
+                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count')
             )
                 ->where(['venues.city_id' => $city_id, 'venues.popular' => true])
                 ->whereRaw("FIND_IN_SET(?, venue_category_ids)", [$category_id])
