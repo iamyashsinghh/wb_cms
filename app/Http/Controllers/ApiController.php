@@ -367,7 +367,7 @@ class ApiController extends Controller
             $data = [];
             $venue = Venue::where('slug', $slug)->first();
             if ($venue) {
-                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(",", $venue->similar_venue_ids))->get();
+                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured', 'place_rating', 'reviews_count')->whereIn('id', explode(",", $venue->similar_venue_ids))->get();
                 $data['venue'] = $venue;
                 $data['similar_packages'] = $similar_packages;
                 $tag = "venue";
