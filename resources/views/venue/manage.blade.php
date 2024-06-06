@@ -289,10 +289,16 @@
                                     <textarea class="form-control" id="" placeholder="Enter map iframe" name="location_map" rows="5">{{$venue->location_map}}</textarea>
                                 </div>
                             </div>
-                            <div class="col-sm-12 mb-3">
+                            <div class="col-sm-6 mb-3">
                                 <div class="form-group">
                                     <label for="" class="">Location Place Id</label>
                                     <input class="form-control" id="" placeholder="Enter Place Id" name="location_place_id" value="{{$venue->location_place_id}}">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="form-group">
+                                    <label for="" class="">Review</label>
+                                    <input class="form-control" id="" placeholder="Enter Average Review" name="place_rating" value="{{$venue->place_rating}}">
                                 </div>
                             </div>
                             <div class="col-sm-12 mb-3" id="area_capacity_container">

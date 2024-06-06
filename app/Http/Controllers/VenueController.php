@@ -90,6 +90,7 @@ class VenueController extends Controller {
                 'end_time_morning' => '',
                 'start_time_evening' => '',
                 'end_time_evening' => '',
+                'place_rating'=> '',
                 'area_capacity' => '{}',
             ]));
         }
@@ -179,6 +180,7 @@ class VenueController extends Controller {
         $venue->tax_charges = $request->tax_charges;
         $venue->alcohol = $request->alcohol;
         $venue->food = $request->food;
+        $venue->place_rating = $request->place_rating;
         $venue->decoration = $request->decoration;
         $venue->location_map = $request->location_map;
         $venue->location_place_id = $request->location_place_id;
