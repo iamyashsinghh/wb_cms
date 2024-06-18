@@ -8,8 +8,8 @@ use App\Mail\VerificationMail;
 use App\Models\Budget;
 use App\Models\BusinessUser;
 use App\Models\City;
-use App\Models\C_Number;
 use App\Models\Location;
+use App\Models\PageListingMeta;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\UserSignupRequest;
@@ -21,7 +21,6 @@ use App\Models\Venue;
 use App\Models\VenueCategory;
 use App\Models\VenueListingMeta;
 use App\Models\VenueUserContent;
-use App\Models\PageListingMeta;
 use App\Models\WebAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,24 +46,32 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
+
         return $response;
     }
 
     public function get_all_venues()
     {
-        $venues = Venue::select('id', 'name', 'slug', 'city_id', 'location_id', 'images')->get();
-        // $venues = Venue::get();
+        $venues = Venue::select('venues.id', 'venues.name', 'venues.slug', 'venues.city_id', 'venues.location_id', 'venues.images', 'cities.slug as city_slug')
+            ->join('cities', 'venues.city_id', '=', 'cities.id')
+            ->get();
+
         return $venues;
     }
+
     public function get_all_vendors()
     {
-        $vendors = Vendor::all();
+        $vendors = Vendor::select('vendors.*', 'cities.slug as city_slug')
+            ->join('cities', 'vendors.city_id', '=', 'cities.id')
+            ->get();
+
         return $vendors;
     }
 
     public function budgets()
     {
         $budgets = Budget::select('id', 'name', 'min', 'max')->get();
+
         return response()->json(['success' => true, 'data' => $budgets, 'message' => 'Data fetched successfully.']);
     }
 
@@ -86,30 +93,35 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
+
         return $response;
     }
 
-
     public function get_json_reviews($place_id)
     {
-        $yash = Storage::get('public/uploads/all_reviews/' . $place_id . '_reviews.json');
+        $yash = Storage::get('public/uploads/all_reviews/'.$place_id.'_reviews.json');
+
         return $yash;
     }
 
     public function get_json_reviews_site($product_id)
     {
         $yash = Review::where('product_id', $product_id)->where('status', 1)->get();
+
         return $yash;
     }
 
     public function search_form_result_venue()
     {
         $venue = Venue::Select('id', 'name', 'slug')->get();
+
         return $venue;
     }
+
     public function search_form_result_vendor()
     {
         $vendor = Vendor::Select('id', 'brand_name', 'slug')->get();
+
         return $vendor;
     }
 
@@ -164,6 +176,7 @@ class ApiController extends Controller
                 'data' => [],
             ];
         }
+
         return $response;
     }
 
@@ -189,7 +202,7 @@ class ApiController extends Controller
                 DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count')
             )
                 ->where(['venues.city_id' => $city_id, 'venues.popular' => true])
-                ->whereRaw("FIND_IN_SET(?, venue_category_ids)", [$category_id])
+                ->whereRaw('FIND_IN_SET(?, venue_category_ids)', [$category_id])
                 ->limit(10)
                 ->get();
             $response = [
@@ -204,10 +217,11 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
+
         return $response;
     }
 
-    public function home_page(string $city_slug = "delhi")
+    public function home_page(string $city_slug = 'delhi')
     {
         try {
             $cities = $this->cities()['data'];
@@ -228,9 +242,9 @@ class ApiController extends Controller
                     '(select for_image.guid from wp_posts as for_image where for_image.post_parent = wp_posts.ID and for_image.post_type = "attachment" limit 1) as post_thumbnail'
                 ),
             )->where([
-                        'wp_posts.post_type' => 'post',
-                        'wp_posts.post_status' => 'publish',
-                    ])->orderBy('wp_posts.ID', 'desc')->limit(3)->get();
+                'wp_posts.post_type' => 'post',
+                'wp_posts.post_status' => 'publish',
+            ])->orderBy('wp_posts.ID', 'desc')->limit(3)->get();
 
             $data = compact('cities', 'venue_categories', 'vendor_categories', 'popular_venues', 'blogs');
             $response = [
@@ -245,10 +259,11 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
+
         return $response;
     }
 
-    public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = "all", int $page_no = 1)
+    public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
     {
         try {
             $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
@@ -282,40 +297,40 @@ class ApiController extends Controller
                 )->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
                 if ($location != null && $location->is_group == true) {
-                    $data->whereIn('venues.location_id', explode(",", $location->locality_ids));
+                    $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
                 }
 
-                if ($location_slug != "all" && $location->is_group == false) {
+                if ($location_slug != 'all' && $location->is_group == false) {
                     $data->where('venues.location_id', $location->id);
                 }
                 $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
-                $tag = "venues";
+                $tag = 'venues';
 
                 if ($request->guest) {
-                    $params = explode(",", $request->guest);
+                    $params = explode(',', $request->guest);
                     $data->whereBetween('max_capacity', [$params[0], $params[1]]);
                 }
                 if ($request->per_plate) {
-                    $params = explode(",", $request->per_plate);
+                    $params = explode(',', $request->per_plate);
                     $data->whereBetween('veg_price', [$params[0], $params[1]]);
                 }
                 if ($request->per_budget) {
-                    $params = explode(",", $request->per_budget);
+                    $params = explode(',', $request->per_budget);
                     $data->join('budgets', 'budgets.id', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
                 }
                 if ($request->multi_localities) {
-                    $group_locations = Location::whereIn('id', explode(",", $request->multi_localities))->where('is_group', 1)->get();
+                    $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
 
                     $arr = $request->multi_localities;
                     foreach ($group_locations as $list) {
-                        $arr .= "," . $list->locality_ids;
+                        $arr .= ','.$list->locality_ids;
                     }
-                    $params = explode(",", $arr);
+                    $params = explode(',', $arr);
 
                     $data->whereIn('location_id', array_unique($params));
                 }
                 if ($request->food_type) {
-                    $food_type = $request->food_type . "_price";
+                    $food_type = $request->food_type.'_price';
                     $data->whereNotNull($food_type);
                 }
 
@@ -334,10 +349,10 @@ class ApiController extends Controller
                 )->join('cities', 'cities.id', 'vendors.city_id')
                     ->join('locations', 'locations.id', 'vendors.location_id')
                     ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
-                if ($location_slug != "all") {
+                if ($location_slug != 'all') {
                     $data->where('locations.slug', "$location_slug");
                 }
-                $tag = "vendors";
+                $tag = 'vendors';
                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
             }
 
@@ -367,18 +382,18 @@ class ApiController extends Controller
             $data = [];
             $venue = Venue::where('slug', $slug)->first();
             if ($venue) {
-                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(",", $venue->similar_venue_ids))->get();
+                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(',', $venue->similar_venue_ids))->get();
                 $data['venue'] = $venue;
                 $data['similar_packages'] = $similar_packages;
-                $tag = "venue";
+                $tag = 'venue';
                 $city = City::where('id', $venue->city_id)->first();
                 $reviews = Review::where('product_id', $venue->id)->get();
             } else {
                 $vendor = Vendor::where('slug', $slug)->first();
-                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(",", trim($vendor->similar_vendor_ids)))->get();
+                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))->get();
                 $data['vendor'] = $vendor;
                 $data['similar_vendors'] = $similar_vendors;
-                $tag = "vendor";
+                $tag = 'vendor';
                 $reviews = '';
                 $city = City::where('id', $vendor->city_id)->first();
             }
@@ -411,7 +426,7 @@ class ApiController extends Controller
                 'name' => 'required|string|max:255',
                 'business_name' => 'required|string|max:255',
                 'business_type' => 'required|int|min:1|max:2',
-                'business_category' => 'required|' . $is_valid_business_category,
+                'business_category' => 'required|'.$is_valid_business_category,
                 'email' => 'required|email|unique:business_users,email',
                 'phone' => 'required|int|unique:business_users,phone|min_digits:10|max_digits:10',
                 'city' => 'required|exists:cities,slug',
@@ -426,7 +441,7 @@ class ApiController extends Controller
             } else {
                 $business_category = VendorCategory::where('slug', $request->business_category)->first();
             }
-            if (!$city || !$business_category) {
+            if (! $city || ! $business_category) {
                 return response()->json(['success' => false, 'message' => 'Something went wrong.']);
             }
 
@@ -445,8 +460,9 @@ class ApiController extends Controller
 
             if (env('MAIL_STATUS') == true) {
                 Mail::to($request->email)->send(new ThanksForSignin($mail_data));
-                Mail::to(env('WB_TEAM_EMAIL'))->cc(explode(",", env('WB_TEAM_CC')))->send(new NotifyReceivedUser($mail_data));
+                Mail::to(env('WB_TEAM_EMAIL'))->cc(explode(',', env('WB_TEAM_CC')))->send(new NotifyReceivedUser($mail_data));
             }
+
             return response()->json(['success' => true, 'message' => 'Thanks for signup, your profile is in under review. Our customer executive will contact you shortly.']);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => 'Something went wrong.', 'err' => $th->getMessage()]);
@@ -470,7 +486,7 @@ class ApiController extends Controller
                 if (env('INTERAKT_STATUS') == true) {
                     if (strlen($business_user->business_name) > 15) {
                         $str = str_split($business_user->business_name, 13);
-                        $business_name = $str[0] . "..";
+                        $business_name = $str[0].'..';
                     } else {
                         $business_name = $business_user->business_name;
                     }
@@ -509,6 +525,7 @@ class ApiController extends Controller
             $business_user->otp_code = null;
             $business_user->remember_token = $token;
             $business_user->save();
+
             return response()->json(['success' => true, 'token' => $token]);
         } catch (\Throwable $th) {
             return response()->json(['success' => true, 'message' => 'Something went wrong.', 'error' => $th->getMessage()]);
@@ -518,7 +535,7 @@ class ApiController extends Controller
     public function update_business_user_content(Request $request)
     {
         $user = BusinessUser::where('remember_token', $request->header('bearer'))->first();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'message' => 'Invalid request!']);
         }
 
@@ -541,7 +558,7 @@ class ApiController extends Controller
             }
 
             $content_model = $user->getVenueContent;
-            if (!$content_model) {
+            if (! $content_model) {
                 $content_model = new VenueUserContent();
                 $content_model->venue_id = $user->migrated_business_id;
             }
@@ -554,10 +571,10 @@ class ApiController extends Controller
             $content_model->nonveg_price = $request->nonveg_price;
             $content_model->budget_id = $request->budget_id;
             $content_model->venue_category_ids = $request->business_category;
-            $content_model->start_time_morning = $request->start_time_morning != "null" ? $request->start_time_morning : '';
-            $content_model->end_time_morning = $request->end_time_morning != "null" ? $request->end_time_morning : '';
-            $content_model->start_time_evening = $request->start_time_evening != "null" ? $request->start_time_evening : '';
-            $content_model->end_time_evening = $request->end_time_evening != "null" ? $request->end_time_evening : '';
+            $content_model->start_time_morning = $request->start_time_morning != 'null' ? $request->start_time_morning : '';
+            $content_model->end_time_morning = $request->end_time_morning != 'null' ? $request->end_time_morning : '';
+            $content_model->start_time_evening = $request->start_time_evening != 'null' ? $request->start_time_evening : '';
+            $content_model->end_time_evening = $request->end_time_evening != 'null' ? $request->end_time_evening : '';
             $content_model->area_capacity = $request->area_capacity;
         } else {
             $is_validate_yrs_exp = $request->yrs_exp != 0 ? 'required|int|max_digits:6' : '';
@@ -580,7 +597,7 @@ class ApiController extends Controller
             }
 
             $content_model = $user->getVendorContent;
-            if (!$content_model) {
+            if (! $content_model) {
                 $content_model = new VendorUserContent();
                 $content_model->vendor_id = $user->migrated_business_id;
             }
@@ -602,23 +619,24 @@ class ApiController extends Controller
             $content_model->city_id = $city_id;
             $content_model->location_id = $location_id;
 
-            $images_arr = $content_model->images ? explode(",", $content_model->images) : [];
+            $images_arr = $content_model->images ? explode(',', $content_model->images) : [];
             if (is_array($request->images)) {
                 $image_file_tag = $user->business_type == 1 ? 'venue_' : 'vendor_';
                 foreach ($request->images as $key => $image) {
                     $ext = $image->getClientOriginalExtension();
                     $sub_str = substr($request->business_name, 0, 5);
-                    $file_name = $image_file_tag . strtolower(str_replace(' ', '_', $sub_str)) . "_" . time() + $key . "." . $ext;
+                    $file_name = $image_file_tag.strtolower(str_replace(' ', '_', $sub_str)).'_'.time() + $key.'.'.$ext;
                     $path = "uploads/$file_name";
-                    Storage::put("public/" . $path, file_get_contents($image));
+                    Storage::put('public/'.$path, file_get_contents($image));
                     array_push($images_arr, $file_name);
                 }
-                $content_model->images = implode(",", $images_arr);
+                $content_model->images = implode(',', $images_arr);
                 $user->images_status = 1; // 1=pending;
             }
             $content_model->save();
             $user->content_status = 1; // 1=pending;
             $user->save();
+
             return response()->json(['success' => true, 'message' => 'content updated.', 'data' => $this->fetch_business_user_and_content($request)->original['data']['content']]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => 'Someting went wrong.', 'error' => $th->getMessage()]);
@@ -709,9 +727,9 @@ class ApiController extends Controller
             $user = BusinessUser::where('remember_token', $request->header('bearer'))->first();
             $exist_with_phone = BusinessUser::where('phone', $request->phone)->whereNot('id', $user->id)->get();
             $exist_with_email = BusinessUser::where('email', $request->email)->whereNot('id', $user->id)->get();
-            if (sizeof($exist_with_phone) > 0) {
+            if (count($exist_with_phone) > 0) {
                 return response()->json(['success' => false, 'message' => 'invalid phone number.']);
-            } elseif (sizeof($exist_with_email) > 0) {
+            } elseif (count($exist_with_email) > 0) {
                 return response()->json(['success' => false, 'message' => 'invalid email.']);
             }
             $city_id = City::where('slug', $request->city)->first()->id;
@@ -737,6 +755,7 @@ class ApiController extends Controller
                 'business_users.images_status',
                 'business_users.migrated_business_id',
             )->join('cities', 'cities.id', 'business_users.city_id')->where('remember_token', $request->header('bearer'))->first();
+
             return response()->json(['success' => true, 'message' => 'User updated!', 'data' => $data]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'log' => 'th']);
@@ -760,7 +779,7 @@ class ApiController extends Controller
             $verification_code = rand(111111, 999999);
 
             $signup_request = UserSignupRequest::where('phone', $request->phone)->first();
-            if (!$signup_request) {
+            if (! $signup_request) {
                 $signup_request = new UserSignupRequest();
             }
             $signup_request->phone = $request->phone;
@@ -806,7 +825,7 @@ class ApiController extends Controller
         }
         try {
             $signup_request = UserSignupRequest::where('phone', $request->phone)->first();
-            if (!$signup_request || ($signup_request->otp_code != $request->otp_code)) {
+            if (! $signup_request || ($signup_request->otp_code != $request->otp_code)) {
                 return response()->json(['success' => false, 'message' => 'Invalid credentials.']);
             }
 
@@ -830,7 +849,8 @@ class ApiController extends Controller
 
             $signup_request->delete();
 
-            $res_user = ["name" => $user->name, 'city' => $user->get_city->slug, 'location' => $user->get_location->slug, 'venues_liked' => $user->venues_liked];
+            $res_user = ['name' => $user->name, 'city' => $user->get_city->slug, 'location' => $user->get_location->slug, 'venues_liked' => $user->venues_liked];
+
             return response()->json(['success' => true, 'token' => $token, 'user' => $res_user]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => 'Something went wrong.', 'error' => $th->getMessage()]);
@@ -849,7 +869,7 @@ class ApiController extends Controller
         }
 
         $user = User::where('email', $request->username)->orWhere('phone', $request->username)->first();
-        if (!$user || !password_verify($request->password, $user->password) || $user->phone_verified_at == null) {
+        if (! $user || ! password_verify($request->password, $user->password) || $user->phone_verified_at == null) {
             return response()->json(['success' => false, 'message' => 'Invalid credentials.']);
         }
 
@@ -857,7 +877,8 @@ class ApiController extends Controller
         $user->remember_token = $token;
         $user->save();
 
-        $res_user = ["name" => $user->name, 'city' => $user->get_city->slug, 'location' => $user->get_location->slug, 'venues_liked' => $user->venues_liked];
+        $res_user = ['name' => $user->name, 'city' => $user->get_city->slug, 'location' => $user->get_location->slug, 'venues_liked' => $user->venues_liked];
+
         return response()->json(['success' => true, 'token' => $token, 'user' => $res_user]);
     }
 
@@ -872,7 +893,7 @@ class ApiController extends Controller
             'users.venues_liked',
         )->join('cities', 'cities.id', 'users.city_id')
             ->where('users.remember_token', $request->header('bearer'))->first();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'message' => 'Invalid request.']);
         }
         $venues_liked = Venue::select(
@@ -886,7 +907,7 @@ class ApiController extends Controller
             'max_capacity',
             'veg_price',
             'nonveg_price'
-        )->whereIn('id', explode(",", $user->venues_liked))->get();
+        )->whereIn('id', explode(',', $user->venues_liked))->get();
 
         $user->venues_liked = $venues_liked;
 
@@ -897,7 +918,7 @@ class ApiController extends Controller
     {
         try {
             $user = User::where('remember_token', $request->header('bearer'))->first();
-            $liked_arr = $user->venues_liked != null ? explode(",", $user->venues_liked) : [];
+            $liked_arr = $user->venues_liked != null ? explode(',', $user->venues_liked) : [];
             $index = array_search($venue_id, $liked_arr);
             if ($index === false) {
                 array_push($liked_arr, $venue_id);
@@ -905,8 +926,8 @@ class ApiController extends Controller
                 unset($liked_arr[$index]);
             }
 
-            if (sizeof($liked_arr) > 0) {
-                $user->venues_liked = implode(",", $liked_arr);
+            if (count($liked_arr) > 0) {
+                $user->venues_liked = implode(',', $liked_arr);
                 $user->save();
             }
 
@@ -960,11 +981,10 @@ class ApiController extends Controller
                 'status' => 0,
                 'is_read' => 0,
             ]);
+
             return response()->json(['message' => 'Review saved successfully'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to save review'], 500);
         }
     }
-
-
 }

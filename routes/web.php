@@ -3,7 +3,9 @@
 use App\Http\Controllers;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ExternalApiController;
+use App\Http\Controllers\FroalaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -210,6 +212,34 @@ Route::group(['middleware' => 'admin'], function () {
             Route::post('/manage_process/{c_num_id}', 'manage_process')->name('c_num.manage_process');
             // delete c_num
             Route::delete('/destroy/{id}', 'destroy')->name('c_num.destroy');
+        });
+    });
+    // blog
+    Route::prefix('blog')->group(function () {
+        Route::controller(Controllers\BlogController::class)->group(function () {
+            Route::get('/list', 'list')->name('blog.list');
+            Route::get('/ajax_list', 'ajax_list')->name('blog.ajax_list');
+
+            Route::get('/manage/{blog_id?}', 'manage')->name('blog.manage');
+            Route::post('/manage_process/{blog_id?}', 'manage_process')->name('blog.manage_process');
+            Route::get('/update_blog_status/{blog_id?}/{status?}', 'update_blog_status')->name('blog.status');
+
+            // delete blog
+            Route::delete('/destroy/{id}', 'destroy')->name('blog.destroy');
+        });
+
+        Route::post('froala/upload_image', [FroalaController::class, 'uploadImage'])->name('froala.upload_image');
+        Route::post('froala/upload_video', [FroalaController::class, 'uploadVideo'])->name('froala.upload_video');
+        Route::get('froala/load_images', [FroalaController::class, 'loadImages'])->name('froala.load_images');
+        Route::post('froala/delete_image', [FroalaController::class, 'deleteImage'])->name('froala.delete_image');
+
+        Route::prefix('authors')->group(function () {
+            Route::get('/', [AuthorController::class, 'index'])->name('author.list');
+            Route::get('/create', [AuthorController::class, 'create'])->name('author.create');
+            Route::post('/store', [AuthorController::class, 'store'])->name('author.store');
+            Route::get('/edit/{id}', [AuthorController::class, 'edit'])->name('author.edit');
+            Route::post('/update/{id}', [AuthorController::class, 'update'])->name('author.update');
+            Route::get('/delete/{id}', [AuthorController::class, 'delete'])->name('author.delete');
         });
     });
 

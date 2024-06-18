@@ -91,6 +91,18 @@ $route = Route::currentRouteName();
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <a href="{{route('blog.list')}}" class="nav-link {{$route == "blog.list" ? 'active' : ''}}">
+                        <i class="fas fa-icons nav-icon"></i>
+                        <p>Blog</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('author.list')}}" class="nav-link {{$route == "author.list" ? 'active' : ''}}">
+                        <i class="fas fa-icons nav-icon"></i>
+                        <p>Author</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{route('review.list')}}" class="nav-link {{$route == "review.list" ? 'active' : ''}}">
                         <i class="fas fa-icons nav-icon"></i>
                         <p>Review</p>

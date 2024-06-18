@@ -227,10 +227,7 @@ class VenueController extends Controller {
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
         return redirect()->route('venue.list');
-        // } catch (\Throwable $th) {
-        //     session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $th->getMessage()]);
-        //     return redirect()->back();
-        // }
+
     }
     public function update_status($venue_id, $status) {
         try {
