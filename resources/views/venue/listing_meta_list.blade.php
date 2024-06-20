@@ -46,6 +46,7 @@
         placeholder: 'Type here content',
         tabsize: 2,
     });
+    
      $(document).ready(function() {
         $('#serverTable').DataTable({
             pageLength: 10,
@@ -167,8 +168,6 @@
                 </div>`;
                 updateFaqModal.querySelector('#faq_modal_body').innerHTML = faqElem;
             }
-            
-
             modal.show();
         })
     }
