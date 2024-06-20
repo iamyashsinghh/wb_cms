@@ -546,14 +546,14 @@
             function updateSlug() {
                 const locality = localitySelect.options[localitySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
                 const city = citySelect.options[citySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
-                const newSlug = `${str}-${locality}-${city}`.replaceAll(" ", "-").toLowerCase();
+                const newSlug = `${str}-${locality}`.replaceAll(" ", "-").toLowerCase();
                 const fixedSlug= newSlug.toLowerCase()
                 .replace(/[^a-z0-9\s-]/g, '')
                 .trim()
                 .replace(/\s+/g, '-')
                 document.getElementById('slug_inp').value = fixedSlug;
             }
-
+            
             localitySelect.addEventListener('change', updateSlug);
             citySelect.addEventListener('change', updateSlug);
 
