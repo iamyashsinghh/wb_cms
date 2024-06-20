@@ -540,27 +540,29 @@
         }
 
         function generate_slug(str) {
-    const localitySelect = document.querySelector('select[name="location"]');
-    const citySelect = document.querySelector('select[name="city"]');
+            const localitySelect = document.querySelector('select[name="location"]');
+            const citySelect = document.querySelector('select[name="city"]');
 
-    function updateSlug() {
-        const locality = localitySelect.options[localitySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
-        const city = citySelect.options[citySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
-        const newSlug = `${str}-${locality}-${city}`.replaceAll(" ", "-").toLowerCase();
-        document.getElementById('slug_inp').value = newSlug;
-    }
+            function updateSlug() {
+                const locality = localitySelect.options[localitySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
+                const city = citySelect.options[citySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
+                const newSlug = `${str}-${locality}-${city}`.replaceAll(" ", "-").toLowerCase();
+                const fixedSlug= newSlug.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                document.getElementById('slug_inp').value = fixedSlug;
+            }
 
-    localitySelect.addEventListener('change', updateSlug);
-    citySelect.addEventListener('change', updateSlug);
+            localitySelect.addEventListener('change', updateSlug);
+            citySelect.addEventListener('change', updateSlug);
 
-    if (localitySelect.value && citySelect.value) {
-        updateSlug();
-    } else {
-        document.getElementById('slug_inp').value = '';
-        alert('Please select both Locality and City first.');
-    }
-}
-
-
+            if (localitySelect.value && citySelect.value) {
+                updateSlug();
+            } else {
+                document.getElementById('slug_inp').value = '';
+                alert('Please select both Locality and City first.');
+            }
+        }
     </script>
 @endsection
