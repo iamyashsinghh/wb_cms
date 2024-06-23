@@ -100,4 +100,24 @@ class AccountController extends Controller
             'roles' => []
         ]));
     }
+
+    public function validatePhone(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric|digits:10'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['valid' => false, 'message' => 'Invalid phone number format.']);
+        }
+
+        $phoneExists = User::where('phone', $request->phone)->exists();
+
+        if ($phoneExists) {
+            return response()->json(['valid' => false, 'message' => 'Phone number already exists.']);
+        }
+
+        return response()->json(['valid' => true, 'message' => 'Phone number is valid.']);
+    }
+
 }

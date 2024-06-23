@@ -23,7 +23,7 @@
                         @csrf
                         <div class="modal-body text-sm">
                             <div class="row">
-                                @foreach (['name', 'email', 'phone'] as $field)
+                                @foreach (['name', 'email'] as $field)
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="{{ $field }}">{{ ucfirst($field) }}</label>
@@ -39,6 +39,18 @@
                                         </div>
                                     </div>
                                 @endforeach
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="phone">Phone</label>
+                                        <input type="text" id="phone" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') ?? $meta->phone }}" required>
+                                        <span id="phone-feedback" class="invalid-feedback"></span>
+                                        @error('phone')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="roles">Roles</label>
@@ -104,5 +116,32 @@
                 alert('Passwords do not match.');
             }
         });
+
+        document.getElementById('phone').addEventListener('input', function() {
+        var phone = this.value;
+        var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('{{ route('phone.validate') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token
+            },
+            body: JSON.stringify({ phone: phone })
+        })
+        .then(response => response.json())
+        .then(data => {
+            var feedback = document.getElementById('phone-feedback');
+            if (data.valid) {
+                feedback.textContent = 'Phone number is valid';
+                feedback.classList.remove('text-danger');
+                feedback.classList.add('text-success');
+            } else {
+                feedback.textContent = 'Phone number is invalid';
+                feedback.classList.remove('text-success');
+                feedback.classList.add('text-danger');
+            }
+        });
+    });
     </script>
 @endsection

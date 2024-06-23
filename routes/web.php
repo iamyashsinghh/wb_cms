@@ -37,6 +37,7 @@ Route::group(['middleware' => 'admin'], function () {
         Route::get('/manage/{account_id?}', [AccountController::class, 'manage'])->name('account.manage');
         Route::get('/delete/{account_id?}', [AccountController::class, 'delete'])->name('account.delete');
         Route::post('/manage_process/{account_id?}', [AccountController::class, 'manage_process'])->name('account.manage_process');
+        Route::post('/phone/validate', [AccountController::class, 'validatePhone'])->name('phone.validate');
     });
 
     Route::resource('roles', RoleController::class);
