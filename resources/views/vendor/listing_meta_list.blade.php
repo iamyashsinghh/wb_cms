@@ -132,21 +132,31 @@
                     td_elements[4].innerText = 'N/A';
                 }
 
+                @canany(['super power', 'publish venue_vendor_list'])
                 if(data[5] == 1){
                     status_elem = `<a data-id="${data[0]}" data-status="0" href="javascript:void(0);" style="font-size: 22px;" onclick="update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
                 }else{
                     status_elem = `<a data-id="${data[0]}" data-status="1" href="javascript:void(0);" style="font-size: 22px;" onclick="update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                 }
-                
+                @else
+                if(data[5] == 1){
+                    status_elem = `<a data-id="${data[0]}" data-status="0" style="font-size: 22px;"><i class="fa fa-toggle-on text-success"></i></a>`;
+                }else{
+                    status_elem = `<a data-id="${data[0]}" data-status="1" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                }
+                @endcanany
+
                 td_elements[5].innerHTML = status_elem;
 
                 td_elements[6].classList.add('text-center');
                 td_elements[6].innerHTML = `<a href="{{route('vendor.listing_meta.manage')}}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
-                <a href="{{route('vendor.listing_meta.delete')}}/${data[0]}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete">
+                @canany(['super power', 'delete venue_vendor_list'])
+                 <a href="{{route('vendor.listing_meta.delete')}}/${data[0]}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
-                </a>
+                 </a>
+                @endcanany
                 <div class="dropdown d-inline-block mx-2">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-caret-down text-dark"></i>
@@ -172,7 +182,7 @@
                     }else{
                         icon.classList = `fa fa-toggle-on text-success`;
                         elem.setAttribute('data-status', 0);
-                    }    
+                    }
                 }
                 toastr[data.alert_type](data.message);
             })
@@ -229,11 +239,11 @@
                 </div>`;
                 updateFaqModal.querySelector('#faq_modal_body').innerHTML = faqElem;
             }
-            
+
 
             modal.show();
         })
     }
 </script>
-    
+
 @endsection

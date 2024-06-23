@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\FroalaController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,12 +20,13 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => 'AuthCheck'], function () {
     Route::get('/', [AuthController::class, 'login'])->name('login');
-    Route::post('/login_process', [AuthController::class, 'login_process'])->name('login.process');
-});
+    Route::post('send_otp', [AuthController::class, 'send_otp'])->name('send_otp');
+    Route::post('verify_otp', [AuthController::class, 'verify_otp'])->name('verify_otp');
+    });
 
 Route::group(['middleware' => 'admin'], function () {
     Route::get('dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
@@ -36,6 +38,8 @@ Route::group(['middleware' => 'admin'], function () {
         Route::get('/delete/{account_id?}', [AccountController::class, 'delete'])->name('account.delete');
         Route::post('/manage_process/{account_id?}', [AccountController::class, 'manage_process'])->name('account.manage_process');
     });
+
+    Route::resource('roles', RoleController::class);
 
     Route::prefix('external_api')->group(function () {
         Route::get('/maps_review', [ExternalApiController::class, 'maps_review'])->name('api.maps_review');

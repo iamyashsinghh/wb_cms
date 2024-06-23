@@ -70,17 +70,26 @@
                 }else{
                     wb_assured = `<a data-id="${data[0]}" data-status="1" data-submit-url="{{route('vendor.update_wb_assured_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                 }
+
                 if(data[7] == 1){
                     popular_status = `<a data-id="${data[0]}" data-status="0" data-submit-url="{{route('vendor.update_popular_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
                 }else{
                     popular_status = `<a data-id="${data[0]}" data-status="1" data-submit-url="{{route('vendor.update_popular_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                 }
+
+                @canany(['super power', 'publish venue_vendor'])
                 if(data[8] == 1){
                     status_elem = `<a data-id="${data[0]}" data-status="0" data-submit-url="{{route('vendor.update_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
                 }else{
                     status_elem = `<a data-id="${data[0]}" data-status="1" data-submit-url="{{route('vendor.update_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                 }
-
+                @else
+                if(data[8] == 1){
+                    status_elem = `<a data-id="${data[0]}" data-status="0" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-on text-success"></i></a>`;
+                }else{
+                    status_elem = `<a data-id="${data[0]}" data-status="1" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                }
+                @endcanany
 
                 td_elements[6].innerHTML = wb_assured;
                 td_elements[7].innerHTML = popular_status;
@@ -95,9 +104,11 @@
                 td_elements[10].innerHTML = `<a href="{{route('vendor.edit')}}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
+                @canany(['super power', 'delete venue_vendor'])
                 <a onclick="handle_delete_vendor(${data[0]})" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                 </a>
+                @endcanany
                 <div class="dropdown d-inline-block mx-2">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-caret-down text-dark"></i>
