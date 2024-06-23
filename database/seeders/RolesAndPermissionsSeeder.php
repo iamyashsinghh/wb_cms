@@ -27,7 +27,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // venue _ vendor listing meta permissions
         Permission::create(['name' => 'create venue_vendor_list']);
-        Permission::create(['name' => 'edit ']);
+        Permission::create(['name' => 'edit venue_vendor_list']);
         Permission::create(['name' => 'publish venue_vendor_list']);
         Permission::create(['name' => 'delete venue_vendor_list']);
 
