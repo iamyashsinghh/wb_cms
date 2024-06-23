@@ -53,7 +53,7 @@ class AuthController extends Controller
             Mail::to($user->email)->send(new OtpMail($otp, $user));
         }
 
-        $this->sendWhatsAppMessage($user->phone,$user->name, $user-> $otp);
+        $this->sendWhatsAppMessage($user->phone,$user->name, $user->$otp);
         return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
     }
 
@@ -108,7 +108,7 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    private function sendWhatsAppMessage($phone,$name, $otp)
+    private function sendWhatsAppMessage($phone, $name, $otp)
     {
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
             return false;
