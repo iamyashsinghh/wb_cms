@@ -109,7 +109,7 @@
         $('.select2').select2();
     });
 
-    var phoneValid = false;
+    var phoneValid = true;
 
     document.querySelector('form').addEventListener('submit', function(e) {
         var password = document.getElementById('password').value;
