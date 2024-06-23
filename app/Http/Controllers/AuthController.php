@@ -36,7 +36,8 @@ class AuthController extends Controller
         }
 
         $user = User::where('phone', $request->phone)->first();
-        $otp = 999999; // Hardcoded for testing, replace with rand(100000, 999999) in production
+        // $otp = 999999; // Hardcoded for testing, replace with rand(100000, 999999) in production
+        $otp = rand(100000, 999999);
 
         $login_info = LoginInfo::updateOrCreate(
             ['user_id' => $user->id],
@@ -148,6 +149,7 @@ class AuthController extends Controller
                         ]
                     ]
                 ]);
+                Log::info( $response);
                 return $response;
     }
 }
