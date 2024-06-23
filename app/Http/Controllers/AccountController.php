@@ -47,10 +47,10 @@ class AccountController extends Controller
 
     public function manage_process(Request $request, $meta_id = 0)
     {
-        // $user = Auth::user();
-        // if(!$user->hasRole('admin')){    // this is the working function but vs code is showing error
-        //     abort('403');
-        // }
+        $user = Auth::user();
+        if(!$user->hasRole('admin')){    // this is the working function but vs code is showing error
+            abort('403');
+        }
 
         $rules = [
             'name' => 'required|string|max:255',
