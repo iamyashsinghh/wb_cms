@@ -4,6 +4,7 @@
 
 @section('header-css')
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('main')
