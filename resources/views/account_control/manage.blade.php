@@ -71,13 +71,13 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="password">Password</label>
-                                        <input type="password" id="password" name="password"
-                                            class="form-control @error('password') is-invalid @enderror">
-                                        @error('password')
-                                            <span class="invalid-feedback" role="alert">
+                                        <label for="phone">Phone</label>
+                                        <input type="text" id="phone" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') ?? $meta->phone }}" required>
+                                        <div id="phone-feedback" class="invalid-feedback"></div>
+                                        @error('phone')
+                                            <div class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
-                                            </span>
+                                            </div>
                                         @enderror
                                     </div>
                                 </div>
@@ -105,6 +105,8 @@
 @section('footer-script')
 <script src="{{ asset('plugins/select2/js/select2.min.js') }}"></script>
 <script>
+    <script src="{{ asset('plugins/select2/js/select2.min.js') }}"></script>
+<>
     $(document).ready(function() {
         $('.select2').select2();
     });
@@ -142,15 +144,20 @@
         .then(response => response.json())
         .then(data => {
             var feedback = document.getElementById('phone-feedback');
+            var phoneInput = document.getElementById('phone');
             if (data.valid) {
-                feedback.textContent = data.message;
-                feedback.classList.remove('text-danger');
-                feedback.classList.add('text-success');
+                feedback.textContent = 'Phone number is valid';
+                feedback.classList.remove('invalid-feedback');
+                feedback.classList.add('valid-feedback');
+                phoneInput.classList.remove('is-invalid');
+                phoneInput.classList.add('is-valid');
                 phoneValid = true;
             } else {
                 feedback.textContent = data.message;
-                feedback.classList.remove('text-success');
-                feedback.classList.add('text-danger');
+                feedback.classList.remove('valid-feedback');
+                feedback.classList.add('invalid-feedback');
+                phoneInput.classList.remove('is-valid');
+                phoneInput.classList.add('is-invalid');
                 phoneValid = false;
             }
         });
