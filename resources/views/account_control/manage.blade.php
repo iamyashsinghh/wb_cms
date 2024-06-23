@@ -103,22 +103,31 @@
 @endsection
 
 @section('footer-script')
-    <script src="{{ asset('plugins/select2/js/select2.min.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2();
-        });
+<script src="{{ asset('plugins/select2/js/select2.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
 
-        document.querySelector('form').addEventListener('submit', function(e) {
-            var password = document.getElementById('password').value;
-            var confirmPassword = document.getElementById('password_confirmation').value;
-            if (password !== '' && password !== confirmPassword) {
-                e.preventDefault();
-                alert('Passwords do not match.');
-            }
-        });
+    var phoneValid = false;
 
-        document.getElementById('phone').addEventListener('input', function() {
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('password_confirmation').value;
+
+        if (password !== '' && password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match.');
+            return;
+        }
+
+        if (!phoneValid) {
+            e.preventDefault();
+            alert('Phone number is invalid.');
+        }
+    });
+
+    document.getElementById('phone').addEventListener('input', function() {
         var phone = this.value;
         var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -134,15 +143,18 @@
         .then(data => {
             var feedback = document.getElementById('phone-feedback');
             if (data.valid) {
-                feedback.textContent = 'Phone number is valid';
+                feedback.textContent = data.message;
                 feedback.classList.remove('text-danger');
                 feedback.classList.add('text-success');
+                phoneValid = true;
             } else {
-                feedback.textContent = 'Phone number is invalid';
+                feedback.textContent = data.message;
                 feedback.classList.remove('text-success');
                 feedback.classList.add('text-danger');
+                phoneValid = false;
             }
         });
     });
-    </script>
+</script>
+
 @endsection
