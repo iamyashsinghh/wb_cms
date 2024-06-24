@@ -31,7 +31,8 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
-                @canany(['super power', 'create venue_vendor', 'edit venue_vendor', 'publish venue_vendor', 'create venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list'])
+                @canany(['super power', 'create venue_vendor', 'edit venue_vendor', 'publish venue_vendor', 'create
+                    venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list'])
                     <li class="nav-item">
                         <a href="javascript:void(0);" class="nav-link venue_collapse_link venue_category_collapse_link">
                             <i class="nav-icon fas fa-map-marked-alt"></i>
@@ -63,7 +64,8 @@
                                     </span>
                                 </li>
                             @endcanany
-                            @canany(['create venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list', 'super power'])
+                            @canany(['create venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list',
+                                'super power'])
                                 <li class="nav-item">
                                     <span
                                         class="nav-link d-flex justify-content-between align-items-center {{ $route == 'venue.listing_meta.list' ? 'active' : '' }}">
@@ -77,7 +79,8 @@
                         </ul>
                     </li>
                 @endcanany
-                @canany(['super power', 'create venue_vendor', 'edit venue_vendor', 'publish venue_vendor', 'create venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list'])
+                @canany(['super power', 'create venue_vendor', 'edit venue_vendor', 'publish venue_vendor', 'create
+                    venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list'])
                     <li class="nav-item">
                         <a href="javascript:void(0);" class="nav-link venue_collapse_link vendor_collapse_link">
                             <i class="nav-icon fas fa-briefcase"></i>
@@ -100,7 +103,8 @@
                                 </li>
                             @endcanany
 
-                            @canany(['super power', 'create venue_vendor_list', 'edit venue_vendor_list', 'publish venue_vendor_list'])
+                            @canany(['super power', 'create venue_vendor_list', 'edit venue_vendor_list', 'publish
+                                venue_vendor_list'])
                                 <li class="nav-item">
                                     <span
                                         class="nav-link d-flex justify-content-between align-items-center {{ $route == 'vendor.listing_meta.list' ? 'active' : '' }}">
@@ -192,7 +196,8 @@
                                     </span>
                                 </li>
                             @endcanany
-                            @canany(['super power', 'publish business users', 'create business users', 'edit business users'])
+                            @canany(['super power', 'publish business users', 'create business users', 'edit business
+                                users'])
                                 <li class="nav-item">
                                     <span
                                         class="nav-link d-flex justify-content-between align-items-center {{ $route == 'business_user.list' ? 'active' : '' }}">
@@ -249,7 +254,8 @@
                     </li>
                 @endcanany
 
-                @canany(['super power', 'create page_listing_meta', 'edit page_listing_meta', 'publish page_listing_meta'])
+                @canany(['super power', 'create page_listing_meta', 'edit page_listing_meta', 'publish
+                    page_listing_meta'])
                     <li class="nav-item">
                         <span
                             class="nav-link d-flex justify-content-between align-items-center {{ $route == 'page_listing_meta.listing_meta.list' ? 'active' : '' }}">
@@ -272,7 +278,6 @@
                         </span>
                     </li>
                 @endcanany
-
                 @canany(['super power'])
                     <li class="nav-item">
                         <a href="javascript:void(0);" class="nav-link role_permission_collapse_link">
@@ -285,6 +290,13 @@
                                     class="nav-link {{ $route == 'roles.index' ? 'active' : '' }}">
                                     <i class="fas fa-user-tag nav-icon"></i>
                                     <p>Manage Roles</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('permissions.index') }}"
+                                    class="nav-link {{ $route == 'permissions.index' ? 'active' : '' }}">
+                                    <i class="fas fa-user-lock nav-icon"></i>
+                                    <p>Manage Permissions</p>
                                 </a>
                             </li>
                         </ul>

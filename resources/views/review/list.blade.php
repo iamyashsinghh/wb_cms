@@ -19,8 +19,10 @@
                     </div>
                 </div>
                 <div class="button-group my-4">
-                    <a href="{{ route('review.add') }}" class="btn btn-sm text-light buttons-print"
-                        style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New</a>
+                    @canany(['create review', 'super power'])
+                        <a href="{{ route('review.add') }}" class="btn btn-sm text-light buttons-print"
+                            style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New</a>
+                    @endcanany
                 </div>
             </div>
         </section>
@@ -47,14 +49,13 @@
 @section('footer-script')
     <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script>
-
-function handle_delete_review(review_id) {
-    const deleteReviewModal = new bootstrap.Modal(document.getElementById('deleteVendorVenueModal'));
-    const deleteReviewForm = document.getElementById('deleteVendorVenueForm');
-    const actionUrl = `{{ route('review.destroy', ':id') }}`.replace(':id', review_id);
-    deleteReviewForm.action = actionUrl;
-    deleteReviewModal.show();
-}
+        function handle_delete_review(review_id) {
+            const deleteReviewModal = new bootstrap.Modal(document.getElementById('deleteVendorVenueModal'));
+            const deleteReviewForm = document.getElementById('deleteVendorVenueForm');
+            const actionUrl = `{{ route('review.destroy', ':id') }}`.replace(':id', review_id);
+            deleteReviewForm.action = actionUrl;
+            deleteReviewModal.show();
+        }
 
         $(document).ready(function() {
             let venue = @json($data['venue']);
@@ -84,13 +85,23 @@ function handle_delete_review(review_id) {
                 rowCallback: function(row, data, index) {
                     const td_elements = row.querySelectorAll('td');
 
-                    const status = (data[5] == 1) ?
-                        `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('review.update_review_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)">
+                    @canany(['publish review', 'super power'])
+                        const status = (data[5] == 1) ?
+                            `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('review.update_review_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)">
                             <i class="fa fa-toggle-on text-success"></i>
                         </a>` :
-                        `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('review.update_review_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)">
+                            `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('review.update_review_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)">
                             <i class="fa fa-toggle-off text-danger"></i>
                         </a>`;
+                    @else
+                        const status = (data[5] == 1) ?
+                            `<a href="javascript:void(0);" style="font-size: 22px;"">
+                            <i class="fa fa-toggle-on text-success"></i>
+                        </a>` :
+                            `<a href="javascript:void(0);" style="font-size: 22px;">
+                            <i class="fa fa-toggle-off text-danger"></i>
+                        </a>`;
+                    @endcanany
 
                     let result;
                     if (data[3] == 'vendor') {
@@ -101,12 +112,19 @@ function handle_delete_review(review_id) {
 
                     td_elements[4].innerHTML = result;
                     td_elements[5].innerHTML = status;
-                    td_elements[6].innerHTML = `<a href="{{ route('review.edit') }}/${data[0]}" class="text-success mx-2" title="Edit">
+                    td_elements[6].innerHTML = `
+                                        @canany(['edit review', 'super power'])
+                    <a href="{{ route('review.edit') }}/${data[0]}" class="text-success mx-2" title="Edit">
                             <i class="fa fa-edit" style="font-size: 15px;"></i>
                         </a>
+                        @endcanany
+
+                                        @canany(['delete review', 'super power'])
                         <a href="javascript:void(0);" onclick="handle_delete_review(${data[0]})" class="text-danger mx-2" title="Delete">
                             <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
-                        </a>`;
+                        </a>
+                        @endcanany
+                        `;
                 }
             });
 
@@ -116,6 +134,7 @@ function handle_delete_review(review_id) {
                 });
                 return result ? result.name : null;
             }
+
             function getNameByIdV(id, array) {
                 var result = array.find(function(item) {
                     return item.id === id;
@@ -125,34 +144,33 @@ function handle_delete_review(review_id) {
         });
 
         function handle_update_status(elem) {
-    if (confirm("Are you sure want to update the status")) {
-        const submit_url = elem.getAttribute('data-submit-url');
-        const data_id = elem.getAttribute('data-id');
-        const data_status = elem.getAttribute('data-status');
+            if (confirm("Are you sure want to update the status")) {
+                const submit_url = elem.getAttribute('data-submit-url');
+                const data_id = elem.getAttribute('data-id');
+                const data_status = elem.getAttribute('data-status');
 
-        fetch(`${submit_url}/${data_id}/${data_status}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success === true) {
-                    const icon = elem.querySelector('i');
+                fetch(`${submit_url}/${data_id}/${data_status}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success === true) {
+                            const icon = elem.querySelector('i');
 
-                    if (data_status == 0) {
-                        icon.classList.remove('fa-toggle-on', 'text-success');
-                        icon.classList.add('fa-toggle-off', 'text-danger');
-                        elem.setAttribute('data-status', 1);
-                    } else {
-                        icon.classList.remove('fa-toggle-off', 'text-danger');
-                        icon.classList.add('fa-toggle-on', 'text-success');
-                        elem.setAttribute('data-status', 0);
-                    }
-                }
-                toastr[data.alert_type](data.message);
-            })
-            .catch(error => {
-                console.error('Error updating status:', error);
-            });
-    }
-}
-
+                            if (data_status == 0) {
+                                icon.classList.remove('fa-toggle-on', 'text-success');
+                                icon.classList.add('fa-toggle-off', 'text-danger');
+                                elem.setAttribute('data-status', 1);
+                            } else {
+                                icon.classList.remove('fa-toggle-off', 'text-danger');
+                                icon.classList.add('fa-toggle-on', 'text-success');
+                                elem.setAttribute('data-status', 0);
+                            }
+                        }
+                        toastr[data.alert_type](data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error updating status:', error);
+                    });
+            }
+        }
     </script>
 @endsection

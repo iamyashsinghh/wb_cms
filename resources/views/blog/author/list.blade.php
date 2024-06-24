@@ -12,9 +12,9 @@
                     </div>
                 </div>
                 <div class="button-group my-4">
-                    <a href="{{ route('author.create') }}" class="btn btn-sm text-light buttons-print" style="background-color: var(--wb-renosand)">
-                        <i class="fa fa-plus mr-1"></i>Add New
-                    </a>
+                    @canany(['create author', 'super power'])
+                    <a href="{{ route('author.create') }}" class="btn btn-sm text-light buttons-print" style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New </a>
+                    @endcanany
                 </div>
             </div>
         </section>
@@ -35,18 +35,25 @@
                                     <td>{{ $author->id }}</td>
                                     <td>{{ $author->name }}</td>
                                     <td>
-                                        @if($author->image)
+                                        @if($author->image)  
                                             <img src="{{ $author->image }}" alt="{{ $author->name }}" style="width: 50px; height: 50px; object-fit: cover;">
                                         @endif
                                     </td>
                                     <td>{{ Str::limit($author->bio, 50) }}</td>
                                     <td class="text-center">
+
+                                        @canany(['edit author', 'super power'])
                                         <a href="{{ route('author.edit', $author->id) }}" class="text-success mx-2" title="Edit">
                                             <i class="fa fa-edit" style="font-size: 15px;"></i>
                                         </a>
+                                        @endcanany
+
+                                        @canany(['delete author', 'super power'])
                                         <a href="{{ route('author.delete', $author->id) }}" class="text-danger mx-2" title="Delete" onclick="return confirm('Are you sure you want to delete this author?')">
                                             <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                                         </a>
+                                        @endcanany
+
                                     </td>
                                 </tr>
                             @endforeach

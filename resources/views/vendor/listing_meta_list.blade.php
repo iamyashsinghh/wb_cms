@@ -13,7 +13,9 @@
                 </div>
             </div>
             <div class="button-group my-4">
+                @canany(['create venue_vendor_list', 'super power'])
                 <a href="{{route('vendor.listing_meta.manage')}}" class="btn btn-sm text-light buttons-print" style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New</a>
+                @endcanany
             </div>
         </div>
     </section>
@@ -149,14 +151,18 @@
                 td_elements[5].innerHTML = status_elem;
 
                 td_elements[6].classList.add('text-center');
-                td_elements[6].innerHTML = `<a href="{{route('vendor.listing_meta.manage')}}/${data[0]}" class="text-success mx-2" title="Edit">
+                td_elements[6].innerHTML = `
+                @canany(['super power', 'edit venue_vendor_list'])
+                <a href="{{route('vendor.listing_meta.manage')}}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
+                @endcanany
                 @canany(['super power', 'delete venue_vendor_list'])
                  <a href="{{route('vendor.listing_meta.delete')}}/${data[0]}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                  </a>
                 @endcanany
+                @canany(['super power', 'edit venue_vendor_list'])
                 <div class="dropdown d-inline-block mx-2">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-caret-down text-dark"></i>
@@ -164,7 +170,8 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="update_faq(${data[0]})">Update FAQ</a></li>
                     </ul>
-                </div>`;
+                </div>
+                @endcanany`;
             }
         });
     });

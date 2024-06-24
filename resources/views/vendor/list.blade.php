@@ -14,7 +14,9 @@
                 </div>
             </div>
             <div class="button-group my-4">
+                @canany(['create venue_vendor', 'super power'])
                 <a href="{{route('vendor.add')}}" class="btn btn-sm text-light buttons-print" style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New</a>
+                @endcanany
             </div>
         </div>
     </section>
@@ -101,14 +103,22 @@
                 }
 
                 td_elements[10].classList = 'text-center text-nowrap';
-                td_elements[10].innerHTML = `<a href="{{route('vendor.edit')}}/${data[0]}" class="text-success mx-2" title="Edit">
+                td_elements[10].innerHTML = `
+
+                                @canany(['super power', 'edit venue_vendor'])
+
+                                <a href="{{route('vendor.edit')}}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
+                @endcanany
+
                 @canany(['super power', 'delete venue_vendor'])
                 <a onclick="handle_delete_vendor(${data[0]})" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                 </a>
                 @endcanany
+
+                @canany(['super power', 'edit venue_vendor'])
                 <div class="dropdown d-inline-block mx-2">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-caret-down text-dark"></i>
@@ -118,7 +128,8 @@
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_phone_no('vendor', ${data[0]})">Update Phone Number</a></li>
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_meta('vendor', ${data[0]})">Update Meta</a></li>
                     </ul>
-                </div>`;
+                </div>
+                @endcanany`;
             }
         });
     });

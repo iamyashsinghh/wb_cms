@@ -13,7 +13,9 @@
                 </div>
             </div>
             <div class="button-group my-4">
+                @canany(['super power', 'create page_listing_meta'])
                 <a href="{{route('page_listing_meta.listing_meta.manage')}}" class="btn btn-sm text-light buttons-print" style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New</a>
+                @endcanany
             </div>
         </div>
     </section>
@@ -57,7 +59,7 @@
                                     <label>City <span class="text-danger">*</span></label>
                                     <select class="form-control" name="city" onchange="fetch_locations(this.value)" required>
                                         <option disabled selected>Select City</option>
-                                        
+
                                     </select>
                                 </div>
                             </div>
@@ -122,21 +124,36 @@
                 const td_elements = row.querySelectorAll('td');
 
 
+                @canany(['publish page_listing_meta', 'super power'])
                 if(data[5] == 1){
                     status_elem = `<a data-id="${data[0]}" data-status="0" href="javascript:void(0);" style="font-size: 22px;" onclick="update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
                 }else{
                     status_elem = `<a data-id="${data[0]}" data-status="1" href="javascript:void(0);" style="font-size: 22px;" onclick="update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                 }
-
+                @else
+                if(data[5] == 1){
+                    status_elem = `<a data-id="${data[0]}" data-status="0" style="font-size: 22px;" ><i class="fa fa-toggle-on text-success"></i></a>`;
+                }else{
+                    status_elem = `<a data-id="${data[0]}" data-status="1" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                }
+                @endcanany
                 td_elements[3].innerHTML = status_elem;
 
                 td_elements[4].classList.add('text-center');
-                td_elements[4].innerHTML = `<a href="{{route('page_listing_meta.listing_meta.manage')}}/${data[0]}" class="text-success mx-2" title="Edit">
+                td_elements[4].innerHTML = `
+                    @canany(['edit page_listing_meta', 'super power'])
+                <a href="{{route('page_listing_meta.listing_meta.manage')}}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
+                @endcanany
+
+                @canany(['delete page_listing_meta', 'super power'])
                 <a href="{{route('page_listing_meta.listing_meta.delete')}}/${data[0]}" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                 </a>
+                @endcanany
+
+                @canany(['edit page_listing_meta', 'super power'])
                 <div class="dropdown d-inline-block mx-2">
                     <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-caret-down text-dark"></i>
@@ -144,7 +161,9 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="update_faq(${data[0]})">Update FAQ</a></li>
                     </ul>
-                </div>`;
+                </div>
+                @endcanany
+                `;
             }
         });
     });

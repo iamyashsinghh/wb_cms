@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\FroalaController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,8 @@ Route::group(['middleware' => 'admin'], function () {
     });
 
     Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
+
 
     Route::prefix('external_api')->group(function () {
         Route::get('/maps_review', [ExternalApiController::class, 'maps_review'])->name('api.maps_review');
