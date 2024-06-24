@@ -20,7 +20,7 @@
                 <img src="{{ asset('wb-logo2.webp') }}" alt="AdminLTE Logo" style="width: 89% !important;">
             </div>
             <div class="card-body">
-                <h4 class="text-center text-bold">Login | Team CRM</h4>
+                <h4 class="text-center text-bold">Login | Backend Team</h4>
                 <form id="login_verify_form" onsubmit="handle_login_verify(event)" method="post">
                     @csrf
                     <div class="input-group mb-3">
