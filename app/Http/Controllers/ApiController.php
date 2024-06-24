@@ -262,7 +262,6 @@ class ApiController extends Controller
 
         return $response;
     }
-
     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
     {
         try {
@@ -293,8 +292,13 @@ class ApiController extends Controller
                     'venues.popular',
                     'venues.wb_assured',
                     'venues.place_rating',
-                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count')
-                )->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
+                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                ->join('locations', 'locations.id', '=', 'venues.location_id')
+                ->join('cities', 'cities.id', '=', 'venues.city_id')
+                ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
                 if ($location != null && $location->is_group == true) {
                     $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
@@ -303,6 +307,7 @@ class ApiController extends Controller
                 if ($location_slug != 'all' && $location->is_group == false) {
                     $data->where('venues.location_id', $location->id);
                 }
+
                 $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
                 $tag = 'venues';
 
@@ -310,14 +315,17 @@ class ApiController extends Controller
                     $params = explode(',', $request->guest);
                     $data->whereBetween('max_capacity', [$params[0], $params[1]]);
                 }
+
                 if ($request->per_plate) {
                     $params = explode(',', $request->per_plate);
                     $data->whereBetween('veg_price', [$params[0], $params[1]]);
                 }
+
                 if ($request->per_budget) {
                     $params = explode(',', $request->per_budget);
-                    $data->join('budgets', 'budgets.id', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
-                }
+                    $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
+                }   
+
                 if ($request->multi_localities) {
                     $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
 
@@ -329,6 +337,7 @@ class ApiController extends Controller
 
                     $data->whereIn('location_id', array_unique($params));
                 }
+
                 if ($request->food_type) {
                     $food_type = $request->food_type.'_price';
                     $data->whereNotNull($food_type);
@@ -345,13 +354,18 @@ class ApiController extends Controller
                     'vendors.slug',
                     'vendors.images',
                     'vendors.popular',
-                    'vendors.wb_assured'
-                )->join('cities', 'cities.id', 'vendors.city_id')
-                    ->join('locations', 'locations.id', 'vendors.location_id')
-                    ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
+                    'vendors.wb_assured',
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                ->join('cities', 'cities.id', '=', 'vendors.city_id')
+                ->join('locations', 'locations.id', '=', 'vendors.location_id')
+                ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
+
                 if ($location_slug != 'all') {
-                    $data->where('locations.slug', "$location_slug");
+                    $data->where('locations.slug', $location_slug);
                 }
+
                 $tag = 'vendors';
                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
             }
@@ -363,8 +377,9 @@ class ApiController extends Controller
                 'data' => $data->orderBy('popular', 'desc')->offset($offset)->limit(21)->get(),
                 'meta' => $meta,
                 'cities' => $cities,
-                'message' => 'Data fetched succesfully',
+                'message' => 'Data fetched successfully',
             ];
+
         } catch (\Throwable $th) {
             $response = [
                 'success' => false,
@@ -372,9 +387,10 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
-
         return $response;
     }
+
+
 
     public function venue_or_vendor_details(string $slug)
     {
@@ -397,7 +413,6 @@ class ApiController extends Controller
                 $reviews = '';
                 $city = City::where('id', $vendor->city_id)->first();
             }
-
             $response = [
                 'success' => true,
                 'tag' => $tag,

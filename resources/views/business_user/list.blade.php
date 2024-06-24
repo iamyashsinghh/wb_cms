@@ -101,8 +101,7 @@
                                                     <li><a class="dropdown-item"
                                                             href="{{ route('business_user.manage_content', $list->id) }}"
                                                             target="_blank">Update</a></li>
-                                                    <li><a class="dropdown-item"
-                                                            href="{{ route('business_user.update_content_status', [$list->id, 2]) }}">Reject</a>
+                                                    <li><a class="dropdown-item" href="{{ route('business_user.update_content_status', [$list->id, 2]) }}">Reject</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -209,8 +208,7 @@
                                     <div class="form-group">
                                         <input type="hidden" name="user_id">
                                         <label>Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" placeholder="Enter user name"
-                                            name="name" required>
+                                        <input type="text" class="form-control" placeholder="Enter user name" name="name" required>
                                     </div>
                                 </div>
                                 <div class="col-sm-4 mb-3">
@@ -335,7 +333,6 @@
                         business_category.innerHTML +=
                             `<option value="${category.id}" ${data.user.business_category_id == category.id ? 'selected': ''}>${category.name}</option>`;
                     }
-
                     modal.show();
                 } else {
                     toastr.error(data.message);

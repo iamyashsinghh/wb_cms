@@ -88,22 +88,22 @@
                     @canany(['publish review', 'super power'])
                         const status = (data[5] == 1) ?
                             `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('review.update_review_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)">
-                            <i class="fa fa-toggle-on text-success"></i>
-                        </a>` :
+                                <i class="fa fa-toggle-on text-success"></i>
+                            </a>` :
                             `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('review.update_review_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)">
-                            <i class="fa fa-toggle-off text-danger"></i>
-                        </a>`;
+                                <i class="fa fa-toggle-off text-danger"></i>
+                            </a>`;
                     @else
                         const status = (data[5] == 1) ?
                             `<a href="javascript:void(0);" style="font-size: 22px;"">
-                            <i class="fa fa-toggle-on text-success"></i>
-                        </a>` :
+                                <i class="fa fa-toggle-on text-success"></i>
+                            </a>`:
                             `<a href="javascript:void(0);" style="font-size: 22px;">
-                            <i class="fa fa-toggle-off text-danger"></i>
-                        </a>`;
+                                <i class="fa fa-toggle-off text-danger"></i>
+                            </a>`;
                     @endcanany
-
                     let result;
+
                     if (data[3] == 'vendor') {
                         result = getNameByIdV(data[4], vendor);
                     } else {
@@ -113,13 +113,13 @@
                     td_elements[4].innerHTML = result;
                     td_elements[5].innerHTML = status;
                     td_elements[6].innerHTML = `
-                                        @canany(['edit review', 'super power'])
-                    <a href="{{ route('review.edit') }}/${data[0]}" class="text-success mx-2" title="Edit">
-                            <i class="fa fa-edit" style="font-size: 15px;"></i>
-                        </a>
+                    @canany(['edit review', 'super power'])
+                            <a href="{{ route('review.edit') }}/${data[0]}" class="text-success mx-2" title="Edit">
+                                <i class="fa fa-edit" style="font-size: 15px;"></i>
+                            </a>
                         @endcanany
 
-                                        @canany(['delete review', 'super power'])
+                        @canany(['delete review', 'super power'])
                         <a href="javascript:void(0);" onclick="handle_delete_review(${data[0]})" class="text-danger mx-2" title="Delete">
                             <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                         </a>
@@ -145,6 +145,7 @@
 
         function handle_update_status(elem) {
             if (confirm("Are you sure want to update the status")) {
+
                 const submit_url = elem.getAttribute('data-submit-url');
                 const data_id = elem.getAttribute('data-id');
                 const data_status = elem.getAttribute('data-status');
@@ -164,6 +165,7 @@
                                 icon.classList.add('fa-toggle-on', 'text-success');
                                 elem.setAttribute('data-status', 0);
                             }
+
                         }
                         toastr[data.alert_type](data.message);
                     })
