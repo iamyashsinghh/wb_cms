@@ -372,7 +372,7 @@ class ApiController extends Controller
         }
 
         // Fetch data
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(21)->get();
+        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(12)->get();
 
         // Convert venue_category_ids from IDs to names
         foreach ($venues_or_vendors as $venue_or_vendor) {
