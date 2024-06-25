@@ -267,7 +267,7 @@ class ApiController extends Controller
     try {
         $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
 
-        $offset = (12 * $page_no) - 12;
+        $offset = (21 * $page_no) - 21;
         $venue_category = VenueCategory::where('slug', $category_slug)->first();
         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
