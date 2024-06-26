@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\NotifyReceivedUser;
 use App\Mail\ThanksForSignin;
 use App\Mail\VerificationMail;
+use App\Models\Blog;
 use App\Models\Budget;
 use App\Models\BusinessUser;
 use App\Models\City;
@@ -266,8 +267,8 @@ class ApiController extends Controller
 {
     try {
         $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-
-        $offset = (3 * $page_no) - 3;
+        
+        $offset = (12 * $page_no) - 12;
         $venue_category = VenueCategory::where('slug', $category_slug)->first();
         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
@@ -304,32 +305,25 @@ class ApiController extends Controller
             if ($location != null && $location->is_group == true) {
                 $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
             }
-
             if ($location_slug != 'all' && $location->is_group == false) {
                 $data->where('venues.location_id', $location->id);
             }
-
             $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
             $tag = 'venues';
-
             if ($request->guest) {
                 $params = explode(',', $request->guest);
                 $data->whereBetween('max_capacity', [$params[0], $params[1]]);
             }
-
             if ($request->per_plate) {
                 $params = explode(',', $request->per_plate);
                 $data->whereBetween('veg_price', [$params[0], $params[1]]);
             }
-
             if ($request->per_budget) {
                 $params = explode(',', $request->per_budget);
                 $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
             }
-
             if ($request->multi_localities) {
                 $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-
                 $arr = $request->multi_localities;
                 foreach ($group_locations as $list) {
                     $arr .= ','.$list->locality_ids;
@@ -338,12 +332,10 @@ class ApiController extends Controller
 
                 $data->whereIn('location_id', array_unique($params));
             }
-
             if ($request->food_type) {
                 $food_type = $request->food_type.'_price';
                 $data->whereNotNull($food_type);
             }
-
             $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
         } else {
             $data = Vendor::select(
@@ -366,15 +358,11 @@ class ApiController extends Controller
             if ($location_slug != 'all') {
                 $data->where('locations.slug', $location_slug);
             }
-
             $tag = 'vendors';
             $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
         }
 
-        // Fetch data
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(3)->get();
-
-        // Convert venue_category_ids from IDs to names
+        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(5)->get();
         foreach ($venues_or_vendors as $venue_or_vendor) {
             $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
             $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
@@ -400,9 +388,6 @@ class ApiController extends Controller
     }
     return response()->json($response);
 }
-
-
-
     public function venue_or_vendor_details(string $slug)
     {
         try {
@@ -439,8 +424,23 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
-
         return $response;
+    }
+
+    public function blog_list(Request $request)
+    {
+        $blogs = Blog::select('id', 'slug', 'heading', 'excerpt', 'image', 'image_alt', 'author_id', 'publish_date')
+                    ->where('status', 1)
+                    ->paginate(5);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $blogs
+        ]);
+    }
+
+    public function blog_detail($query){
+
     }
 
     //for business auth, dashboard, and profile related methods

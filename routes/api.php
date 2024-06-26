@@ -35,6 +35,8 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('get_all_vendors', 'get_all_vendors');
     Route::get('venues_vendor_page_data/{city?}/{type?}', 'venues_vendor_page_data');
 
+    Route::get('blog_list', 'blog_list');
+
 
     Route::get('superb', function() {
         return Venue::select('id', 'name')->whereNull('place_rating')->where('city_id', 1)->count();
