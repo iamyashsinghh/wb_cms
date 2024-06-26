@@ -267,7 +267,7 @@ class ApiController extends Controller
 {
     try {
         $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-        
+
         $offset = (12 * $page_no) - 12;
         $venue_category = VenueCategory::where('slug', $category_slug)->first();
         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
@@ -362,7 +362,7 @@ class ApiController extends Controller
             $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
         }
 
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(5)->get();
+        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(12)->get();
         foreach ($venues_or_vendors as $venue_or_vendor) {
             $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
             $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
