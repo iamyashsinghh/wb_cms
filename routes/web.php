@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\FroalaController;
+use App\Http\Controllers\MegaDatabaseChangeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Route;
  */
 
  Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+ Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
 
 Route::group(['middleware' => 'AuthCheck'], function () {
     Route::get('/', [AuthController::class, 'login'])->name('login');
