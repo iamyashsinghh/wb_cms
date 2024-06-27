@@ -36,6 +36,8 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('venues_vendor_page_data/{city?}/{type?}', 'venues_vendor_page_data');
 
     Route::get('blog_list', 'blog_list');
+    Route::get('blog_detail/{slug}', 'blog_detail');
+
 
 
     Route::get('superb', function() {

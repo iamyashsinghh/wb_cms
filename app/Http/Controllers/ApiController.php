@@ -435,12 +435,13 @@ class ApiController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $blogs
+            'data' => $blogs,
         ]);
     }
 
-    public function blog_detail($query){
-
+    public function blog_detail($slug){
+        $blog = Blog::where('slug', $slug)->first();
+        return $blog;
     }
 
     //for business auth, dashboard, and profile related methods
