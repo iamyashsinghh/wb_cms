@@ -258,7 +258,29 @@
     }
 
     function generate_slug(str) {
-        slug_inp.value = str.replaceAll(" ", "-").toLowerCase();
-    }
+            const localitySelect = document.querySelector('select[name="location"]');
+            const citySelect = document.querySelector('select[name="city"]');
+
+            function updateSlug() {
+                const locality = localitySelect.options[localitySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
+                const city = citySelect.options[citySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
+                const newSlug = `${str}-${locality}`.replaceAll(" ", "-").toLowerCase();
+                const fixedSlug= newSlug.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                document.getElementById('slug_inp').value = fixedSlug;
+            }
+
+            localitySelect.addEventListener('change', updateSlug);
+            citySelect.addEventListener('change', updateSlug);
+
+            if (localitySelect.value && citySelect.value) {
+                updateSlug();
+            } else {
+                document.getElementById('slug_inp').value = '';
+                alert('Please select both Locality and City first.');
+            }
+        }
 </script>
 @endsection
