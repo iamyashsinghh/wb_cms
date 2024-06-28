@@ -57,60 +57,61 @@ class BlogController extends Controller
     }
 
     public function manage_process(Request $request, $blog_id = 0)
-    {
-        $rules = [
-            'slug' => 'required|string',
-            'meta_title' => 'required|string',
-            'meta_description' => 'required|string',
-            'meta_keywords' => 'required|string',
-            'heading' => 'required|string',
-            'image_alt' => 'required|string',
-            'summary' => 'required|string',
-        ];
+{
+    $rules = [
+        'slug' => 'required|string',
+        'meta_title' => 'required|string',
+        'meta_description' => 'required|string',
+        'meta_keywords' => 'required|string',
+        'heading' => 'required|string',
+        'image_alt' => 'required|string',
+        'summary' => 'required|string',
+    ];
 
-        $validate = Validator::make($request->all(), $rules);
+    $validate = Validator::make($request->all(), $rules);
 
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
-
-        try {
-            $blog = Blog::find($blog_id) ?? new Blog();
-            $blog->slug = $request->slug;
-            $blog->meta_title = $request->meta_title;
-            $blog->meta_description = $request->meta_description;
-            $blog->meta_keywords = $request->meta_keywords;
-            $blog->heading = $request->heading;
-            $blog->excerpt = $request->excerpt;
-
-            // Handle the image upload
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time().'.'.$image->getClientOriginalExtension();
-                $path = $image->storeAs('public/images/flora', $imageName);
-                $blog->image = Storage::url($path);
-            }
-
-            $blog->image_alt = $request->image_alt;
-            $blog->summary = $request->summary;
-            $blog->og_title = $request->og_title;
-            $blog->og_description = $request->og_description;
-            $blog->header_text = $request->header_text;
-            $blog->footer_text = $request->footer_text;
-            $blog->category = $request->category;
-            $blog->tag = $request->tag;
-            $blog->author_id = $request->author_id;
-            $blog->save();
-
-            session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Blog updated successfully.']);
-        } catch (\Exception $e) {
-            session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => $e->getMessage()]);
-        }
-
-        return redirect()->back();
+    if ($validate->fails()) {
+        return redirect()->back()
+            ->withErrors($validate)
+            ->withInput();
     }
+
+    $content_to_trim = '<p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>';
+        
+    try {
+        $blog = Blog::find($blog_id) ?? new Blog();
+        $blog->slug = $request->slug;
+        $blog->meta_title = $request->meta_title;
+        $blog->meta_description = $request->meta_description;
+        $blog->meta_keywords = $request->meta_keywords;
+        $blog->heading = $request->heading;
+        $blog->excerpt = $request->excerpt;
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $path = $image->storeAs('public/images/flora', $imageName);
+            $blog->image = Storage::url($path);
+        }
+
+        $blog->image_alt = $request->image_alt;
+        $blog->summary = str_replace($content_to_trim, '', $request->summary);
+        $blog->og_title = $request->og_title;
+        $blog->og_description = $request->og_description;
+        $blog->header_text = $request->header_text;
+        $blog->footer_text = $request->footer_text;
+        $blog->category = $request->category;
+        $blog->tag = $request->tag;
+        $blog->author_id = $request->author_id;
+        $blog->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Blog updated successfully.']);
+    } catch (\Exception $e) {
+        session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => $e->getMessage()]);
+    }
+
+    return redirect()->back();
+}
 
     public function delete($blog_id)
     {

@@ -329,13 +329,10 @@
             ],
             events: {
                 'imageManager.beforeLoad': function() {
-                    console.log('Image manager is about to load.');
                 },
                 'imageManager.loaded': function(data) {
-                    console.log('Image manager loaded:', data);
                 },
                 'imageManager.error': function(error) {
-                    console.error('Image manager error:', error);
                 }
             }
         });
