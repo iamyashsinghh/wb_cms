@@ -50,10 +50,10 @@ class AuthController extends Controller
         );
 
         if($user->email){
-            // Mail::to($user->email)->send(new OtpMail($otp, $user));
+            Mail::to($user->email)->send(new OtpMail($otp, $user));
         }
 
-        // $this->sendWhatsAppMessage($user->phone,$user->name,$otp);
+        $this->sendWhatsAppMessage($user->phone,$user->name,$otp);
         return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
     }
 
