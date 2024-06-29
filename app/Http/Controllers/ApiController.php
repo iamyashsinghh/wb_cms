@@ -443,7 +443,10 @@ class ApiController extends Controller
 
     public function blog_detail($slug)
     {
-        $blog = Blog::where('slug', $slug)->where('status', 1)->first();
+        $blog = Blog::where('slug', $slug)
+            ->where('status', 1)
+            ->first();
+
         if (!$blog) {
             return response()->json([
                 'status' => 'error',
@@ -451,9 +454,21 @@ class ApiController extends Controller
             ], 404);
         }
 
-        $popular = Blog::select('id', 'slug', 'heading', 'image', 'image_alt', 'publish_date')->where('popular', 1)->where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+        $popular = Blog::select('id', 'slug', 'heading', 'image', 'image_alt', 'publish_date', 'blogs.author_id', 'authors.name as author_name')
+            ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
+            ->where('popular', 1)
+            ->where('status', 1)
+            ->orderBy('publish_date', 'desc')
+            ->limit(4)
+            ->get();
 
-        $latest = Blog::select('id', 'slug', 'heading', 'image', 'image_alt', 'publish_date')->where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+        $latest = Blog::select('id', 'slug', 'heading', 'image', 'image_alt', 'publish_date', 'blogs.author_id', 'authors.name as author_name')
+            ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
+            ->where('status', 1)
+            ->where('id', '!=', $blog->id)
+            ->orderBy('publish_date', 'desc')
+            ->limit(4)
+            ->get();
 
         $author = Author::where('id', $blog->author_id)->first();
 
@@ -465,6 +480,7 @@ class ApiController extends Controller
             'latest' => $latest,
         ]);
     }
+
 
 
     //for business auth, dashboard, and profile related methods
