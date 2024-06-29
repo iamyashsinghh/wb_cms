@@ -26,13 +26,17 @@
                 <div class="table-responsive">
                     <table id="serverTable" class="table text-sm">
                         <thead>
-                            <th>ID</th>
-                            <th>Blog Heading</th>
-                            <th>Author</th>
-                            <th>Status</th>
-                            <th>Last Modified At</th>
-                            <th class="text-center">Action</th>
+                            <tr>
+                                <th>ID</th>
+                                <th>Blog Heading</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Popular</th>
+                                <th>Last Modified At</th>
+                                <th class="text-center">Action</th>
+                            </tr>
                         </thead>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -59,45 +63,41 @@
                     const td_elements = row.querySelectorAll('td');
 
                     @canany(['publish blog', 'super power'])
-                        if (data[3] == 1) {
-                            wb_assured =
-                                `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('blog.status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
-                        } else {
-                            wb_assured =
-                                `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('blog.status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
-                        }
+                        let status = data[3] == 1 ?
+                            `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('blog.status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>` :
+                            `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('blog.status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                     @else
-                        if (data[3] == 1) {
-                            wb_assured =
-                                `<a data-id="${data[0]}" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-on text-success"></i></a>`;
-                        } else {
-                            wb_assured =
-                                `<a data-id="${data[0]}" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
-                        }
+                        let status = data[3] == 1 ?
+                            `<a data-id="${data[0]}" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-on text-success"></i></a>` :
+                            `<a data-id="${data[0]}" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
                     @endcanany
 
-                    td_elements[3].innerHTML = wb_assured;
+                    let popular = data[6] == 1 ?
+                        `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('blog.popular') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>` :
+                        `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('blog.popular') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
 
-                    td_elements[5].innerHTML = `
-                    @canany(['edit blog', 'super power'])
-                    <a href="{{ route('blog.manage') }}/${data[0]}" class="text-success mx-2" title="Edit">
-                    <i class="fa fa-edit" style="font-size: 15px;"></i>
-                </a>
-                @endcanany
+                    td_elements[3].innerHTML = status;
+                    td_elements[4].innerHTML = popular;
+                    td_elements[5].innerText = data[5];
 
-                @canany(['delete blog', 'super power'])
-                <a onclick="handle_delete_blog(${data[0]})" class="text-danger mx-2" title="Delete">
-                    <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
-                </a>
-                @endcanany
-                `;
+                    td_elements[6].innerHTML = `
+                        @canany(['edit blog', 'super power'])
+                            <a href="{{ route('blog.manage') }}/${data[0]}" class="text-success mx-2" title="Edit">
+                                <i class="fa fa-edit" style="font-size: 15px;"></i>
+                            </a>
+                        @endcanany
+                        @canany(['delete blog', 'super power'])
+                            <a onclick="handle_delete_blog(${data[0]})" class="text-danger mx-2" title="Delete">
+                                <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
+                            </a>
+                        @endcanany
+                    `;
                 }
             });
         });
 
-
         function handle_update_status(elem) {
-            if (confirm("Are you sure want to update the status")) {
+            if (confirm("Are you sure want to update the status?")) {
                 const submit_url = elem.getAttribute('data-submit-url');
                 const data_id = elem.getAttribute('data-id');
                 const data_status = elem.getAttribute('data-status');
@@ -111,11 +111,28 @@
                             icon.classList = `fa fa-toggle-on text-success`;
                             elem.setAttribute('data-status', 0);
                         }
+                        toastr[data.alert_type](data.message);
                     }
-                    toastr[data.alert_type](data.message);
-                })
+                });
+            }
+        }
+
+        function handle_delete_blog(blogId) {
+            if (confirm("Are you sure you want to delete this blog?")) {
+                fetch(`{{ route('blog.destroy', '') }}/${blogId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }).then(response => response.json()).then(data => {
+                    if (data.success === true) {
+                        toastr[data.alert_type](data.message);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                });
             }
         }
     </script>
-
 @endsection

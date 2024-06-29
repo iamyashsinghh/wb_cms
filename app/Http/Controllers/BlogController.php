@@ -17,7 +17,7 @@ class BlogController extends Controller
 
     public function ajax_list()
     {
-        $data = Blog::select('blogs.id', 'blogs.heading', 'authors.name as author_name', 'blogs.status', 'blogs.updated_at', 'blogs.created_at')
+        $data = Blog::select('blogs.id', 'blogs.heading', 'authors.name as author_name', 'blogs.status', 'blogs.updated_at', 'blogs.created_at', 'blogs.popular')
             ->join('authors', 'blogs.author_id', '=', 'authors.id')
             ->get();
 
@@ -96,6 +96,7 @@ class BlogController extends Controller
             if ($blog_id == 0) {
                 $blog->publish_date = today();
                 $blog->popular = 0;
+                $blog->status = 0;
             }
 
             $blog->image_alt = $request->image_alt;
@@ -113,7 +114,7 @@ class BlogController extends Controller
         } catch (\Exception $e) {
             session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => $e->getMessage()]);
         }
-        return redirect()->back();
+        return redirect()->route('blog.list');
     }
 
     public function checkSlug($slug)
@@ -123,7 +124,7 @@ class BlogController extends Controller
     }
 
 
-    public function delete($blog_id)
+    public function destroy($blog_id)
     {
         try {
             Blog::find($blog_id)->delete();
@@ -145,4 +146,18 @@ class BlogController extends Controller
         }
         return $res;
     }
+
+    public function update_popular_status($blog_id, $popular_status)
+    {
+        try {
+            $blog = Blog::find($blog_id);
+            $blog->popular = $popular_status;
+            $blog->save();
+            $res = response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Blog Popular Updated!']);
+        } catch (\Throwable $th) {
+            $res = response()->json(['success' => false, 'alert_type' => 'danger', 'message' => 'Something went wrong!']);
+        }
+        return $res;
+    }
+
 }
