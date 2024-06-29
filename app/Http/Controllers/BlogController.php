@@ -52,7 +52,6 @@ class BlogController extends Controller
                 'author_id' => '',
             ]));
         }
-
         return view('blog.blog.manage', compact('data', 'page_heading', 'authors'));
     }
 
@@ -93,12 +92,12 @@ class BlogController extends Controller
                 $path = $image->storeAs('public/images/flora', $imageName);
                 $blog->image = Storage::url($path);
             }
-            
+
             if ($blog_id == 0) {
                 $blog->publish_date = today();
+                $blog->popular = 0;
             }
-
-            $blog->popular = 0;
+            
             $blog->image_alt = $request->image_alt;
             $blog->summary = str_replace($content_to_trim, '', $request->summary);
             $blog->og_title = $request->og_title;
@@ -109,6 +108,7 @@ class BlogController extends Controller
             $blog->tag = $request->tag;
             $blog->author_id = $request->author_id;
             $blog->save();
+
             session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Blog updated successfully.']);
         } catch (\Exception $e) {
             session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => $e->getMessage()]);
