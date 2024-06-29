@@ -442,55 +442,47 @@ class ApiController extends Controller
 
 
     public function blog_detail($slug)
-{
-    // Fetch the blog post with the given slug that is published and active
-    $blog = Blog::where('slug', $slug)
-                ->where('status', 1)
-                ->first();
+    {
+        $blog = Blog::where('slug', $slug)
+            ->where('status', 1)
+            ->first();
 
-    // If no blog post is found, return a 404 error response
-    if (!$blog) {
+        if (!$blog) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Blog not found',
+            ], 404);
+        }
+
+        $popular = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.image', 'blogs.image_alt', 'blogs.publish_date', 'blogs.author_id', 'authors.name as author_name')
+            ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
+            ->where('blogs.popular', 1)
+            ->where('blogs.status', 1)
+            ->orderBy('blogs.publish_date', 'desc')
+            ->limit(4)
+            ->get();
+
+        $latest = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.image', 'blogs.image_alt', 'blogs.publish_date', 'blogs.author_id', 'authors.name as author_name')
+            ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
+            ->where('blogs.status', 1)
+            ->where('blogs.id', '!=', $blog->id)
+            ->orderBy('blogs.publish_date', 'desc')
+            ->limit(4)
+            ->get();
+
+        $author = Author::where('id', $blog->author_id)->first();
+
         return response()->json([
-            'status' => 'error',
-            'message' => 'Blog not found',
-        ], 404);
+            'status' => 'success',
+            'data' => $blog,
+            'author' => $author,
+            'popular' => $popular,
+            'latest' => $latest,
+        ]);
     }
 
-    // Fetch related popular blog posts (if any)
-    $popular = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.image', 'blogs.image_alt', 'blogs.publish_date', 'blogs.author_id', 'authors.name as author_name')
-                    ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
-                    ->where('blogs.popular', 1)
-                    ->where('blogs.status', 1)
-                    ->orderBy('blogs.publish_date', 'desc')
-                    ->limit(4)
-                    ->get();
-
-    // Fetch latest blog posts (excluding the current one)
-    $latest = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.image', 'blogs.image_alt', 'blogs.publish_date', 'blogs.author_id', 'authors.name as author_name')
-                    ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
-                    ->where('blogs.status', 1)
-                    ->where('blogs.id', '!=', $blog->id) // Exclude the current blog post
-                    ->orderBy('blogs.publish_date', 'desc')
-                    ->limit(4)
-                    ->get();
-
-    // Fetch the author information for the blog post
-    $author = Author::where('id', $blog->author_id)->first();
-
-    // Return a JSON response with the blog post details, author information, and related posts
-    return response()->json([
-        'status' => 'success',
-        'data' => $blog,
-        'author' => $author,
-        'popular' => $popular,
-        'latest' => $latest,
-    ]);
-}
 
 
-
-
-    //for business auth, dashboard, and profile related methods
     public function business_signup(Request $request)
     {
         try {
