@@ -450,9 +450,13 @@ class ApiController extends Controller
                 'message' => 'Blog not found',
             ], 404);
         }
-        $popular = Blog::where('popular', 1)->where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
-        $latest = Blog::where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+
+        $popular = Blog::select('id', 'slug', 'heading', 'image', 'image_alt', 'publish_date')->where('popular', 1)->where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+
+        $latest = Blog::select('id', 'slug', 'heading', 'image', 'image_alt', 'publish_date')->where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+
         $author = Author::where('id', $blog->author_id)->first();
+
         return response()->json([
             'status' => 'success',
             'data' => $blog,
