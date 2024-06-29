@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\NotifyReceivedUser;
 use App\Mail\ThanksForSignin;
 use App\Mail\VerificationMail;
+use App\Models\Author;
 use App\Models\Blog;
 use App\Models\Budget;
 use App\Models\BusinessUser;
@@ -100,7 +101,7 @@ class ApiController extends Controller
 
     public function get_json_reviews($place_id)
     {
-        $yash = Storage::get('public/uploads/all_reviews/'.$place_id.'_reviews.json');
+        $yash = Storage::get('public/uploads/all_reviews/' . $place_id . '_reviews.json');
 
         return $yash;
     }
@@ -264,130 +265,129 @@ class ApiController extends Controller
         return $response;
     }
     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-{
-    try {
-        $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    {
+        try {
+            $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
 
-        $offset = (12 * $page_no) - 12;
-        $venue_category = VenueCategory::where('slug', $category_slug)->first();
-        $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+            $offset = (12 * $page_no) - 12;
+            $venue_category = VenueCategory::where('slug', $category_slug)->first();
+            $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
-        $city = City::where('slug', $city_slug)->first();
-        $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+            $city = City::where('slug', $city_slug)->first();
+            $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
 
-        $slug = "$category_slug/$city_slug/$location_slug";
+            $slug = "$category_slug/$city_slug/$location_slug";
 
-        if ($venue_category) {
-            $data = Venue::select(
-                'venues.id',
-                'venues.name',
-                'venues.venue_address',
-                'venues.summary',
-                'venues.veg_price',
-                'venues.nonveg_price',
-                'venues.phone',
-                'venues.images',
-                'venues.slug',
-                'venues.min_capacity',
-                'venues.max_capacity',
-                'venues.popular',
-                'venues.wb_assured',
-                'venues.place_rating',
-                'venues.venue_category_ids',
-                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
-                'locations.name as location_name',
-                'cities.name as city_name'
-            )
-            ->join('locations', 'locations.id', '=', 'venues.location_id')
-            ->join('cities', 'cities.id', '=', 'venues.city_id')
-            ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
+            if ($venue_category) {
+                $data = Venue::select(
+                    'venues.id',
+                    'venues.name',
+                    'venues.venue_address',
+                    'venues.summary',
+                    'venues.veg_price',
+                    'venues.nonveg_price',
+                    'venues.phone',
+                    'venues.images',
+                    'venues.slug',
+                    'venues.min_capacity',
+                    'venues.max_capacity',
+                    'venues.popular',
+                    'venues.wb_assured',
+                    'venues.place_rating',
+                    'venues.venue_category_ids',
+                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                    ->join('locations', 'locations.id', '=', 'venues.location_id')
+                    ->join('cities', 'cities.id', '=', 'venues.city_id')
+                    ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
-            if ($location != null && $location->is_group == true) {
-                $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
-            }
-            if ($location_slug != 'all' && $location->is_group == false) {
-                $data->where('venues.location_id', $location->id);
-            }
-            $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
-            $tag = 'venues';
-            if ($request->guest) {
-                $params = explode(',', $request->guest);
-                $data->whereBetween('max_capacity', [$params[0], $params[1]]);
-            }
-            if ($request->per_plate) {
-                $params = explode(',', $request->per_plate);
-                $data->whereBetween('veg_price', [$params[0], $params[1]]);
-            }
-            if ($request->per_budget) {
-                $params = explode(',', $request->per_budget);
-                $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
-            }
-            if ($request->multi_localities) {
-                $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-                $arr = $request->multi_localities;
-                foreach ($group_locations as $list) {
-                    $arr .= ','.$list->locality_ids;
+                if ($location != null && $location->is_group == true) {
+                    $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
                 }
-                $params = explode(',', $arr);
+                if ($location_slug != 'all' && $location->is_group == false) {
+                    $data->where('venues.location_id', $location->id);
+                }
+                $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
+                $tag = 'venues';
+                if ($request->guest) {
+                    $params = explode(',', $request->guest);
+                    $data->whereBetween('max_capacity', [$params[0], $params[1]]);
+                }
+                if ($request->per_plate) {
+                    $params = explode(',', $request->per_plate);
+                    $data->whereBetween('veg_price', [$params[0], $params[1]]);
+                }
+                if ($request->per_budget) {
+                    $params = explode(',', $request->per_budget);
+                    $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
+                }
+                if ($request->multi_localities) {
+                    $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+                    $arr = $request->multi_localities;
+                    foreach ($group_locations as $list) {
+                        $arr .= ',' . $list->locality_ids;
+                    }
+                    $params = explode(',', $arr);
 
-                $data->whereIn('location_id', array_unique($params));
-            }
-            if ($request->food_type) {
-                $food_type = $request->food_type.'_price';
-                $data->whereNotNull($food_type);
-            }
-            $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
-        } else {
-            $data = Vendor::select(
-                'vendors.id',
-                'vendors.brand_name',
-                'vendors.vendor_address',
-                'vendors.package_price',
-                'vendors.phone',
-                'vendors.slug',
-                'vendors.images',
-                'vendors.popular',
-                'vendors.wb_assured',
-                'locations.name as location_name',
-                'cities.name as city_name'
-            )
-            ->join('cities', 'cities.id', '=', 'vendors.city_id')
-            ->join('locations', 'locations.id', '=', 'vendors.location_id')
-            ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
+                    $data->whereIn('location_id', array_unique($params));
+                }
+                if ($request->food_type) {
+                    $food_type = $request->food_type . '_price';
+                    $data->whereNotNull($food_type);
+                }
+                $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
+            } else {
+                $data = Vendor::select(
+                    'vendors.id',
+                    'vendors.brand_name',
+                    'vendors.vendor_address',
+                    'vendors.package_price',
+                    'vendors.phone',
+                    'vendors.slug',
+                    'vendors.images',
+                    'vendors.popular',
+                    'vendors.wb_assured',
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                    ->join('cities', 'cities.id', '=', 'vendors.city_id')
+                    ->join('locations', 'locations.id', '=', 'vendors.location_id')
+                    ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
 
-            if ($location_slug != 'all') {
-                $data->where('locations.slug', $location_slug);
+                if ($location_slug != 'all') {
+                    $data->where('locations.slug', $location_slug);
+                }
+                $tag = 'vendors';
+                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
             }
-            $tag = 'vendors';
-            $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
+
+            $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(12)->get();
+            foreach ($venues_or_vendors as $venue_or_vendor) {
+                $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
+                $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+                $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
+            }
+
+            $response = [
+                'success' => true,
+                'tag' => $tag,
+                'count' => $data->count(),
+                'data' => $venues_or_vendors,
+                'meta' => $meta,
+                'cities' => $cities,
+                'message' => 'Data fetched successfully',
+            ];
+        } catch (\Throwable $th) {
+            $response = [
+                'success' => false,
+                'data' => [],
+                'message' => $th->getMessage(),
+            ];
         }
-
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(12)->get();
-        foreach ($venues_or_vendors as $venue_or_vendor) {
-            $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
-            $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-            $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
-        }
-
-        $response = [
-            'success' => true,
-            'tag' => $tag,
-            'count' => $data->count(),
-            'data' => $venues_or_vendors,
-            'meta' => $meta,
-            'cities' => $cities,
-            'message' => 'Data fetched successfully',
-        ];
-
-    } catch (\Throwable $th) {
-        $response = [
-            'success' => false,
-            'data' => [],
-            'message' => $th->getMessage(),
-        ];
+        return response()->json($response);
     }
-    return response()->json($response);
-}
     public function venue_or_vendor_details(string $slug)
     {
         try {
@@ -429,9 +429,10 @@ class ApiController extends Controller
 
     public function blog_list(Request $request)
     {
-        $blogs = Blog::select('id', 'slug', 'heading', 'excerpt', 'image', 'image_alt', 'author_id', 'publish_date')
-                    ->where('status', 1)
-                    ->paginate(5);
+        $blogs = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.excerpt', 'blogs.image', 'blogs.image_alt', 'blogs.author_id', 'blogs.publish_date', 'authors.name as author_name')
+            ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
+            ->where('blogs.status', 1)
+            ->paginate(5);
 
         return response()->json([
             'status' => 'success',
@@ -439,14 +440,28 @@ class ApiController extends Controller
         ]);
     }
 
-    public function blog_detail($slug){
-        $blog = Blog::where('slug', $slug)->first();
+
+    public function blog_detail($slug)
+    {
+        $blog = Blog::where('slug', $slug)->where('status', 1)->first();
+        if (!$blog) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Blog not found',
+            ], 404);
+        }
+        $popular = Blog::where('popular', 1)->where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+        $latest = Blog::where('status', 1)->orderBy('publish_date', 'desc')->limit(4)->get();
+        $author = Author::where('id', $blog->author_id)->first();
         return response()->json([
             'status' => 'success',
             'data' => $blog,
+            'author' => $author,
+            'popular' => $popular,
+            'latest' => $latest,
         ]);
-
     }
+
 
     //for business auth, dashboard, and profile related methods
     public function business_signup(Request $request)
@@ -457,7 +472,7 @@ class ApiController extends Controller
                 'name' => 'required|string|max:255',
                 'business_name' => 'required|string|max:255',
                 'business_type' => 'required|int|min:1|max:2',
-                'business_category' => 'required|'.$is_valid_business_category,
+                'business_category' => 'required|' . $is_valid_business_category,
                 'email' => 'required|email|unique:business_users,email',
                 'phone' => 'required|int|unique:business_users,phone|min_digits:10|max_digits:10',
                 'city' => 'required|exists:cities,slug',
@@ -472,7 +487,7 @@ class ApiController extends Controller
             } else {
                 $business_category = VendorCategory::where('slug', $request->business_category)->first();
             }
-            if (! $city || ! $business_category) {
+            if (!$city || !$business_category) {
                 return response()->json(['success' => false, 'message' => 'Something went wrong.']);
             }
 
@@ -517,7 +532,7 @@ class ApiController extends Controller
                 if (env('INTERAKT_STATUS') == true) {
                     if (strlen($business_user->business_name) > 15) {
                         $str = str_split($business_user->business_name, 13);
-                        $business_name = $str[0].'..';
+                        $business_name = $str[0] . '..';
                     } else {
                         $business_name = $business_user->business_name;
                     }
@@ -566,7 +581,7 @@ class ApiController extends Controller
     public function update_business_user_content(Request $request)
     {
         $user = BusinessUser::where('remember_token', $request->header('bearer'))->first();
-        if (! $user) {
+        if (!$user) {
             return response()->json(['success' => false, 'message' => 'Invalid request!']);
         }
 
@@ -589,7 +604,7 @@ class ApiController extends Controller
             }
 
             $content_model = $user->getVenueContent;
-            if (! $content_model) {
+            if (!$content_model) {
                 $content_model = new VenueUserContent();
                 $content_model->venue_id = $user->migrated_business_id;
             }
@@ -628,7 +643,7 @@ class ApiController extends Controller
             }
 
             $content_model = $user->getVendorContent;
-            if (! $content_model) {
+            if (!$content_model) {
                 $content_model = new VendorUserContent();
                 $content_model->vendor_id = $user->migrated_business_id;
             }
@@ -656,9 +671,9 @@ class ApiController extends Controller
                 foreach ($request->images as $key => $image) {
                     $ext = $image->getClientOriginalExtension();
                     $sub_str = substr($request->business_name, 0, 5);
-                    $file_name = $image_file_tag.strtolower(str_replace(' ', '_', $sub_str)).'_'.time() + $key.'.'.$ext;
+                    $file_name = $image_file_tag . strtolower(str_replace(' ', '_', $sub_str)) . '_' . time() + $key . '.' . $ext;
                     $path = "uploads/$file_name";
-                    Storage::put('public/'.$path, file_get_contents($image));
+                    Storage::put('public/' . $path, file_get_contents($image));
                     array_push($images_arr, $file_name);
                 }
                 $content_model->images = implode(',', $images_arr);
@@ -810,7 +825,7 @@ class ApiController extends Controller
             $verification_code = rand(111111, 999999);
 
             $signup_request = UserSignupRequest::where('phone', $request->phone)->first();
-            if (! $signup_request) {
+            if (!$signup_request) {
                 $signup_request = new UserSignupRequest();
             }
             $signup_request->phone = $request->phone;
@@ -856,7 +871,7 @@ class ApiController extends Controller
         }
         try {
             $signup_request = UserSignupRequest::where('phone', $request->phone)->first();
-            if (! $signup_request || ($signup_request->otp_code != $request->otp_code)) {
+            if (!$signup_request || ($signup_request->otp_code != $request->otp_code)) {
                 return response()->json(['success' => false, 'message' => 'Invalid credentials.']);
             }
 
@@ -900,7 +915,7 @@ class ApiController extends Controller
         }
 
         $user = User::where('email', $request->username)->orWhere('phone', $request->username)->first();
-        if (! $user || ! password_verify($request->password, $user->password) || $user->phone_verified_at == null) {
+        if (!$user || !password_verify($request->password, $user->password) || $user->phone_verified_at == null) {
             return response()->json(['success' => false, 'message' => 'Invalid credentials.']);
         }
 
@@ -924,7 +939,7 @@ class ApiController extends Controller
             'users.venues_liked',
         )->join('cities', 'cities.id', 'users.city_id')
             ->where('users.remember_token', $request->header('bearer'))->first();
-        if (! $user) {
+        if (!$user) {
             return response()->json(['success' => false, 'message' => 'Invalid request.']);
         }
         $venues_liked = Venue::select(
