@@ -234,6 +234,8 @@ Route::group(['middleware' => 'admin'], function () {
             Route::post('/manage_process/{blog_id?}', 'manage_process')->name('blog.manage_process');
             Route::get('/update_blog_status/{blog_id?}/{status?}', 'update_blog_status')->name('blog.status');
 
+            Route::get('/check-slug/{slug?}', 'checkSlug')->name('check-slug');
+
             // delete blog
             Route::delete('/destroy/{id}', 'destroy')->name('blog.destroy');
         });

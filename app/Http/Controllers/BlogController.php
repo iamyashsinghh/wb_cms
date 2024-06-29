@@ -97,7 +97,7 @@ class BlogController extends Controller
                 $blog->publish_date = today();
                 $blog->popular = 0;
             }
-            
+
             $blog->image_alt = $request->image_alt;
             $blog->summary = str_replace($content_to_trim, '', $request->summary);
             $blog->og_title = $request->og_title;
@@ -115,6 +115,13 @@ class BlogController extends Controller
         }
         return redirect()->back();
     }
+
+    public function checkSlug($slug)
+    {
+        $count = Blog::where('slug', $slug)->count();
+        return response()->json(['unique' => $count]);
+    }
+
 
     public function delete($blog_id)
     {

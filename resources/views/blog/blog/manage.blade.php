@@ -72,7 +72,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="blog_feture_img">Feature Image <span class="text-danger">*</span></label>
+                                        <label for="blog_feture_img">Feature Image <span
+                                                class="text-danger">*</span></label>
                                         <div class="d-flex">
                                             <div class="row">
                                                 <input type="file"
@@ -89,7 +90,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="meta_title_count">Meta Title <span class="text-danger">*</span></label>
+                                        <label for="meta_title_count">Meta Title <span
+                                                class="text-danger">*</span></label>
                                         <textarea class="form-control @error('meta_title') is-invalid @enderror" placeholder="Enter meta title"
                                             name="meta_title" id="meta_title_count" rows="3" required>{{ old('meta_title', $data->meta_title) }}</textarea>
                                         @error('meta_title')
@@ -100,7 +102,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="meta_description_count">Meta Description <span class="text-danger">*</span></label>
+                                        <label for="meta_description_count">Meta Description <span
+                                                class="text-danger">*</span></label>
                                         <textarea class="form-control @error('meta_description') is-invalid @enderror" placeholder="Enter meta description"
                                             id="meta_description_count" name="meta_description" rows="3" required>{{ old('meta_description', $data->meta_description) }}</textarea>
                                         @error('meta_description')
@@ -111,7 +114,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="meta_keywords">Meta Keywords <span class="text-danger">*</span></label>
+                                        <label for="meta_keywords">Meta Keywords <span
+                                                class="text-danger">*</span></label>
                                         <textarea class="form-control @error('meta_keywords') is-invalid @enderror" placeholder="Enter meta keywords"
                                             name="meta_keywords" rows="3" required>{{ old('meta_keywords', $data->meta_keywords) }}</textarea>
                                         @error('meta_keywords')
@@ -151,7 +155,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="image_alt">Feature Image Alt <span class="text-danger">*</span></label>
+                                        <label for="image_alt">Feature Image Alt <span
+                                                class="text-danger">*</span></label>
                                         <textarea class="form-control @error('image_alt') is-invalid @enderror" placeholder="Feature Image Alt"
                                             name="image_alt" rows="3" required>{{ old('image_alt', $data->image_alt) }}</textarea>
                                         @error('image_alt')
@@ -192,10 +197,13 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="author_id">Author <span class="text-danger">*</span></label>
-                                        <select class="form-control @error('author_id') is-invalid @enderror" id="author_id" name="author_id" required>
+                                        <select class="form-control @error('author_id') is-invalid @enderror"
+                                            id="author_id" name="author_id" required>
                                             <option value="">Select Author</option>
-                                            @foreach($authors as $author)
-                                                <option value="{{ $author->id }}" {{ old('author_id', $data->author_id) == $author->id ? 'selected' : '' }}>{{ $author->name }}</option>
+                                            @foreach ($authors as $author)
+                                                <option value="{{ $author->id }}"
+                                                    {{ old('author_id', $data->author_id) == $author->id ? 'selected' : '' }}>
+                                                    {{ $author->name }}</option>
                                             @endforeach
                                         </select>
                                         @error('author_id')
@@ -291,14 +299,41 @@
             reader.readAsDataURL(event.target.files[0]);
         }
 
+        // function generateSlug() {
+        //     const heading = document.getElementById('blog_title').value;
+        //     const slug = heading.toLowerCase()
+        //         .replace(/[^a-z0-9\s-]/g, '')
+        //         .trim()
+        //         .replace(/\s+/g, '-');
+        //     document.getElementById('blog_slug').value = slug;
+        // }
+
         function generateSlug() {
-            const heading = document.getElementById('blog_title').value;
-            const slug = heading.toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-');
+    const heading = document.getElementById('blog_title').value;
+    let slug = heading.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-');
+        
+    fetch(`{{route('check-slug')}}/${slug}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const unique = data.unique;
+            if (unique > 0) {
+                slug += unique;
+            }
             document.getElementById('blog_slug').value = slug;
-        }
+        })
+        .catch(error => {
+            console.error('Error checking slug uniqueness:', error);
+        });
+}
+
 
         new FroalaEditor('#blog_summary', {
             attribution: false,
@@ -328,12 +363,9 @@
                 'url', 'wordPaste'
             ],
             events: {
-                'imageManager.beforeLoad': function() {
-                },
-                'imageManager.loaded': function(data) {
-                },
-                'imageManager.error': function(error) {
-                }
+                'imageManager.beforeLoad': function() {},
+                'imageManager.loaded': function(data) {},
+                'imageManager.error': function(error) {}
             }
         });
     </script>
