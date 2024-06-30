@@ -81,16 +81,19 @@
                     td_elements[5].innerText = data[5];
 
                     td_elements[6].innerHTML = `
+
                         @canany(['edit blog', 'super power'])
                             <a href="{{ route('blog.manage') }}/${data[0]}" class="text-success mx-2" title="Edit">
                                 <i class="fa fa-edit" style="font-size: 15px;"></i>
                             </a>
                         @endcanany
+
                         @canany(['delete blog', 'super power'])
                             <a onclick="handle_delete_blog(${data[0]})" class="text-danger mx-2" title="Delete">
                                 <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                             </a>
                         @endcanany
+                        
                     `;
                 }
             });
