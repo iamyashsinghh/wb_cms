@@ -57,16 +57,27 @@ class BlogController extends Controller
 
     public function manage_process(Request $request, $blog_id = 0)
     {
-        $rules = [
-            'slug' => 'required|string|unique:blogs,slug',
-            'meta_title' => 'required|string',
-            'meta_description' => 'required|string',
-            'meta_keywords' => 'required|string',
-            'heading' => 'required|string',
-            'image_alt' => 'required|string',
-            'summary' => 'required|string',
-        ];
-
+        if($blog_id > 0){
+            $rules = [
+                'slug' => 'required|string',
+                'meta_title' => 'required|string',
+                'meta_description' => 'required|string',
+                'meta_keywords' => 'required|string',
+                'heading' => 'required|string',
+                'image_alt' => 'required|string',
+                'summary' => 'required|string',
+            ];
+        }else{
+            $rules = [
+                'slug' => 'required|string|unique:blogs,slug',
+                'meta_title' => 'required|string',
+                'meta_description' => 'required|string',
+                'meta_keywords' => 'required|string',
+                'heading' => 'required|string',
+                'image_alt' => 'required|string',
+                'summary' => 'required|string',
+            ];
+        }
         $validate = Validator::make($request->all(), $rules);
 
         if ($validate->fails()) {
