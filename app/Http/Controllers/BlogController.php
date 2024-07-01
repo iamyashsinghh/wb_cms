@@ -58,7 +58,7 @@ class BlogController extends Controller
     public function manage_process(Request $request, $blog_id = 0)
     {
         $rules = [
-            'slug' => 'required|string',
+            'slug' => 'required|string|unique:blogs,slug',
             'meta_title' => 'required|string',
             'meta_description' => 'required|string',
             'meta_keywords' => 'required|string',
@@ -123,7 +123,6 @@ class BlogController extends Controller
         return response()->json(['unique' => $count]);
     }
 
-
     public function destroy($blog_id)
     {
         try {
@@ -159,5 +158,4 @@ class BlogController extends Controller
         }
         return $res;
     }
-
 }

@@ -299,74 +299,65 @@
             reader.readAsDataURL(event.target.files[0]);
         }
 
-        // function generateSlug() {
-        //     const heading = document.getElementById('blog_title').value;
-        //     const slug = heading.toLowerCase()
-        //         .replace(/[^a-z0-9\s-]/g, '')
-        //         .trim()
-        //         .replace(/\s+/g, '-');
-        //     document.getElementById('blog_slug').value = slug;
-        // }
-
         function generateSlug() {
-    const heading = document.getElementById('blog_title').value;
-    let slug = heading.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .trim()
-        .replace(/\s+/g, '-');
-        
-    fetch(`{{route('check-slug')}}/${slug}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const unique = data.unique;
-            if (unique > 0) {
-                slug += unique;
-            }
-            document.getElementById('blog_slug').value = slug;
-        })
-        .catch(error => {
-            console.error('Error checking slug uniqueness:', error);
-        });
-}
+            const heading = document.getElementById('blog_title').value;
+            let slug = heading.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-');
 
+            fetch(`{{ route('check-slug') }}/${slug}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const unique = data.unique;
+                    if (unique > 0) {
+                        slug += unique;
+                    }
+                    document.getElementById('blog_slug').value = slug;
+                })
+                .catch(error => {
+                    console.error('Error checking slug uniqueness:', error);
+                });
+        }
 
-        new FroalaEditor('#blog_summary', {
-            attribution: false,
-            imageUploadURL: '{{ route('froala.upload_image') }}',
-            imageUploadParams: {
-                _token: '{{ csrf_token() }}'
-            },
-            imageManagerLoadURL: '{{ route('froala.load_images') }}',
-            imageManagerDeleteURL: '{{ route('froala.delete_image') }}',
-            imageManagerDeleteMethod: 'POST',
-            imageManagerLoadParams: {
-                _token: '{{ csrf_token() }}'
-            },
-            imageManagerDeleteParams: {
-                _token: '{{ csrf_token() }}'
-            },
-            videoUploadURL: '{{ route('froala.upload_video') }}',
-            videoUploadParams: {
-                _token: '{{ csrf_token() }}'
-            },
-            pluginsEnabled: [
-                'image', 'imageManager', 'video', 'align', 'charCounter', 'codeBeautifier',
-                'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
-                'fullscreen',
-                'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                'quickInsert', 'quote', 'table',
-                'url', 'wordPaste'
-            ],
-            events: {
-                'imageManager.beforeLoad': function() {},
-                'imageManager.loaded': function(data) {},
-                'imageManager.error': function(error) {}
-            }
+        document.addEventListener('DOMContentLoaded', function () {
+            new FroalaEditor('#blog_summary', {
+                attribution: false,
+                imageUploadURL: '{{ route('froala.upload_image') }}',
+                imageUploadParams: {
+                    _token: '{{ csrf_token() }}'
+                },
+                imageManagerLoadURL: '{{ route('froala.load_images') }}',
+                imageManagerDeleteURL: '{{ route('froala.delete_image') }}',
+                imageManagerDeleteMethod: 'POST',
+                imageManagerLoadParams: {
+                    _token: '{{ csrf_token() }}'
+                },
+                imageManagerDeleteParams: {
+                    _token: '{{ csrf_token() }}'
+                },
+                videoUploadURL: '{{ route('froala.upload_video') }}',
+                videoUploadParams: {
+                    _token: '{{ csrf_token() }}'
+                },
+                pluginsEnabled: [
+                    'image', 'imageManager', 'video', 'align', 'charCounter', 'codeBeautifier',
+                    'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
+                    'fullscreen', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                    'quickInsert', 'quote', 'table', 'url', 'wordPaste'
+                ],
+                fontSize: ['8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '36', '40', '44', '48', '54', '60', '72', '96'],
+                events: {
+                    'imageManager.beforeLoad': function () { },
+                    'imageManager.loaded': function (data) { },
+                    'imageManager.error': function (error) { }
+                }
+            });
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>

@@ -75,25 +75,20 @@
                     let popular = data[6] == 1 ?
                         `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('blog.popular') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>` :
                         `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('blog.popular') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
-
                     td_elements[3].innerHTML = status;
                     td_elements[4].innerHTML = popular;
                     td_elements[5].innerText = data[5];
-
                     td_elements[6].innerHTML = `
-
                         @canany(['edit blog', 'super power'])
                             <a href="{{ route('blog.manage') }}/${data[0]}" class="text-success mx-2" title="Edit">
                                 <i class="fa fa-edit" style="font-size: 15px;"></i>
                             </a>
                         @endcanany
-
                         @canany(['delete blog', 'super power'])
                             <a onclick="handle_delete_blog(${data[0]})" class="text-danger mx-2" title="Delete">
                                 <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                             </a>
                         @endcanany
-                        
                     `;
                 }
             });
