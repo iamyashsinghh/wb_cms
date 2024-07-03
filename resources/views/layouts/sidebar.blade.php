@@ -176,6 +176,8 @@
                                         </a>
                                     </span>
                                 </li>
+                            @endcanany
+                            @canany(['super power', 'location crud'])
                                 <li class="nav-item">
                                     <span
                                         class="nav-link d-flex justify-content-between align-items-center
@@ -186,6 +188,8 @@
                                         </a>
                                     </span>
                                 </li>
+                            @endcanany
+                            @canany(['super power'])
                                 <li class="nav-item">
                                     <span
                                         class="nav-link d-flex justify-content-between align-items-center {{ $route == 'meal.list' ? 'active' : '' }}">
