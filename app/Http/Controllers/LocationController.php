@@ -24,7 +24,7 @@ class LocationController extends Controller {
         return datatables($locations)->make(false);
     }
 
-    //ajax functions: 
+    //ajax functions:
     public function edit_ajax($location_id) {
         try {
             $location = Location::find($location_id);
@@ -71,7 +71,7 @@ class LocationController extends Controller {
             if (!$group) {
                 return abort(404);
             }
-            $locations = Location::select('id', 'name')->where(['city_id' => $group->city_id, 'is_group' => false])->get();
+            $locations = Location::select('id', 'name')->where(['city_id' => $group->city_id])->get();
         } else {
             $page_heading = "Add Location group";
             $group = json_decode(json_encode([

@@ -39,4 +39,7 @@ class MegaDatabaseChangeController extends Controller
     }
 
 
+    public function convert_all_the_localities_into_group(){
+        Location::where('city_id', 1)->update(['is_group' => 1]);
+    }
 }

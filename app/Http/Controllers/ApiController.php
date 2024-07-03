@@ -26,6 +26,7 @@ use App\Models\VenueUserContent;
 use App\Models\WebAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -101,16 +102,16 @@ class ApiController extends Controller
 
     public function get_json_reviews($place_id)
     {
-        $yash = Storage::get('public/uploads/all_reviews/' . $place_id . '_reviews.json');
+        $get_json_reviews = Storage::get('public/uploads/all_reviews/' . $place_id . '_reviews.json');
 
-        return $yash;
+        return $get_json_reviews;
     }
 
     public function get_json_reviews_site($product_id)
     {
-        $yash = Review::where('product_id', $product_id)->where('status', 1)->get();
+        $get_json_reviews_site = Review::where('product_id', $product_id)->where('status', 1)->get();
 
-        return $yash;
+        return $get_json_reviews_site;
     }
 
     public function search_form_result_venue()
@@ -273,6 +274,7 @@ class ApiController extends Controller
 
             $city = City::where('slug', $city_slug)->first();
             $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+            // Log::info($location);
 
             $slug = "$category_slug/$city_slug/$location_slug";
 
@@ -296,17 +298,28 @@ class ApiController extends Controller
                     DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
                     'locations.name as location_name',
                     'cities.name as city_name'
-                )
+                 )
                     ->join('locations', 'locations.id', '=', 'venues.location_id')
                     ->join('cities', 'cities.id', '=', 'venues.city_id')
                     ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
+                // if ($location != null && $location->is_group == true) {
+                //     $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
+                // }
+
                 if ($location != null && $location->is_group == true) {
-                    $data->whereIn('venues.location_id', explode(',', $location->locality_ids));
+                    $localityIds = explode(',', $location->locality_ids);
+                    $newValue = $location->id;
+                    if (!in_array($newValue, $localityIds)) {
+                        $localityIds[] = $newValue;
+                    }
+                    $data->whereIn('venues.location_id', $localityIds);
                 }
+
                 if ($location_slug != 'all' && $location->is_group == false) {
                     $data->where('venues.location_id', $location->id);
                 }
+
                 $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
                 $tag = 'venues';
                 if ($request->guest) {
@@ -321,6 +334,7 @@ class ApiController extends Controller
                     $params = explode(',', $request->per_budget);
                     $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
                 }
+                
                 if ($request->multi_localities) {
                     $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
                     $arr = $request->multi_localities;
@@ -331,6 +345,7 @@ class ApiController extends Controller
 
                     $data->whereIn('location_id', array_unique($params));
                 }
+
                 if ($request->food_type) {
                     $food_type = $request->food_type . '_price';
                     $data->whereNotNull($food_type);
@@ -357,11 +372,13 @@ class ApiController extends Controller
                 if ($location_slug != 'all') {
                     $data->where('locations.slug', $location_slug);
                 }
+
                 $tag = 'vendors';
                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
             }
 
             $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit(9)->get();
+
             foreach ($venues_or_vendors as $venue_or_vendor) {
                 $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
                 $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
