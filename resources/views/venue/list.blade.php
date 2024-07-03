@@ -1,115 +1,132 @@
 @extends('layouts.app')
-@section('title', "Venue List")
+@section('title', 'Venue List')
 
 @section('header-css')
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 @endsection
 @section('main')
-<div class="content-wrapper pb-5">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Venue List</h1>
+    <div class="content-wrapper pb-5">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Venue List</h1>
+                    </div>
+                </div>
+                <div class="button-group my-4">
+                    @canany(['create venue_vendor', 'super power'])
+                        <a href="{{ route('venue.add') }}" class="btn btn-sm text-light buttons-print"
+                            style="background-color: var(--wb-renosand)">
+                            <i class="fa fa-plus mr-1"></i>Add New
+                        </a>
+                    @endcanany
                 </div>
             </div>
-            <div class="button-group my-4">
-                @canany(['create venue_vendor', 'super power'])
-                    <a href="{{route('venue.add')}}" class="btn btn-sm text-light buttons-print" style="background-color: var(--wb-renosand)">
-                        <i class="fa fa-plus mr-1"></i>Add New
-                    </a>
-                @endcanany
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="table-responsive">
+                    <table id="serverTable" class="table text-sm">
+                        <thead>
+                            <th>ID</th>
+                            <th>Venue Name</th>
+                            <th>Phone Number</th>
+                            <th>City</th>
+                            <th>Locality</th>
+                            <th>WB Assured</th>
+                            <th>Popular</th>
+                            <th>Status</th>
+                            <th>Images Status</th>
+                            <th>Last Updated By</th>
+                            <th>Created By</th>
+                            <th>Last Updated At</th>
+                            <th>Created At</th>
+                            <th class="text-center">Action</th>
+                        </thead>
+                    </table>
+                </div>
             </div>
-        </div>
-    </section>
-    <section class="content">
-        <div class="container-fluid">
-            <div class="table-responsive">
-                <table id="serverTable" class="table text-sm">
-                    <thead>
-                        <th>ID</th>
-                        <th>Venue Name</th>
-                        <th>Phone Number</th>
-                        <th>City</th>
-                        <th>Locality</th>
-                        <th>WB Assured</th>
-                        <th>Popular</th>
-                        <th>Status</th>
-                        <th>Images Status</th>
-                        <th class="text-center">Action</th>
-                    </thead>
-                </table>
-            </div>
-        </div>
-    </section>
-    @include('includes.update_phone_no_modal')
-    @include('includes.delete_vendor_venue_modal')
-    @include('includes.update_meta_modal')
-    @include('includes.update_faq_modal')
-</div>
+        </section>
+        @include('includes.update_phone_no_modal')
+        @include('includes.delete_vendor_venue_modal')
+        @include('includes.update_meta_modal')
+        @include('includes.update_faq_modal')
+    </div>
 @endsection
 @section('footer-script')
-<script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-<script>
-     $(document).ready(function() {
-        $('#serverTable').DataTable({
-            pageLength: 10,
-            processing: true,
-            searchable: true,
-            ordering: true,
-            language: {
-                "search": "_INPUT_", // Removes the 'Search' field label
-                "searchPlaceholder": "Type here to search..", // Placeholder for the search box
-            },
-            serverSide: true,
-            ajax: `{{route('venue.ajax_list')}}`,
-            order: [
-                [0, 'desc']
-            ],
-            rowCallback: function(row, data, index) {
-                const td_elements = row.querySelectorAll('td');
-                if(data[5] == 1){
-                    wb_assured = `<a data-id="${data[0]}" data-status="0" data-submit-url="{{route('venue.update_wb_assured_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
-                }else{
-                    wb_assured = `<a data-id="${data[0]}" data-status="1" data-submit-url="{{route('venue.update_wb_assured_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
-                }
-                if(data[6] == 1){
-                    popular_elem = `<a data-id="${data[0]}" data-status="0" data-submit-url="{{route('venue.update_popular_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
-                }else{
-                    popular_elem = `<a data-id="${data[0]}" data-status="1" data-submit-url="{{route('venue.update_popular_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
-                }
+    <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#serverTable').DataTable({
+                pageLength: 10,
+                processing: true,
+                searchable: true,
+                ordering: true,
+                language: {
+                    "search": "_INPUT_", // Removes the 'Search' field label
+                    "searchPlaceholder": "Type here to search..", // Placeholder for the search box
+                },
+                serverSide: true,
+                ajax: `{{ route('venue.ajax_list') }}`,
+                order: [
+                    [0, 'desc']
+                ],
+                rowCallback: function(row, data, index) {
+                    const td_elements = row.querySelectorAll('td');
+                    if (data[5] == 1) {
+                        wb_assured =
+                            `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('venue.update_wb_assured_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
+                    } else {
+                        wb_assured =
+                            `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('venue.update_wb_assured_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                    }
+                    if (data[6] == 1) {
+                        popular_elem =
+                            `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('venue.update_popular_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
+                    } else {
+                        popular_elem =
+                            `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('venue.update_popular_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                    }
 
-                @canany(['super power', 'publish venue_vendor'])
-                if(data[7] == 1){
-                    status_elem = `<a data-id="${data[0]}" data-status="0" data-submit-url="{{route('venue.update_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
-                }else{
-                    status_elem = `<a data-id="${data[0]}" data-status="1" data-submit-url="{{route('venue.update_status')}}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
-                }
-                @else
-                if(data[7] == 1){
-                    status_elem = `<a data-id="${data[0]}" data-status="0" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-on text-success"></i></a>`;
-                }else{
-                    status_elem = `<a data-id="${data[0]}" data-status="1" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
-                }
-                @endcanany
+                    @canany(['super power', 'publish venue_vendor'])
+                        if (data[7] == 1) {
+                            status_elem =
+                                `<a data-id="${data[0]}" data-status="0" data-submit-url="{{ route('venue.update_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-on text-success"></i></a>`;
+                        } else {
+                            status_elem =
+                                `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('venue.update_status') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                        }
+                    @else
+                        if (data[7] == 1) {
+                            status_elem =
+                                `<a data-id="${data[0]}" data-status="0" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-on text-success"></i></a>`;
+                        } else {
+                            status_elem =
+                                `<a data-id="${data[0]}" data-status="1" href="javascript:void(0);" style="font-size: 22px;"><i class="fa fa-toggle-off text-danger"></i></a>`;
+                        }
+                    @endcanany
 
+                    td_elements[5].innerHTML = wb_assured;
+                    td_elements[6].innerHTML = popular_elem;
+                    td_elements[7].innerHTML = status_elem;
 
-                td_elements[5].innerHTML = wb_assured;
-                td_elements[6].innerHTML = popular_elem;
-                td_elements[7].innerHTML = status_elem;
+                    if (data[8] == null) {
+                        td_elements[8].innerHTML =
+                            `<span class="badge badge-danger">Not Available</span>`;
+                    } else {
+                        td_elements[8].innerHTML = `<span class="badge badge-success">Available</span>`;
+                    }
 
-                if(data[8] == null){
-                    td_elements[8].innerHTML = `<span class="badge badge-danger">Not Available</span>`;
-                }else{
-                    td_elements[8].innerHTML = `<span class="badge badge-success">Available</span>`;
-                }
+                    td_elements[9].innerText = data[9];
+                    td_elements[10].innerText = data[10];
+                    td_elements[11].innerText = moment(data[11]).format("DD-MMM-YYYY hh:mm a");
+                    td_elements[12].innerText = moment(data[12]).format("DD-MMM-YYYY hh:mm a");
 
-                td_elements[9].classList = 'text-center text-nowrap';
-                td_elements[9].innerHTML = `
-
+                    td_elements[13].classList = 'text-center text-nowrap';
+                    td_elements[13].innerHTML = `
                                 @canany(['super power', 'edit venue_vendor'])
 
-                                <a href="{{route('venue.edit')}}/${data[0]}" class="text-success mx-2" title="Edit">
+                        <a href="{{ route('venue.edit') }}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
                 @endcanany
@@ -125,37 +142,37 @@
                     <i class="fa fa-caret-down text-dark"></i>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{route('venue.manage_images')}}/${data[0]}">Update Images</a></li>
+                        <li><a class="dropdown-item" href="{{ route('venue.manage_images') }}/${data[0]}">Update Images</a></li>
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_phone_no('venue', ${data[0]})">Update Phone Number</a></li>
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_meta('venue', ${data[0]})">Update Meta</a></li>
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_faq(${data[0]})">Update FAQ</a></li>
                     </ul>
                 </div>
                 @endcanany`;
-            }
+                }
+            });
         });
-    });
 
-    function handle_delete_venue(venue_id) {
-        const deleteVenueModal = new bootstrap.Modal(document.getElementById('deleteVendorVenueModal'));
-        const deleteVenueForm = document.getElementById('deleteVendorVenueForm');
-        const actionUrl = `{{ route('venue.destroy', ':id') }}`.replace(':id', venue_id);
-        deleteVenueForm.action = actionUrl;
-        deleteVenueModal.show();
-    }
+        function handle_delete_venue(venue_id) {
+            const deleteVenueModal = new bootstrap.Modal(document.getElementById('deleteVendorVenueModal'));
+            const deleteVenueForm = document.getElementById('deleteVendorVenueForm');
+            const actionUrl = `{{ route('venue.destroy', ':id') }}`.replace(':id', venue_id);
+            deleteVenueForm.action = actionUrl;
+            deleteVenueModal.show();
+        }
 
-    function handle_update_faq(venue_id){
-        fetch(`{{route('venue.fetch_faq')}}/${venue_id}`).then(response => response.json()).then(data => {
-            const faqs = JSON.parse(data.faq);
-            const updateFaqModal = document.getElementById("updateFaqModal");
-            const modal = new bootstrap.Modal(updateFaqModal);
+        function handle_update_faq(venue_id) {
+            fetch(`{{ route('venue.fetch_faq') }}/${venue_id}`).then(response => response.json()).then(data => {
+                const faqs = JSON.parse(data.faq);
+                const updateFaqModal = document.getElementById("updateFaqModal");
+                const modal = new bootstrap.Modal(updateFaqModal);
 
-            updateFaqModal.querySelector('form').action = `{{route('venue.update_faq')}}/${venue_id}`;
-            updateFaqModal.querySelector('#faq_modal_body').innerHTML = "";
+                updateFaqModal.querySelector('form').action = `{{ route('venue.update_faq') }}/${venue_id}`;
+                updateFaqModal.querySelector('#faq_modal_body').innerHTML = "";
 
-            if(faqs != null && faqs.length > 0){
-                for(let faq of faqs){
-                    const faqElem = `<div class="row">
+                if (faqs != null && faqs.length > 0) {
+                    for (let faq of faqs) {
+                        const faqElem = `<div class="row">
                         <div class="col-sm-5">
                             <div class="form-group">
                                 <label for="desc_text">FAQ Question <span class="text-danger">*</span></label>
@@ -172,10 +189,10 @@
                             <button type="button" class="btn btn-sm text-danger" onclick="handle_remove_faq(this)"><i class="fa fa-times"></i></button>
                         </div>
                     </div>`;
-                    updateFaqModal.querySelector('#faq_modal_body').innerHTML += faqElem;
-                }
-            }else{
-                const faqElem = `<div class="row">
+                        updateFaqModal.querySelector('#faq_modal_body').innerHTML += faqElem;
+                    }
+                } else {
+                    const faqElem = `<div class="row">
                     <div class="col-sm-5">
                         <div class="form-group">
                             <label for="desc_text">FAQ Question <span class="text-danger">*</span></label>
@@ -192,32 +209,32 @@
                         <button type="button" class="btn btn-sm text-danger" onclick="handle_remove_faq(this)"><i class="fa fa-times"></i></button>
                     </div>
                 </div>`;
-                updateFaqModal.querySelector('#faq_modal_body').innerHTML = faqElem;
-            }
-
-            modal.show();
-        });
-    }
-
-    function handle_update_status(elem){
-        if(confirm("Are you sure want to update the status")){
-            const submit_url = elem.getAttribute('data-submit-url');
-            const data_id = elem.getAttribute('data-id');
-            const data_status = elem.getAttribute('data-status');
-            fetch(`${submit_url}/${data_id}/${data_status}`).then(response => response.json()).then(data => {
-                if(data.success === true){
-                    const icon = elem.firstChild;
-                    if(data_status == 0){
-                        icon.classList = `fa fa-toggle-off text-danger`;
-                        elem.setAttribute('data-status', 1);
-                    }else{
-                        icon.classList = `fa fa-toggle-on text-success`;
-                        elem.setAttribute('data-status', 0);
-                    }
+                    updateFaqModal.querySelector('#faq_modal_body').innerHTML = faqElem;
                 }
-                toastr[data.alert_type](data.message);
+
+                modal.show();
             });
         }
-    }
-</script>
+
+        function handle_update_status(elem) {
+            if (confirm("Are you sure want to update the status")) {
+                const submit_url = elem.getAttribute('data-submit-url');
+                const data_id = elem.getAttribute('data-id');
+                const data_status = elem.getAttribute('data-status');
+                fetch(`${submit_url}/${data_id}/${data_status}`).then(response => response.json()).then(data => {
+                    if (data.success === true) {
+                        const icon = elem.firstChild;
+                        if (data_status == 0) {
+                            icon.classList = `fa fa-toggle-off text-danger`;
+                            elem.setAttribute('data-status', 1);
+                        } else {
+                            icon.classList = `fa fa-toggle-on text-success`;
+                            elem.setAttribute('data-status', 0);
+                        }
+                    }
+                    toastr[data.alert_type](data.message);
+                });
+            }
+        }
+    </script>
 @endsection

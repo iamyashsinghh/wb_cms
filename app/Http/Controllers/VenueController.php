@@ -12,6 +12,7 @@ use App\Models\C_Number;
 use App\Models\VenueCategory;
 use App\Models\VenueUserContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -28,6 +29,10 @@ class VenueController extends Controller {
             'venues.popular',
             'venues.status',
             'venues.images',
+            'venues.updated_by',
+            'venues.created_by',
+            'venues.updated_at',
+            'venues.created_at',
             'venues.id as action',
         )->join('cities', 'cities.id', 'venues.city_id')
             ->join('locations', 'locations.id', 'venues.location_id');
@@ -48,7 +53,6 @@ class VenueController extends Controller {
         } else {
             $nextCompanyNumber = C_Number::where('is_next', 1)->first();
             if (!$nextCompanyNumber) {
-                // If no company number is marked as next, default to the first one
                 $nextCompanyNumber = C_Number::orderBy('id')->first();
             }
             $page_heading = "Add Venue";
@@ -115,13 +119,15 @@ class VenueController extends Controller {
     }
 
     public function manage_process(Request $request, $venue_id = 0) {
-
+        $user = Auth::user();
         if ($venue_id > 0) {
             $venue = Venue::find($venue_id);
             $msg = "Venue updated successfully.";
+            $venue->updated_by = $user->name;
         } else {
             $venue = new Venue();
             $msg = "venue added successfully.";
+            $venue->created_by = $user->name;
         }
 
         $area_capacities = [];
@@ -372,13 +378,16 @@ class VenueController extends Controller {
         $page_heading = "Venue Images";
         return view('common.manage_images', compact('data', 'view_used_for', 'page_heading'));
     }
+
     public function images_manage_process(Request $request, int $venue_id) {
         try {
+            $user = Auth::user();
             if ($request->user_id > 0) {
                 $business_user = BusinessUser::find($request->user_id);
                 $venue = $business_user->getVenueContent;
             } else {
                 $venue = Venue::find($venue_id);
+                $venue->updated_by = $user->name;
             }
 
             $venue_images_arr = $venue->images ? explode(",", $venue->images) : [];
@@ -387,7 +396,6 @@ class VenueController extends Controller {
                 foreach ($request->gallery_images as $key => $image) {
                     if (is_file($image)) {
                         $ext = $image->getClientOriginalExtension();
-
                         $sub_str = substr($venue->name, 0, 5);
                         $file_name = "venue_" . strtolower(str_replace(' ', '_', $sub_str)) . "_" . time() + $key . "." . $ext;
                         $path = "uploads/$file_name";
@@ -419,6 +427,7 @@ class VenueController extends Controller {
         }
         return redirect()->back();
     }
+
     public function image_delete(Request $request, $venue_id) {
         try {
             $venue = Venue::find($venue_id);
@@ -439,6 +448,7 @@ class VenueController extends Controller {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.', 'errors' => $th->getMessage()]);
         }
     }
+    
     public function update_images_sorting(Request $request, $venue_id) {
         try {
             $images = implode(",", $request->images);
