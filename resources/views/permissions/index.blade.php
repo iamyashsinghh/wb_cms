@@ -54,7 +54,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="permissionModalLabel">Add Permission</h5>
-                    <h4 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><b>X</b></h4>
+                    <h4 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
