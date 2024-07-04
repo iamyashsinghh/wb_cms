@@ -689,7 +689,9 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
             'page_no' => $page_no,
         ]);
 
-        $items_per_page = 21;
+        $items_per_page = 9;
+        $offset = ($page_no - 1) * $items_per_page;
+
         $venue_category = VenueCategory::where('slug', $category_slug)->first();
         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
@@ -807,7 +809,8 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
             $tag = 'vendors';
         }
 
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->distinct()->paginate($items_per_page);
+        $total_items = $data->count();
+        $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
 
         if ($venue_category) {
             foreach ($venues_or_vendors as $venue_or_vendor) {
@@ -820,15 +823,15 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
         $response = [
             'success' => true,
             'tag' => $tag,
-            'count' => $venues_or_vendors->total(),
-            'data' => $venues_or_vendors->items(),
+            'count' => $total_items,
+            'data' => $venues_or_vendors,
             'meta' => $meta,
             'cities' => $cities,
             'pagination' => [
-                'current_page' => $venues_or_vendors->currentPage(),
-                'last_page' => $venues_or_vendors->lastPage(),
-                'per_page' => $venues_or_vendors->perPage(),
-                'total' => $venues_or_vendors->total(),
+                'current_page' => $page_no,
+                'last_page' => ceil($total_items / $items_per_page),
+                'per_page' => $items_per_page,
+                'total' => $total_items,
             ],
             'message' => 'Data fetched successfully',
         ];
