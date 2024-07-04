@@ -807,7 +807,7 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
             $tag = 'vendors';
         }
 
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->paginate($items_per_page);
+        $venues_or_vendors = $data->orderBy('popular', 'desc')->distinct()->paginate($items_per_page);
 
         if ($venue_category) {
             foreach ($venues_or_vendors as $venue_or_vendor) {
