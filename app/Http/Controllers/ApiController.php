@@ -539,7 +539,7 @@ class ApiController extends Controller
     return response()->json($response);
 }
 
-public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
+public function venue_or_vendor_list_datahai(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
     {
         try {
             $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();

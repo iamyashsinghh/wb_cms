@@ -21,7 +21,7 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('popular_venues/{category_slug}/{city_slug}', 'popular_venues');
     Route::get('state_management', 'state_management');
     Route::get('venue_or_vendor_list/{category_slug}/{city_slug}/{location_slug?}/{page_no?}', 'venue_or_vendor_list');
-    Route::get('venue_or_vendor_list_data/{category_slug}/{city_slug}/{location_slug?}/{page_no?}', 'venue_or_vendor_list_data');
+    Route::get('venue_or_vendor_list_data/{category_slug}/{city_slug}/{location_slug?}/{page_no?}', 'venue_or_vendor_list_datahai');
     Route::get('venue_or_vendor_details/{slug}', 'venue_or_vendor_details');
     Route::get('cities', 'cities');
     Route::get('locations/{city_slug}', 'locations');
