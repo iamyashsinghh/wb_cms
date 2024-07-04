@@ -689,7 +689,7 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
             'page_no' => $page_no,
         ]);
 
-        $items_per_page = 9;
+        $items_per_page = 21;
         $venue_category = VenueCategory::where('slug', $category_slug)->first();
         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
