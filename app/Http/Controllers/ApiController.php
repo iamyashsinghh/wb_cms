@@ -414,7 +414,6 @@ class ApiController extends Controller
         $offset = ($items_per_page * $page_no) - $items_per_page;
         $venue_category = VenueCategory::where('slug', $category_slug)->first();
         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
-
         $city = City::where('slug', $city_slug)->first();
         $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
         $slug = "$category_slug/$city_slug/$location_slug";
