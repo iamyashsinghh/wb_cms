@@ -539,11 +539,11 @@ class ApiController extends Controller
     return response()->json($response);
 }
 
-public function venue_or_vendor_list_datahai(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
+public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
     {
         try {
             $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-
+Log::info("venue_or_vendor_list_data");
             $items_per_page = 9;
             $venue_category = VenueCategory::where('slug', $category_slug)->first();
             $vendor_category = VendorCategory::where('slug', $category_slug)->first();
@@ -639,7 +639,6 @@ public function venue_or_vendor_list_datahai(Request $request, string $category_
                 if ($location_slug != 'all') {
                     $data->where('locations.slug', $location_slug);
                 }
-
                 $tag = 'vendors';
                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
             }
@@ -661,13 +660,13 @@ public function venue_or_vendor_list_datahai(Request $request, string $category_
                 'data' => $venues_or_vendors->items(),
                 'meta' => $meta,
                 'cities' => $cities,
-                'message' => 'Data fetched successfully',
                 'pagination' => [
                     'current_page' => $venues_or_vendors->currentPage(),
                     'last_page' => $venues_or_vendors->lastPage(),
                     'per_page' => $venues_or_vendors->perPage(),
                     'total' => $venues_or_vendors->total(),
                 ],
+                'message' => 'Data fetched successfully',
             ];
         } catch (\Throwable $th) {
             $response = [
