@@ -99,15 +99,15 @@
 <script src="{{asset('plugins/bs-custom-file-input/bs-custom-file-input.min.js')}}"></script>
 
 <script>
-    const data_id = "{{$data->id}}";
-
     $(document).ready(function () {
-        bsCustomFileInput.init()
-    })
+        bsCustomFileInput.init();
 
-    $("#images_gallery").sortable({
-        handle: "img"
-    })
+        $("#images_gallery").sortable({
+            handle: "img"
+        });
+    });
+
+    const data_id = "{{$data->id}}";
 
     function handle_sorting_process() {
         let confirmation = window.confirm('Sorting confirmation..');
@@ -121,22 +121,27 @@
                 images: sort_images
             })).then(response => response.json()).then(data => {
                 toastr[data.alert_type](data.message);
-            })
+            });
         }
     }
 
-    function handle_image_delete(elem, image_name){
-        let confirm = window.confirm("Are your sure want to delete the current image");
-        if(confirm){
+    function handle_image_delete(elem, image_name) {
+        console.log("Delete function called for image:", image_name); // Debug log
+        let confirm_delete = window.confirm("Are your sure you want to delete the current image?");
+        if (confirm_delete) {
+            console.log("Delete confirmed for image:", image_name); // Debug log
             common_ajax(`{{route("$view_used_for.image.delete")}}/${data_id}`, 'post', JSON.stringify({
                 image_name: image_name
             })).then(response => response.json()).then(data => {
-                if(data.success){
+                console.log("Server response:", data); // Debug log
+                if (data.success) {
                     const gallery_card = elem.closest('.col-sm-3');
                     gallery_card.remove();
                 }
                 toastr[data.alert_type](data.message);
-            })
+            }).catch(error => {
+                console.error("Error during delete operation:", error); // Debug log
+            });
         }
     }
 </script>
