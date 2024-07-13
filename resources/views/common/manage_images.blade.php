@@ -35,7 +35,7 @@
     }
 </style>
 @php
-    
+
 @endphp
 <div class="content-wrapper pb-5">
     <section class="content-header">
@@ -122,25 +122,20 @@
             })).then(response => response.json()).then(data => {
                 toastr[data.alert_type](data.message);
             })
-            
         }
     }
 
     function handle_image_delete(elem, image_name){
         let confirm = window.confirm("Are your sure want to delete the current image");
         if(confirm){
-           
-            const image_url = elem.parentElement.parentElement.firstElementChild.src;
-            common_ajax(`{{route("$view_used_for.image.delete")}}/${data_id}`, 'post' ,JSON.stringify({
+            common_ajax(`{{route("$view_used_for.image.delete")}}/${data_id}`, 'post', JSON.stringify({
                 image_name: image_name
             })).then(response => response.json()).then(data => {
-                console.log(data);
                 if(data.success){
-                    const gallery_card = elem.parentElement.parentElement.parentElement;
+                    const gallery_card = elem.closest('.col-sm-3');
                     gallery_card.remove();
                 }
                 toastr[data.alert_type](data.message);
-
             })
         }
     }
