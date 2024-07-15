@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
  Route::get('logout', [AuthController::class, 'logout'])->name('logout');
  Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
  Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
+ Route::get('hi/{country?}/{city?}/{location?}', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
+
 
 Route::group(['middleware' => 'AuthCheck'], function () {
     Route::get('/', [AuthController::class, 'login'])->name('login');
