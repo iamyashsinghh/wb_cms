@@ -4,6 +4,7 @@ use App\Http\Controllers;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\FroalaController;
 use App\Http\Controllers\MegaDatabaseChangeController;
@@ -44,6 +45,11 @@ Route::group(['middleware' => 'admin'], function () {
         Route::get('/delete/{account_id?}', [AccountController::class, 'delete'])->name('account.delete');
         Route::post('/manage_process/{account_id?}', [AccountController::class, 'manage_process'])->name('account.manage_process');
         Route::post('/phone/validate', [AccountController::class, 'validatePhone'])->name('phone.validate');
+    });
+
+    Route::prefix('manage_devices')->group(function(){
+        Route::get('permit_or_not_more_device_for_login_for_an_account/{member_id?}/{value?}', [DeviceController::class, 'permit_or_not_more_device_for_login_for_an_account'])->name('admin.permit.unpermit.canadddevice');
+        Route::get('delete_device/{device_id?}', [DeviceController::class, 'delete_device'])->name('admin.devices.manage.delete');
     });
 
     Route::resource('roles', RoleController::class);

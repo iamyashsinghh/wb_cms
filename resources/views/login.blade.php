@@ -81,7 +81,6 @@
 
         function handle_login_verify(e) {
             e.preventDefault();
-
             const custom_spinner = document.getElementById('custom_spinner');
             const submit_btn = document.getElementById('submit_btn');
             custom_spinner.classList.remove('d-none');

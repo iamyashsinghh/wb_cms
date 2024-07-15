@@ -49,4 +49,7 @@ class User extends Authenticatable {
     public function get_location() {
         return $this->hasOne(Location::class, 'id', 'location_id');
     }
+    public function get_registered_devices() {
+        return $this->hasMany(Device::class, 'member_id', 'id');
+    }
 }

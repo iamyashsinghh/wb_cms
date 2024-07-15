@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpMail;
+use App\Models\Device;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Jenssegers\Agent\Agent;
 
 class AuthController extends Controller
 {
@@ -27,6 +30,12 @@ class AuthController extends Controller
             'phone' => 'required|digits_between:10,15|exists:users,phone',
         ]);
 
+        $agent = new Agent();
+        $browser_name = $agent->browser();
+        $browser_version = $agent->version($browser_name);
+        $platform = $agent->platform();
+        $client_ip = $request->getClientIp();
+
         if ($validate->fails()) {
             return response()->json([
                 'success' => false,
@@ -36,25 +45,76 @@ class AuthController extends Controller
         }
 
         $user = User::where('phone', $request->phone)->first();
-        // $otp = 999999; // Hardcoded for testing, replace with rand(100000, 999999) in production
-        $otp = rand(100000, 999999);
 
-        $login_info = LoginInfo::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'otp_code' => Hash::make($otp),
-                'request_otp_at' => Carbon::now(),
-                'ip_address' => $request->ip(),
-                'status' => 0,
-            ]
-        );
+        $device_id = Cookie::get("device_id_cms_$user->phone");
+        $datetime = date('Y-m-d H:i:s');
+        $cookie_val = md5("$user->phone-$datetime");
+        $can_user_login = 0;
 
-        if($user->email){
-            Mail::to($user->email)->send(new OtpMail($otp, $user));
+        $verified_device = Device::where(['device_id' => $device_id])->where('member_id', $user->id)->first();
+
+        $device = Device::where('member_id', $user->id)->first();
+
+        if (!$device) {
+            if ($user->can_add_device === 1) {
+                $device = new Device();
+                $device->member_id = $user->id;
+                $device->device_name = "$browser_name Ver:$browser_version /  Platform:$platform";
+                $device->device_id = $cookie_val;
+                if ($device->save()) {
+                    $user->can_add_device = 0;
+                    $user->save();
+                    $can_user_login = 1;
+                    Cookie::queue(Cookie::make("device_id_cms_$request->login_type-$user->phone", $cookie_val, 60 * 24 * 30));
+                }
+            }
+        } else {
+
+            if ($user->can_add_device === 1) {
+                $device = new Device();
+                $device->member_id = $user->id;
+                $device->type = $request->login_type;
+                $device->device_name = "$browser_name Ver:$browser_version / Platform: $platform";
+                $device->device_id = $cookie_val;
+                $device->save();
+                if ($device->save()) {
+                    $user->can_add_device = 0;
+                    $user->save();
+                    $can_user_login = 1;
+                    Cookie::queue(Cookie::make("device_id_cms_$request->login_type-$user->phone", $cookie_val, 60 * 24 * 30));
+                }
+            }
+
+            if ($verified_device) {
+                $can_user_login = 1;
+                $verified_device->device_id  = $cookie_val;
+                $verified_device->save();
+                Cookie::queue(Cookie::make("device_id_cms_$request->login_type-$user->phone", $cookie_val, 60 * 24 * 30));
+            }
         }
 
-        $this->sendWhatsAppMessage($user->phone,$user->name,$otp);
-        return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
+        if ($can_user_login === 1) {
+            $otp = rand(100000, 999999);
+            // $otp = 999999; // Hardcoded for testing, replace with rand(100000, 999999) in production
+
+            $login_info = LoginInfo::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'otp_code' => Hash::make($otp),
+                    'request_otp_at' => Carbon::now(),
+                    'ip_address' => $request->ip(),
+                    'status' => 0,
+                ]
+            );
+            if ($user->email) {
+                Mail::to($user->email)->send(new OtpMail($otp, $user));
+            }
+            $this->sendWhatsAppMessage($user->phone, $user->name, $otp);
+
+            return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
+        } else {
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Your device is not registed please ask admin for the registration'], 500);
+        }
     }
 
     public function verify_otp(Request $request)
@@ -120,36 +180,36 @@ class AuthController extends Controller
             'Authorization' => $authToken,
             'Content-Type' => 'application/json',
         ])->post($url, [
-                    "to" => "91{$phone}",
-                    "type" => "template",
-                    "template" => [
-                        "name" => "login_otp_new",
-                        "language" => [
-                            "code" => "en"
-                        ],
-                        "components" => [
+            "to" => "91{$phone}",
+            "type" => "template",
+            "template" => [
+                "name" => "login_otp_new",
+                "language" => [
+                    "code" => "en"
+                ],
+                "components" => [
+                    [
+                        "type" => "header",
+                        "parameters" => [
                             [
-                                "type" => "header",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$name",
-                                    ]
-                                ]
-                            ],
+                                "type" => "text",
+                                "text" => "$name",
+                            ]
+                        ]
+                    ],
+                    [
+                        "type" => "body",
+                        "parameters" => [
                             [
-                                "type" => "body",
-                                "parameters" => [
-                                    [
-                                        "type" => "text",
-                                        "text" => "$otp",
-                                    ]
-                                ]
+                                "type" => "text",
+                                "text" => "$otp",
                             ]
                         ]
                     ]
-                ]);
-                Log::info( $response);
-                return $response;
+                ]
+            ]
+        ]);
+        Log::info($response);
+        return $response;
     }
 }
