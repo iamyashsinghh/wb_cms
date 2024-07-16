@@ -45,10 +45,10 @@ class MegaDatabaseChangeController extends Controller
     }
 
 
-public function getLocationCoordinates($country= 'india', $city = 'new delhi', $location = 'Rohini')
+public function getLocationCoordinates($location = 'Rohini')
 {
     $apiKey = 'AIzaSyBrWQqxRrVwgEDFYZdiC_nHlBE0pn5cjTw';
-    $address = "$location, $city, $country";
+    $address = Venue::where('location_id', 30)->first()->venue_address;
     $client = new Client();
     $response = $client->get('https://maps.googleapis.com/maps/api/geocode/json', [
         'query' => [

@@ -57,7 +57,7 @@
                 td_elements[4].innerHTML = `<a href="{{route('account.manage')}}/${data[0]}" class="text-success mx-2" title="Edit">
                     <i class="fa fa-edit" style="font-size: 15px;"></i>
                 </a>
-                <a onclick="return alert('Are you sure want to delete the account')" class="text-danger mx-2" title="Delete">
+                <a href="{{route('account.delete') }}/${data[0]}" onclick="return alert('Are you sure want to delete the account')" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                 </a>`;
             }

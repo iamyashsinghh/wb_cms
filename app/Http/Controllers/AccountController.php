@@ -89,6 +89,16 @@ class AccountController extends Controller
         return redirect()->back();
     }
 
+    public function delete($user_id){
+        try{
+            $user = User::find($user_id)->delete();
+            session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Account deleted successfully.']);
+        }catch (\Exception $e){
+            session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => $e->getMessage()]);
+        }
+        return redirect()->back();
+    }
+
     private function initializeMeta()
     {
         return json_decode(json_encode([

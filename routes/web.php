@@ -42,13 +42,13 @@ Route::group(['middleware' => 'admin'], function () {
         Route::view('/list', 'account_control.list')->name('account.list');
         Route::get('/list_ajax', [AccountController::class, 'ajax_list'])->name('account.ajax_list');
         Route::get('/manage/{account_id?}', [AccountController::class, 'manage'])->name('account.manage');
-        Route::get('/delete/{account_id?}', [AccountController::class, 'delete'])->name('account.delete');
         Route::post('/manage_process/{account_id?}', [AccountController::class, 'manage_process'])->name('account.manage_process');
         Route::post('/phone/validate', [AccountController::class, 'validatePhone'])->name('phone.validate');
+        Route::get('/user/delete/{user_id?}', [AccountController::class, 'delete'])->name('account.delete');
     });
 
     Route::prefix('manage_devices')->group(function(){
-        Route::get('permit_or_not_more_device_for_login_for_an_account/{member_id?}/{value?}', [DeviceController::class, 'permit_or_not_more_device_for_login_for_an_account'])->name('admin.permit.unpermit.canadddevice');
+        Route::get('permit_or_not_more_device_for_login_for_an_acjcount/{member_id?}/{value?}', [DeviceController::class, 'permit_or_not_more_device_for_login_for_an_account'])->name('admin.permit.unpermit.canadddevice');
         Route::get('delete_device/{device_id?}', [DeviceController::class, 'delete_device'])->name('admin.devices.manage.delete');
     });
 

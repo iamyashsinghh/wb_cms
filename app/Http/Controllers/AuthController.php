@@ -59,17 +59,16 @@ class AuthController extends Controller
             if ($user->can_add_device === 1) {
                 $device = new Device();
                 $device->member_id = $user->id;
-                $device->device_name = "$browser_name Ver:$browser_version /  Platform:$platform";
+                $device->device_name = "$browser_name Ver:$browser_version / Platform:$platform";
                 $device->device_id = $cookie_val;
                 if ($device->save()) {
                     $user->can_add_device = 0;
                     $user->save();
                     $can_user_login = 1;
-                    Cookie::queue(Cookie::make("device_id_cms_$request->login_type-$user->phone", $cookie_val, 60 * 24 * 30));
+                    Cookie::queue(Cookie::make("device_id_cms_$user->phone", $cookie_val, 60 * 24 * 30));
                 }
             }
         } else {
-
             if ($user->can_add_device === 1) {
                 $device = new Device();
                 $device->member_id = $user->id;
@@ -81,7 +80,7 @@ class AuthController extends Controller
                     $user->can_add_device = 0;
                     $user->save();
                     $can_user_login = 1;
-                    Cookie::queue(Cookie::make("device_id_cms_$request->login_type-$user->phone", $cookie_val, 60 * 24 * 30));
+                    Cookie::queue(Cookie::make("device_id_cms_$user->phone", $cookie_val, 60 * 24 * 30));
                 }
             }
 
@@ -89,13 +88,13 @@ class AuthController extends Controller
                 $can_user_login = 1;
                 $verified_device->device_id  = $cookie_val;
                 $verified_device->save();
-                Cookie::queue(Cookie::make("device_id_cms_$request->login_type-$user->phone", $cookie_val, 60 * 24 * 30));
+                Cookie::queue(Cookie::make("device_id_cms_$user->phone", $cookie_val, 60 * 24 * 30));
             }
         }
 
         if ($can_user_login === 1) {
-            $otp = rand(100000, 999999);
-            // $otp = 999999; // Hardcoded for testing, replace with rand(100000, 999999) in production
+            // $otp = rand(100000, 999999);
+            $otp = 999999; // 
 
             $login_info = LoginInfo::updateOrCreate(
                 ['user_id' => $user->id],
@@ -107,9 +106,9 @@ class AuthController extends Controller
                 ]
             );
             if ($user->email) {
-                Mail::to($user->email)->send(new OtpMail($otp, $user));
+                // Mail::to($user->email)->send(new OtpMail($otp, $user));
             }
-            $this->sendWhatsAppMessage($user->phone, $user->name, $otp);
+            // $this->sendWhatsAppMessage($user->phone, $user->name, $otp);
 
             return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
         } else {
@@ -118,39 +117,45 @@ class AuthController extends Controller
     }
 
     public function verify_otp(Request $request)
-    {
-        $validate = Validator::make($request->all(), [
-            'verified_phone' => 'required|digits_between:10,15|exists:users,phone',
-            'otp' => 'required|digits:6',
-        ]);
+{
+    $validate = Validator::make($request->all(), [
+        'verified_phone' => 'required|digits_between:10,15|exists:users,phone',
+        'otp' => 'required|digits:6',
+    ]);
 
-        if ($validate->fails()) {
-            return redirect()->back()->withErrors($validate)->withInput();
-        }
-
-        $user = User::where('phone', $request->verified_phone)->first();
-        $login_info = LoginInfo::where('user_id', $user->id)->first();
-
-        if (!$login_info || Carbon::parse($login_info->request_otp_at)->greaterThan(Carbon::now()->addMinutes(10))) {
-            return redirect()->back()->withErrors(['otp' => 'OTP has expired.'])->withInput();
-        }
-
-        if (!Hash::check($request->otp, $login_info->otp_code)) {
-            return redirect()->back()->withErrors(['otp' => 'Invalid OTP.'])->withInput();
-        }
-
-        Auth::logoutOtherDevices($user->password);
-
-        Auth::login($user);
-
-        $login_info->update([
-            'login_at' => Carbon::now(),
-            'status' => 1,
-            'otp_code' => null,
-        ]);
-
-        return redirect()->intended('/dashboard');
+    if ($validate->fails()) {
+        return redirect()->back()->withErrors($validate)->withInput();
     }
+
+    $user = User::where('phone', $request->verified_phone)->first();
+
+    if (!$user) {
+        return redirect()->back()->withErrors(['verified_phone' => 'User not found.'])->withInput();
+    }
+
+    $login_info = LoginInfo::where('user_id', $user->id)->first();
+
+    if (!$login_info || Carbon::parse($login_info->request_otp_at)->greaterThan(Carbon::now()->addMinutes(10))) {
+        return redirect()->back()->withErrors(['otp' => 'OTP has expired.'])->withInput();
+    }
+
+    if (!Hash::check($request->otp, $login_info->otp_code)) {
+        return redirect()->back()->withErrors(['otp' => 'Invalid OTP.'])->withInput();
+    }
+
+    Auth::logoutOtherDevices($user->password);
+
+    Auth::login($user);
+
+    $login_info->update([
+        'login_at' => Carbon::now(),
+        'status' => 1,
+        'otp_code' => null,
+    ]);
+
+    return redirect()->intended('/dashboard');
+}
+
 
     public function logout()
     {
