@@ -98,7 +98,7 @@ public function getLocationCoordinates()
 
 public function updateNearbyLocations()
 {
-    $locations = Location::where('id', '>', 4)->limit(5)->get();
+    $locations = Location::where('id', '>', 4)->get();
 
     foreach ($locations as $location) {
         $nearbyLocationIds = [];
