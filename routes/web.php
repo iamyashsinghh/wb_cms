@@ -23,21 +23,25 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
- Route::get('logout', [AuthController::class, 'logout'])->name('logout');
- Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
- Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
- Route::get('hi/{country?}/{city?}/{location?}', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
+Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
+Route::get('hi/{country?}/{city?}/{location?}', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
 
 
 Route::group(['middleware' => 'AuthCheck'], function () {
     Route::get('/', [AuthController::class, 'login'])->name('login');
     Route::post('send_otp', [AuthController::class, 'send_otp'])->name('send_otp');
     Route::post('verify_otp', [AuthController::class, 'verify_otp'])->name('verify_otp');
-    });
+});
 
-Route::group(['middleware' => 'admin'], function () {
+Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
     Route::get('dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
-
+    /*
+    |--------------------------------------------------------------------------
+    | Account routes
+    |--------------------------------------------------------------------------
+     */
     Route::prefix('account')->group(function () {
         Route::view('/list', 'account_control.list')->name('account.list');
         Route::get('/list_ajax', [AccountController::class, 'ajax_list'])->name('account.ajax_list');
@@ -45,17 +49,35 @@ Route::group(['middleware' => 'admin'], function () {
         Route::post('/manage_process/{account_id?}', [AccountController::class, 'manage_process'])->name('account.manage_process');
         Route::post('/phone/validate', [AccountController::class, 'validatePhone'])->name('phone.validate');
         Route::get('/user/delete/{user_id?}', [AccountController::class, 'delete'])->name('account.delete');
+        Route::get('/user/update-status/{user_id?}/{value?}', [AccountController::class, 'updateStatus'])->name('account.update.status');
+        Route::post('/user/update-login-time', [AccountController::class, 'updateLoginTime'])->name('account.update.updateLoginTime');
+        Route::get('/user/update-is-all-time-login/{user_id?}/{value?}', [AccountController::class, 'updateIsAllTimeLogin'])->name('account.update.isAllTimeLogin');
     });
 
-    Route::prefix('manage_devices')->group(function(){
+
+    /*
+    |--------------------------------------------------------------------------
+    | Devices routes
+    |--------------------------------------------------------------------------
+     */
+    Route::prefix('manage_devices')->group(function () {
         Route::get('permit_or_not_more_device_for_login_for_an_acjcount/{member_id?}/{value?}', [DeviceController::class, 'permit_or_not_more_device_for_login_for_an_account'])->name('admin.permit.unpermit.canadddevice');
         Route::get('delete_device/{device_id?}', [DeviceController::class, 'delete_device'])->name('admin.devices.manage.delete');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Roles and Permissions routes
+    |--------------------------------------------------------------------------
+     */
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | External api routes
+    |--------------------------------------------------------------------------
+     */
     Route::prefix('external_api')->group(function () {
         Route::get('/maps_review', [ExternalApiController::class, 'maps_review'])->name('api.maps_review');
         Route::post('/maps_review_fetch', [ExternalApiController::class, 'maps_review_fetch'])->name('api.maps_review_fetch');
@@ -191,7 +213,11 @@ Route::group(['middleware' => 'admin'], function () {
         });
     });
 
-    // page listing
+    /*
+    |--------------------------------------------------------------------------
+    | Pahe Listing routes
+    |--------------------------------------------------------------------------
+     */
     Route::prefix('page_listing_meta')->controller(Controllers\PageController::class)->group(function () {
         Route::view('/list', 'page_listing_meta.listing_meta_list')->name('page_listing_meta.listing_meta.list');
         Route::get('/ajax_list', 'ajax_list')->name('page_listing_meta.listing_meta.ajax_list');
@@ -205,7 +231,11 @@ Route::group(['middleware' => 'admin'], function () {
         Route::get('/fetch_faq/{meta_id?}', 'fetch_faq')->name('page_listing_meta.listing_meta.fetch_faq');
     });
 
-    //Review Routes
+    /*
+    |--------------------------------------------------------------------------
+    | Review routes
+    |--------------------------------------------------------------------------
+     */
     Route::prefix('review')->group(function () {
         Route::controller(Controllers\ReviewController::class)->group(function () {
             Route::get('/list', 'list')->name('review.list');
@@ -219,11 +249,14 @@ Route::group(['middleware' => 'admin'], function () {
             Route::get('/update_review_status/{review_id?}/{status?}', 'update_review_status')->name('review.update_review_status');
             Route::get('/get-venues', 'getVenues')->name('review.getvenues');
             Route::get('/get-vendors', 'getVendors')->name('review.getvendors');
-
         });
     });
 
-    //Company numbers
+    /*
+    |--------------------------------------------------------------------------
+    | Ivr Numbers routes
+    |--------------------------------------------------------------------------
+     */
     Route::prefix('c_numbers')->group(function () {
         Route::controller(Controllers\CompanyNumber::class)->group(function () {
             Route::get('/list', 'list')->name('c_num.list');
@@ -233,7 +266,12 @@ Route::group(['middleware' => 'admin'], function () {
             Route::delete('/destroy/{id}', 'destroy')->name('c_num.destroy');
         });
     });
-    // blog
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blog routes
+    |--------------------------------------------------------------------------
+     */
     Route::prefix('blog')->group(function () {
         Route::controller(Controllers\BlogController::class)->group(function () {
             Route::get('/list', 'list')->name('blog.list');
@@ -310,20 +348,3 @@ Route::group(['middleware' => 'admin'], function () {
         });
     });
 });
-
-// Route::get('/mail1', function () {
-//     $data = ['lead_name' => 'Hello lead name', 'event_name' => 'Hello event name', 'event_date' => 'Hello event date', 'event_slot' => 'Evening', 'lead_email' => 'hello@gmail.com', 'lead_mobile' => '9988776655'];
-//     return view('mail.notifyReceivedUser', compact('data'));
-
-//     // Mail::to(env('WB_TEAM_EMAIL'))->cc(explode(",", env('WB_TEAM_CC')))->send(new NotifyReceivedUser($data));
-// });
-
-// Route::get('/mail2', function () {
-//     $data = ['name' => 'Mohd Sabir', 'otp' => 000];
-//     return view('mail.otpTemplate', compact('data'));
-// });
-
-// Route::get('mail3', function () {
-//     $data = ['lead_name' => 'Hello lead name', 'event_name' => 'Hello event name', 'event_date' => 'Hello event date', 'event_slot' => 'Evening', 'lead_email' => 'hello@gmail.com', 'lead_mobile' => '9988776655'];
-//     return view('mail.thanksForSignin', compact('data'));
-// });

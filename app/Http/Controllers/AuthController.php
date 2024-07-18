@@ -46,6 +46,21 @@ class AuthController extends Controller
 
         $user = User::where('phone', $request->phone)->first();
 
+        if (!$user) {
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Invalid credentials.'], 400);
+        } else if ($user->status == 0) {
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact your manager.'], 400);
+        }
+
+        $currentTime = date('H:i:s');
+        if ($user->is_all_time_login === 0) {
+            if ($user->login_start_time && $user->login_end_time) {
+                if ($currentTime < $user->login_start_time || $currentTime > $user->login_end_time) {
+                    return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'You are not allowed to login at this time.'], 400);
+                }
+            }
+        }
+
         $device_id = Cookie::get("device_id_cms_$user->phone");
         $datetime = date('Y-m-d H:i:s');
         $cookie_val = md5("$user->phone-$datetime");
@@ -94,7 +109,7 @@ class AuthController extends Controller
 
         if ($can_user_login === 1) {
             $otp = rand(100000, 999999);
-            // $otp = 999999; //
+            // $otp = 999999;
 
             $login_info = LoginInfo::updateOrCreate(
                 ['user_id' => $user->id],
@@ -117,44 +132,55 @@ class AuthController extends Controller
     }
 
     public function verify_otp(Request $request)
-{
-    $validate = Validator::make($request->all(), [
-        'verified_phone' => 'required|digits_between:10,15|exists:users,phone',
-        'otp' => 'required|digits:6',
-    ]);
+    {
+        $validate = Validator::make($request->all(), [
+            'verified_phone' => 'required|digits_between:10,15|exists:users,phone',
+            'otp' => 'required|digits:6',
+        ]);
 
-    if ($validate->fails()) {
-        return redirect()->back()->withErrors($validate)->withInput();
+        if ($validate->fails()) {
+            return redirect()->back()->withErrors($validate)->withInput();
+        }
+
+        $user = User::where('phone', $request->verified_phone)->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Invalid credentials.'], 400);
+        } else if ($user->status == 0) {
+            return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Profile is inactive, kindly contact your manager.'], 400);
+        }
+
+        $currentTime = date('H:i:s');
+        if ($user->is_all_time_login === 0) {
+            if ($user->login_start_time && $user->login_end_time) {
+                if ($currentTime < $user->login_start_time || $currentTime > $user->login_end_time) {
+                    return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'You are not allowed to login at this time.'], 400);
+                }
+            }
+        }
+
+        $login_info = LoginInfo::where('user_id', $user->id)->first();
+
+        if (!$login_info || Carbon::parse($login_info->request_otp_at)->greaterThan(Carbon::now()->addMinutes(10))) {
+            return redirect()->back()->withErrors(['otp' => 'OTP has expired.'])->withInput();
+        }
+
+        if (!Hash::check($request->otp, $login_info->otp_code)) {
+            return redirect()->back()->withErrors(['otp' => 'Invalid OTP.'])->withInput();
+        }
+
+        Auth::logoutOtherDevices($user->password);
+
+        Auth::login($user);
+
+        $login_info->update([
+            'login_at' => Carbon::now(),
+            'status' => 1,
+            'otp_code' => null,
+        ]);
+
+        return redirect()->intended('/dashboard');
     }
-
-    $user = User::where('phone', $request->verified_phone)->first();
-
-    if (!$user) {
-        return redirect()->back()->withErrors(['verified_phone' => 'User not found.'])->withInput();
-    }
-
-    $login_info = LoginInfo::where('user_id', $user->id)->first();
-
-    if (!$login_info || Carbon::parse($login_info->request_otp_at)->greaterThan(Carbon::now()->addMinutes(10))) {
-        return redirect()->back()->withErrors(['otp' => 'OTP has expired.'])->withInput();
-    }
-
-    if (!Hash::check($request->otp, $login_info->otp_code)) {
-        return redirect()->back()->withErrors(['otp' => 'Invalid OTP.'])->withInput();
-    }
-
-    Auth::logoutOtherDevices($user->password);
-
-    Auth::login($user);
-
-    $login_info->update([
-        'login_at' => Carbon::now(),
-        'status' => 1,
-        'otp_code' => null,
-    ]);
-
-    return redirect()->intended('/dashboard');
-}
 
 
     public function logout()

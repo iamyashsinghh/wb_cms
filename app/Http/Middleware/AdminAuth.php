@@ -15,13 +15,9 @@ class AdminAuth {
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next) {
-        $token = $request->header('bearer_token');
         if (Auth::guard('admin')->check()) {
             return $next($request);
-        } elseif ($token == "8y9C1z5CDKMVbM3vcO6opuwRL") {
-            session()->put('bearer_token', $token);
-            return $next($request);
-        } else {
+        }  else {
             return redirect()->route('login');
         }
     }

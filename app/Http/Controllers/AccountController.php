@@ -20,6 +20,10 @@ class AccountController extends Controller
             'users.name',
             'users.email',
             'users.phone',
+            'users.login_start_time',
+            'users.login_end_time',
+            'users.is_all_time_login',
+            'users.status',
             'users.id as action',
         )->where('is_admin', '1');
         $data = $data->get();
@@ -99,6 +103,48 @@ class AccountController extends Controller
         return redirect()->back();
     }
 
+    public function updateLoginTime(Request $request)
+    {
+        $user = User::find($request->user_id);
+
+        if ($request->type == 'start') {
+            $user->login_start_time = $request->value;
+        } else if ($request->type == 'end') {
+            $user->login_end_time = $request->value;
+        }
+
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Login time updated successfully.']);
+    }
+
+
+    public function updateIsAllTimeLogin($user_id, $value) {
+        $user = User::find($user_id);
+        if (!$user) {
+            return abort(404);
+        }
+
+        $user->is_all_time_login = $value;
+        $user->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Is all time login updated."]);
+        return redirect()->back();
+    }
+
+    public function updateStatus($user_id, $value) {
+        $user = User::find($user_id);
+        if (!$user) {
+            return abort(404);
+        }
+
+        $user->status = $value;
+        $user->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => "Account Status Updated."]);
+        return redirect()->back();
+    }
+
     private function initializeMeta()
     {
         return json_decode(json_encode([
@@ -129,5 +175,6 @@ class AccountController extends Controller
 
         return response()->json(['valid' => true, 'message' => 'Phone number is valid.']);
     }
+
 
 }
