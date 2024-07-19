@@ -1027,11 +1027,6 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
                 $tag = 'venue';
                 $city = City::where('id', $venue->city_id)->first();
                 $reviews = Review::where('product_id', $venue->id)->get();
-                $is_redirect = $venue->is_redirect;
-                $city = $venue->get_city->slug;
-                $locality = $venue->get_locality->slug;
-                $category = $venue->get_category->slug;
-                $redirect_url = "$category/$city/$locality";
             } else {
                 $vendor = Vendor::where('slug', $slug)->first();
                 $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))->get();
@@ -1040,12 +1035,6 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
                 $tag = 'vendor';
                 $reviews = '';
                 $city = City::where('id', $vendor->city_id)->first();
-                $is_redirect = $vendor->is_redirect;
-                $city = $vendor->get_city->slug;
-                $locality = $vendor->get_locality->slug;
-                $category = $vendor->get_category->slug;
-               $redirect_url = "$category/$city/all";
-
             }
             $response = [
                 'success' => true,
@@ -1053,8 +1042,6 @@ public function venue_or_vendor_list_data(Request $request, string $category_slu
                 'data' => $data,
                 'city' => $city,
                 'reviews' => $reviews,
-                'is_redirect' => $is_redirect,
-                'redirect_url' => $redirect_url,
                 'message' => 'Data fetched succesfully',
             ];
         } catch (\Throwable $th) {
