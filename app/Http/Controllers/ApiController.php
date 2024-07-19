@@ -407,615 +407,615 @@ class ApiController extends Controller
 
 
     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-{
-    try {
-        $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-        Log::info("venue_or_vendor_list_data called with params: ", [
-            'category_slug' => $category_slug,
-            'city_slug' => $city_slug,
-            'location_slug' => $location_slug,
-            'page_no' => $page_no,
-        ]);
-
-        $items_per_page = 9;
-        $offset = ($page_no - 1) * $items_per_page;
-
-        $venue_category = VenueCategory::where('slug', $category_slug)->first();
-        $vendor_category = VendorCategory::where('slug', $category_slug)->first();
-
-        $city = City::where('slug', $city_slug)->first();
-        if (!$city) {
-            throw new \Exception("City not found");
-        }
-
-        $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
-        $slug = "$category_slug/$city_slug/$location_slug";
-
-        if ($venue_category) {
-            $data = Venue::select(
-                'venues.id',
-                'venues.name',
-                'venues.venue_address',
-                'venues.summary',
-                'venues.veg_price',
-                'venues.nonveg_price',
-                'venues.phone',
-                'venues.images',
-                'venues.slug',
-                'venues.min_capacity',
-                'venues.max_capacity',
-                'venues.popular',
-                'venues.wb_assured',
-                'venues.place_rating',
-                'venues.venue_category_ids',
-                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
-                'locations.name as location_name',
-                'cities.name as city_name'
-            )
-            ->join('locations', 'locations.id', '=', 'venues.location_id')
-            ->join('cities', 'cities.id', '=', 'venues.city_id')
-            ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
-
-            if ($location) {
-                if ($location->is_group) {
-                    $localityIds = explode(',', $location->locality_ids);
-                    if (!in_array($location->id, $localityIds)) {
-                        $localityIds[] = $location->id;
-                    }
-                    $data->whereIn('venues.location_id', $localityIds);
-                } elseif ($location_slug != 'all') {
-                    $data->where('venues.location_id', $location->id);
-                }
-            }
-
-            $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
-
-            if ($request->guest) {
-                $params = explode(',', $request->guest);
-                $data->whereBetween('max_capacity', [$params[0], $params[1]]);
-            }
-
-            if ($request->per_plate) {
-                $params = explode(',', $request->per_plate);
-                $data->whereBetween('veg_price', [$params[0], $params[1]]);
-            }
-
-            if ($request->per_budget) {
-                $params = explode(',', $request->per_budget);
-                $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
-                    ->whereBetween('budgets.min', [$params[0], $params[1]]);
-            }
-
-            if ($request->multi_localities) {
-                $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-                $arr = $request->multi_localities;
-                foreach ($group_locations as $list) {
-                    $arr .= ',' . $list->locality_ids;
-                }
-                $params = explode(',', $arr);
-                $data->whereIn('location_id', array_unique($params));
-            }
-
-            if ($request->food_type) {
-                $food_type = $request->food_type . '_price';
-                $data->whereNotNull($food_type);
-            }
-
-            $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                ->where('slug', $slug)->first();
-
-            $tag = 'venues';
-        } else {
-            $data = Vendor::select(
-                'vendors.id',
-                'vendors.brand_name',
-                'vendors.vendor_address',
-                'vendors.package_price',
-                'vendors.phone',
-                'vendors.slug',
-                'vendors.images',
-                'vendors.popular',
-                'vendors.wb_assured',
-                'locations.name as location_name',
-                'cities.name as city_name'
-            )
-            ->join('cities', 'cities.id', '=', 'vendors.city_id')
-            ->join('locations', 'locations.id', '=', 'vendors.location_id')
-            ->where([
-                'vendors.status' => 1,
-                'cities.slug' => $city_slug,
-                'vendors.vendor_category_id' => $vendor_category->id
+    {
+        try {
+            $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+            Log::info("venue_or_vendor_list_data called with params: ", [
+                'category_slug' => $category_slug,
+                'city_slug' => $city_slug,
+                'location_slug' => $location_slug,
+                'page_no' => $page_no,
             ]);
 
-            if ($location_slug != 'all') {
-                $data->where('locations.slug', $location_slug);
+            $items_per_page = 9;
+            $offset = ($page_no - 1) * $items_per_page;
+
+            $venue_category = VenueCategory::where('slug', $category_slug)->first();
+            $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+
+            $city = City::where('slug', $city_slug)->first();
+            if (!$city) {
+                throw new \Exception("City not found");
             }
 
-            $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                ->where('slug', $slug)->first();
+            $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+            $slug = "$category_slug/$city_slug/$location_slug";
 
-            $tag = 'vendors';
-        }
+            if ($venue_category) {
+                $data = Venue::select(
+                    'venues.id',
+                    'venues.name',
+                    'venues.venue_address',
+                    'venues.summary',
+                    'venues.veg_price',
+                    'venues.nonveg_price',
+                    'venues.phone',
+                    'venues.images',
+                    'venues.slug',
+                    'venues.min_capacity',
+                    'venues.max_capacity',
+                    'venues.popular',
+                    'venues.wb_assured',
+                    'venues.place_rating',
+                    'venues.venue_category_ids',
+                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                    ->join('locations', 'locations.id', '=', 'venues.location_id')
+                    ->join('cities', 'cities.id', '=', 'venues.city_id')
+                    ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
-        $total_items = $data->count();
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
-
-        if ($venue_category) {
-            foreach ($venues_or_vendors as $venue_or_vendor) {
-                $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
-                $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-                $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
-            }
-        }
-
-        $response = [
-            'success' => true,
-            'tag' => $tag,
-            'count' => $total_items,
-            'data' => $venues_or_vendors,
-            'meta' => $meta,
-            'cities' => $cities,
-            'pagination' => [
-                'current_page' => $page_no,
-                'last_page' => ceil($total_items / $items_per_page),
-                'per_page' => $items_per_page,
-                'total' => $total_items,
-            ],
-            'message' => 'Data fetched successfully',
-        ];
-    } catch (\Throwable $th) {
-        Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
-        $response = [
-            'success' => false,
-            'data' => [],
-            'message' => $th->getMessage(),
-        ];
-    }
-    return response()->json($response);
-}
-
-//     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-// {
-//     try {
-//         $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-
-//         $items_per_page = 9;
-//         $offset = ($items_per_page * $page_no) - $items_per_page;
-//         $venue_category = VenueCategory::where('slug', $category_slug)->first();
-//         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
-//         $city = City::where('slug', $city_slug)->first();
-//         $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
-//         $slug = "$category_slug/$city_slug/$location_slug";
-
-//         if ($venue_category) {
-//             $data = Venue::select(
-//                 'venues.id',
-//                 'venues.name',
-//                 'venues.venue_address',
-//                 'venues.summary',
-//                 'venues.veg_price',
-//                 'venues.nonveg_price',
-//                 'venues.phone',
-//                 'venues.images',
-//                 'venues.slug',
-//                 'venues.min_capacity',
-//                 'venues.max_capacity',
-//                 'venues.popular',
-//                 'venues.wb_assured',
-//                 'venues.place_rating',
-//                 'venues.venue_category_ids',
-//                 DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
-//                 'locations.name as location_name',
-//                 'cities.name as city_name'
-//             )
-//                 ->join('locations', 'locations.id', '=', 'venues.location_id')
-//                 ->join('cities', 'cities.id', '=', 'venues.city_id')
-//                 ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
-
-//             if ($location != null && $location->is_group == true) {
-//                 $localityIds = explode(',', $location->locality_ids);
-//                 $newValue = $location->id;
-//                 if (!in_array($newValue, $localityIds)) {
-//                     $localityIds[] = $newValue;
-//                 }
-//                 $data->whereIn('venues.location_id', $localityIds);
-//             }
-
-//             if ($location_slug != 'all' && $location->is_group == false) {
-//                 $data->where('venues.location_id', $location->id);
-//             }
-
-//             $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
-//             $tag = 'venues';
-//             if ($request->guest) {
-//                 $params = explode(',', $request->guest);
-//                 $data->whereBetween('max_capacity', [$params[0], $params[1]]);
-//             }
-//             if ($request->per_plate) {
-//                 $params = explode(',', $request->per_plate);
-//                 $data->whereBetween('veg_price', [$params[0], $params[1]]);
-//             }
-//             if ($request->per_budget) {
-//                 $params = explode(',', $request->per_budget);
-//                 $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
-//             }
-//             if ($request->multi_localities) {
-//                 $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-//                 $arr = $request->multi_localities;
-//                 foreach ($group_locations as $list) {
-//                     $arr .= ',' . $list->locality_ids;
-//                 }
-//                 $params = explode(',', $arr);
-//                 $data->whereIn('location_id', array_unique($params));
-//             }
-//             if ($request->food_type) {
-//                 $food_type = $request->food_type . '_price';
-//                 $data->whereNotNull($food_type);
-//             }
-//             $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
-//         } else {
-//             $data = Vendor::select(
-//                 'vendors.id',
-//                 'vendors.brand_name',
-//                 'vendors.vendor_address',
-//                 'vendors.package_price',
-//                 'vendors.phone',
-//                 'vendors.slug',
-//                 'vendors.images',
-//                 'vendors.popular',
-//                 'vendors.wb_assured',
-//                 'locations.name as location_name',
-//                 'cities.name as city_name'
-//             )
-//                 ->join('cities', 'cities.id', '=', 'vendors.city_id')
-//                 ->join('locations', 'locations.id', '=', 'vendors.location_id')
-//                 ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
-
-//             if ($location_slug != 'all') {
-//                 $data->where('locations.slug', $location_slug);
-//             }
-
-//             $tag = 'vendors';
-//             $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
-//         }
-
-//         $total_count = $data->count();
-
-//         $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit($items_per_page)->get();
-
-//         foreach ($venues_or_vendors as $venue_or_vendor) {
-//             $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
-//             $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-//             $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
-//         }
-
-//         $response = [
-//             'success' => true,
-//             'tag' => $tag,
-//             'count' => $total_count,
-//             'data' => $venues_or_vendors,
-//             'meta' => $meta,
-//             'cities' => $cities,
-//             'message' => 'Data fetched successfully',
-//         ];
-//     } catch (\Throwable $th) {
-//         $response = [
-//             'success' => false,
-//             'data' => [],
-//             'message' => $th->getMessage(),
-//         ];
-//     }
-//     return response()->json($response);
-// }
-
-// public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-//     {
-//         try {
-//             $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-// Log::info("venue_or_vendor_list_data");
-//             $items_per_page = 9;
-//             $venue_category = VenueCategory::where('slug', $category_slug)->first();
-//             $vendor_category = VendorCategory::where('slug', $category_slug)->first();
-
-//             $city = City::where('slug', $city_slug)->first();
-//             $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
-//             $slug = "$category_slug/$city_slug/$location_slug";
-
-//             if ($venue_category) {
-//                 $data = Venue::select(
-//                     'venues.id',
-//                     'venues.name',
-//                     'venues.venue_address',
-//                     'venues.summary',
-//                     'venues.veg_price',
-//                     'venues.nonveg_price',
-//                     'venues.phone',
-//                     'venues.images',
-//                     'venues.slug',
-//                     'venues.min_capacity',
-//                     'venues.max_capacity',
-//                     'venues.popular',
-//                     'venues.wb_assured',
-//                     'venues.place_rating',
-//                     'venues.venue_category_ids',
-//                     DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
-//                     'locations.name as location_name',
-//                     'cities.name as city_name'
-//                 )
-//                     ->join('locations', 'locations.id', '=', 'venues.location_id')
-//                     ->join('cities', 'cities.id', '=', 'venues.city_id')
-//                     ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
-
-//                 if ($location != null && $location->is_group == true) {
-//                     $localityIds = explode(',', $location->locality_ids);
-//                     $newValue = $location->id;
-//                     if (!in_array($newValue, $localityIds)) {
-//                         $localityIds[] = $newValue;
-//                     }
-//                     $data->whereIn('venues.location_id', $localityIds);
-//                 }
-
-//                 if ($location_slug != 'all' && $location->is_group == false) {
-//                     $data->where('venues.location_id', $location->id);
-//                 }
-
-//                 $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
-//                 $tag = 'venues';
-//                 if ($request->guest) {
-//                     $params = explode(',', $request->guest);
-//                     $data->whereBetween('max_capacity', [$params[0], $params[1]]);
-//                 }
-//                 if ($request->per_plate) {
-//                     $params = explode(',', $request->per_plate);
-//                     $data->whereBetween('veg_price', [$params[0], $params[1]]);
-//                 }
-//                 if ($request->per_budget) {
-//                     $params = explode(',', $request->per_budget);
-//                     $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
-//                 }
-//                 if ($request->multi_localities) {
-//                     $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-//                     $arr = $request->multi_localities;
-//                     foreach ($group_locations as $list) {
-//                         $arr .= ',' . $list->locality_ids;
-//                     }
-//                     $params = explode(',', $arr);
-//                     $data->whereIn('location_id', array_unique($params));
-//                 }
-//                 if ($request->food_type) {
-//                     $food_type = $request->food_type . '_price';
-//                     $data->whereNotNull($food_type);
-//                 }
-//                 $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
-//             } else {
-//                 $data = Vendor::select(
-//                     'vendors.id',
-//                     'vendors.brand_name',
-//                     'vendors.vendor_address',
-//                     'vendors.package_price',
-//                     'vendors.phone',
-//                     'vendors.slug',
-//                     'vendors.images',
-//                     'vendors.popular',
-//                     'vendors.wb_assured',
-//                     'locations.name as location_name',
-//                     'cities.name as city_name'
-//                 )
-//                     ->join('cities', 'cities.id', '=', 'vendors.city_id')
-//                     ->join('locations', 'locations.id', '=', 'vendors.location_id')
-//                     ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
-
-//                 if ($location_slug != 'all') {
-//                     $data->where('locations.slug', $location_slug);
-//                 }
-//                 $tag = 'vendors';
-//                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
-//             }
-
-//             $venues_or_vendors = $data->orderBy('popular', 'desc')->paginate($items_per_page);
-
-//             if ($venue_category) {
-//                 foreach ($venues_or_vendors as $venue_or_vendor) {
-//                     $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
-//                     $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-//                     $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
-//                 }
-//             }
-
-//             $response = [
-//                 'success' => true,
-//                 'tag' => $tag,
-//                 'count' => $venues_or_vendors->total(),
-//                 'data' => $venues_or_vendors->items(),
-//                 'meta' => $meta,
-//                 'cities' => $cities,
-//                 'pagination' => [
-//                     'current_page' => $venues_or_vendors->currentPage(),
-//                     'last_page' => $venues_or_vendors->lastPage(),
-//                     'per_page' => $venues_or_vendors->perPage(),
-//                     'total' => $venues_or_vendors->total(),
-//                 ],
-//                 'message' => 'Data fetched successfully',
-//             ];
-//         } catch (\Throwable $th) {
-//             $response = [
-//                 'success' => false,
-//                 'data' => [],
-//                 'message' => $th->getMessage(),
-//             ];
-//         }
-//         return response()->json($response);
-//     }
-
-public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-{
-    try {
-        $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
-        Log::info("venue_or_vendor_list_data called with params: ", [
-            'category_slug' => $category_slug,
-            'city_slug' => $city_slug,
-            'location_slug' => $location_slug,
-            'page_no' => $page_no,
-        ]);
-
-        $items_per_page = 9;
-        $offset = ($page_no - 1) * $items_per_page;
-
-        $venue_category = VenueCategory::where('slug', $category_slug)->first();
-        $vendor_category = VendorCategory::where('slug', $category_slug)->first();
-
-        $city = City::where('slug', $city_slug)->first();
-        if (!$city) {
-            throw new \Exception("City not found");
-        }
-
-        $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
-        $slug = "$category_slug/$city_slug/$location_slug";
-
-        if ($venue_category) {
-            $data = Venue::select(
-                'venues.id',
-                'venues.name',
-                'venues.venue_address',
-                'venues.summary',
-                'venues.veg_price',
-                'venues.nonveg_price',
-                'venues.phone',
-                'venues.images',
-                'venues.slug',
-                'venues.min_capacity',
-                'venues.max_capacity',
-                'venues.popular',
-                'venues.wb_assured',
-                'venues.place_rating',
-                'venues.venue_category_ids',
-                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
-                'locations.name as location_name',
-                'cities.name as city_name'
-            )
-            ->join('locations', 'locations.id', '=', 'venues.location_id')
-            ->join('cities', 'cities.id', '=', 'venues.city_id')
-            ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
-
-            if ($location) {
-                if ($location->is_group) {
-                    $localityIds = explode(',', $location->locality_ids);
-                    if (!in_array($location->id, $localityIds)) {
-                        $localityIds[] = $location->id;
+                if ($location) {
+                    if ($location->is_group) {
+                        $localityIds = explode(',', $location->locality_ids);
+                        if (!in_array($location->id, $localityIds)) {
+                            $localityIds[] = $location->id;
+                        }
+                        $data->whereIn('venues.location_id', $localityIds);
+                    } elseif ($location_slug != 'all') {
+                        $data->where('venues.location_id', $location->id);
                     }
-                    $data->whereIn('venues.location_id', $localityIds);
-                } elseif ($location_slug != 'all') {
-                    $data->where('venues.location_id', $location->id);
+                }
+
+                $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
+
+                if ($request->guest) {
+                    $params = explode(',', $request->guest);
+                    $data->whereBetween('max_capacity', [$params[0], $params[1]]);
+                }
+
+                if ($request->per_plate) {
+                    $params = explode(',', $request->per_plate);
+                    $data->whereBetween('veg_price', [$params[0], $params[1]]);
+                }
+
+                if ($request->per_budget) {
+                    $params = explode(',', $request->per_budget);
+                    $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
+                        ->whereBetween('budgets.min', [$params[0], $params[1]]);
+                }
+
+                if ($request->multi_localities) {
+                    $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+                    $arr = $request->multi_localities;
+                    foreach ($group_locations as $list) {
+                        $arr .= ',' . $list->locality_ids;
+                    }
+                    $params = explode(',', $arr);
+                    $data->whereIn('location_id', array_unique($params));
+                }
+
+                if ($request->food_type) {
+                    $food_type = $request->food_type . '_price';
+                    $data->whereNotNull($food_type);
+                }
+
+                $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                    ->where('slug', $slug)->first();
+
+                $tag = 'venues';
+            } else {
+                $data = Vendor::select(
+                    'vendors.id',
+                    'vendors.brand_name',
+                    'vendors.vendor_address',
+                    'vendors.package_price',
+                    'vendors.phone',
+                    'vendors.slug',
+                    'vendors.images',
+                    'vendors.popular',
+                    'vendors.wb_assured',
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                    ->join('cities', 'cities.id', '=', 'vendors.city_id')
+                    ->join('locations', 'locations.id', '=', 'vendors.location_id')
+                    ->where([
+                        'vendors.status' => 1,
+                        'cities.slug' => $city_slug,
+                        'vendors.vendor_category_id' => $vendor_category->id
+                    ]);
+
+                if ($location_slug != 'all') {
+                    $data->where('locations.slug', $location_slug);
+                }
+
+                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                    ->where('slug', $slug)->first();
+
+                $tag = 'vendors';
+            }
+
+            $total_items = $data->count();
+            $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+
+            if ($venue_category) {
+                foreach ($venues_or_vendors as $venue_or_vendor) {
+                    $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
+                    $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+                    $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
                 }
             }
 
-            $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
+            $response = [
+                'success' => true,
+                'tag' => $tag,
+                'count' => $total_items,
+                'data' => $venues_or_vendors,
+                'meta' => $meta,
+                'cities' => $cities,
+                'pagination' => [
+                    'current_page' => $page_no,
+                    'last_page' => ceil($total_items / $items_per_page),
+                    'per_page' => $items_per_page,
+                    'total' => $total_items,
+                ],
+                'message' => 'Data fetched successfully',
+            ];
+        } catch (\Throwable $th) {
+            Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
+            $response = [
+                'success' => false,
+                'data' => [],
+                'message' => $th->getMessage(),
+            ];
+        }
+        return response()->json($response);
+    }
 
-            if ($request->guest) {
-                $params = explode(',', $request->guest);
-                $data->whereBetween('max_capacity', [$params[0], $params[1]]);
-            }
+    //     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
+    // {
+    //     try {
+    //         $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
 
-            if ($request->per_plate) {
-                $params = explode(',', $request->per_plate);
-                $data->whereBetween('veg_price', [$params[0], $params[1]]);
-            }
+    //         $items_per_page = 9;
+    //         $offset = ($items_per_page * $page_no) - $items_per_page;
+    //         $venue_category = VenueCategory::where('slug', $category_slug)->first();
+    //         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+    //         $city = City::where('slug', $city_slug)->first();
+    //         $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+    //         $slug = "$category_slug/$city_slug/$location_slug";
 
-            if ($request->per_budget) {
-                $params = explode(',', $request->per_budget);
-                $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
-                    ->whereBetween('budgets.min', [$params[0], $params[1]]);
-            }
+    //         if ($venue_category) {
+    //             $data = Venue::select(
+    //                 'venues.id',
+    //                 'venues.name',
+    //                 'venues.venue_address',
+    //                 'venues.summary',
+    //                 'venues.veg_price',
+    //                 'venues.nonveg_price',
+    //                 'venues.phone',
+    //                 'venues.images',
+    //                 'venues.slug',
+    //                 'venues.min_capacity',
+    //                 'venues.max_capacity',
+    //                 'venues.popular',
+    //                 'venues.wb_assured',
+    //                 'venues.place_rating',
+    //                 'venues.venue_category_ids',
+    //                 DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+    //                 'locations.name as location_name',
+    //                 'cities.name as city_name'
+    //             )
+    //                 ->join('locations', 'locations.id', '=', 'venues.location_id')
+    //                 ->join('cities', 'cities.id', '=', 'venues.city_id')
+    //                 ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
-            if ($request->multi_localities) {
-                $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-                $arr = $request->multi_localities;
-                foreach ($group_locations as $list) {
-                    $arr .= ',' . $list->locality_ids;
-                }
-                $params = explode(',', $arr);
-                $data->whereIn('location_id', array_unique($params));
-            }
+    //             if ($location != null && $location->is_group == true) {
+    //                 $localityIds = explode(',', $location->locality_ids);
+    //                 $newValue = $location->id;
+    //                 if (!in_array($newValue, $localityIds)) {
+    //                     $localityIds[] = $newValue;
+    //                 }
+    //                 $data->whereIn('venues.location_id', $localityIds);
+    //             }
 
-            if ($request->food_type) {
-                $food_type = $request->food_type . '_price';
-                $data->whereNotNull($food_type);
-            }
+    //             if ($location_slug != 'all' && $location->is_group == false) {
+    //                 $data->where('venues.location_id', $location->id);
+    //             }
 
-            $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                ->where('slug', $slug)->first();
+    //             $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
+    //             $tag = 'venues';
+    //             if ($request->guest) {
+    //                 $params = explode(',', $request->guest);
+    //                 $data->whereBetween('max_capacity', [$params[0], $params[1]]);
+    //             }
+    //             if ($request->per_plate) {
+    //                 $params = explode(',', $request->per_plate);
+    //                 $data->whereBetween('veg_price', [$params[0], $params[1]]);
+    //             }
+    //             if ($request->per_budget) {
+    //                 $params = explode(',', $request->per_budget);
+    //                 $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
+    //             }
+    //             if ($request->multi_localities) {
+    //                 $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+    //                 $arr = $request->multi_localities;
+    //                 foreach ($group_locations as $list) {
+    //                     $arr .= ',' . $list->locality_ids;
+    //                 }
+    //                 $params = explode(',', $arr);
+    //                 $data->whereIn('location_id', array_unique($params));
+    //             }
+    //             if ($request->food_type) {
+    //                 $food_type = $request->food_type . '_price';
+    //                 $data->whereNotNull($food_type);
+    //             }
+    //             $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
+    //         } else {
+    //             $data = Vendor::select(
+    //                 'vendors.id',
+    //                 'vendors.brand_name',
+    //                 'vendors.vendor_address',
+    //                 'vendors.package_price',
+    //                 'vendors.phone',
+    //                 'vendors.slug',
+    //                 'vendors.images',
+    //                 'vendors.popular',
+    //                 'vendors.wb_assured',
+    //                 'locations.name as location_name',
+    //                 'cities.name as city_name'
+    //             )
+    //                 ->join('cities', 'cities.id', '=', 'vendors.city_id')
+    //                 ->join('locations', 'locations.id', '=', 'vendors.location_id')
+    //                 ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
 
-            $tag = 'venues';
-        } else {
-            $data = Vendor::select(
-                'vendors.id',
-                'vendors.brand_name',
-                'vendors.vendor_address',
-                'vendors.package_price',
-                'vendors.phone',
-                'vendors.slug',
-                'vendors.images',
-                'vendors.popular',
-                'vendors.wb_assured',
-                'locations.name as location_name',
-                'cities.name as city_name'
-            )
-            ->join('cities', 'cities.id', '=', 'vendors.city_id')
-            ->join('locations', 'locations.id', '=', 'vendors.location_id')
-            ->where([
-                'vendors.status' => 1,
-                'cities.slug' => $city_slug,
-                'vendors.vendor_category_id' => $vendor_category->id
+    //             if ($location_slug != 'all') {
+    //                 $data->where('locations.slug', $location_slug);
+    //             }
+
+    //             $tag = 'vendors';
+    //             $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
+    //         }
+
+    //         $total_count = $data->count();
+
+    //         $venues_or_vendors = $data->orderBy('popular', 'desc')->offset($offset)->limit($items_per_page)->get();
+
+    //         foreach ($venues_or_vendors as $venue_or_vendor) {
+    //             $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
+    //             $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+    //             $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
+    //         }
+
+    //         $response = [
+    //             'success' => true,
+    //             'tag' => $tag,
+    //             'count' => $total_count,
+    //             'data' => $venues_or_vendors,
+    //             'meta' => $meta,
+    //             'cities' => $cities,
+    //             'message' => 'Data fetched successfully',
+    //         ];
+    //     } catch (\Throwable $th) {
+    //         $response = [
+    //             'success' => false,
+    //             'data' => [],
+    //             'message' => $th->getMessage(),
+    //         ];
+    //     }
+    //     return response()->json($response);
+    // }
+
+    // public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
+    //     {
+    //         try {
+    //             $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    // Log::info("venue_or_vendor_list_data");
+    //             $items_per_page = 9;
+    //             $venue_category = VenueCategory::where('slug', $category_slug)->first();
+    //             $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+
+    //             $city = City::where('slug', $city_slug)->first();
+    //             $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+    //             $slug = "$category_slug/$city_slug/$location_slug";
+
+    //             if ($venue_category) {
+    //                 $data = Venue::select(
+    //                     'venues.id',
+    //                     'venues.name',
+    //                     'venues.venue_address',
+    //                     'venues.summary',
+    //                     'venues.veg_price',
+    //                     'venues.nonveg_price',
+    //                     'venues.phone',
+    //                     'venues.images',
+    //                     'venues.slug',
+    //                     'venues.min_capacity',
+    //                     'venues.max_capacity',
+    //                     'venues.popular',
+    //                     'venues.wb_assured',
+    //                     'venues.place_rating',
+    //                     'venues.venue_category_ids',
+    //                     DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+    //                     'locations.name as location_name',
+    //                     'cities.name as city_name'
+    //                 )
+    //                     ->join('locations', 'locations.id', '=', 'venues.location_id')
+    //                     ->join('cities', 'cities.id', '=', 'venues.city_id')
+    //                     ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
+
+    //                 if ($location != null && $location->is_group == true) {
+    //                     $localityIds = explode(',', $location->locality_ids);
+    //                     $newValue = $location->id;
+    //                     if (!in_array($newValue, $localityIds)) {
+    //                         $localityIds[] = $newValue;
+    //                     }
+    //                     $data->whereIn('venues.location_id', $localityIds);
+    //                 }
+
+    //                 if ($location_slug != 'all' && $location->is_group == false) {
+    //                     $data->where('venues.location_id', $location->id);
+    //                 }
+
+    //                 $data->whereRaw("find_in_set($venue_category->id, venues.venue_category_ids)");
+    //                 $tag = 'venues';
+    //                 if ($request->guest) {
+    //                     $params = explode(',', $request->guest);
+    //                     $data->whereBetween('max_capacity', [$params[0], $params[1]]);
+    //                 }
+    //                 if ($request->per_plate) {
+    //                     $params = explode(',', $request->per_plate);
+    //                     $data->whereBetween('veg_price', [$params[0], $params[1]]);
+    //                 }
+    //                 if ($request->per_budget) {
+    //                     $params = explode(',', $request->per_budget);
+    //                     $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')->whereBetween('budgets.min', [$params[0], $params[1]]);
+    //                 }
+    //                 if ($request->multi_localities) {
+    //                     $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+    //                     $arr = $request->multi_localities;
+    //                     foreach ($group_locations as $list) {
+    //                         $arr .= ',' . $list->locality_ids;
+    //                     }
+    //                     $params = explode(',', $arr);
+    //                     $data->whereIn('location_id', array_unique($params));
+    //                 }
+    //                 if ($request->food_type) {
+    //                     $food_type = $request->food_type . '_price';
+    //                     $data->whereNotNull($food_type);
+    //                 }
+    //                 $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
+    //             } else {
+    //                 $data = Vendor::select(
+    //                     'vendors.id',
+    //                     'vendors.brand_name',
+    //                     'vendors.vendor_address',
+    //                     'vendors.package_price',
+    //                     'vendors.phone',
+    //                     'vendors.slug',
+    //                     'vendors.images',
+    //                     'vendors.popular',
+    //                     'vendors.wb_assured',
+    //                     'locations.name as location_name',
+    //                     'cities.name as city_name'
+    //                 )
+    //                     ->join('cities', 'cities.id', '=', 'vendors.city_id')
+    //                     ->join('locations', 'locations.id', '=', 'vendors.location_id')
+    //                     ->where(['vendors.status' => 1, 'cities.slug' => $city_slug, 'vendors.vendor_category_id' => $vendor_category->id]);
+
+    //                 if ($location_slug != 'all') {
+    //                     $data->where('locations.slug', $location_slug);
+    //                 }
+    //                 $tag = 'vendors';
+    //                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')->where('slug', $slug)->first();
+    //             }
+
+    //             $venues_or_vendors = $data->orderBy('popular', 'desc')->paginate($items_per_page);
+
+    //             if ($venue_category) {
+    //                 foreach ($venues_or_vendors as $venue_or_vendor) {
+    //                     $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
+    //                     $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+    //                     $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
+    //                 }
+    //             }
+
+    //             $response = [
+    //                 'success' => true,
+    //                 'tag' => $tag,
+    //                 'count' => $venues_or_vendors->total(),
+    //                 'data' => $venues_or_vendors->items(),
+    //                 'meta' => $meta,
+    //                 'cities' => $cities,
+    //                 'pagination' => [
+    //                     'current_page' => $venues_or_vendors->currentPage(),
+    //                     'last_page' => $venues_or_vendors->lastPage(),
+    //                     'per_page' => $venues_or_vendors->perPage(),
+    //                     'total' => $venues_or_vendors->total(),
+    //                 ],
+    //                 'message' => 'Data fetched successfully',
+    //             ];
+    //         } catch (\Throwable $th) {
+    //             $response = [
+    //                 'success' => false,
+    //                 'data' => [],
+    //                 'message' => $th->getMessage(),
+    //             ];
+    //         }
+    //         return response()->json($response);
+    //     }
+
+    public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
+    {
+        try {
+            $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+            Log::info("venue_or_vendor_list_data called with params: ", [
+                'category_slug' => $category_slug,
+                'city_slug' => $city_slug,
+                'location_slug' => $location_slug,
+                'page_no' => $page_no,
             ]);
 
-            if ($location_slug != 'all') {
-                $data->where('locations.slug', $location_slug);
+            $items_per_page = 9;
+            $offset = ($page_no - 1) * $items_per_page;
+
+            $venue_category = VenueCategory::where('slug', $category_slug)->first();
+            $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+
+            $city = City::where('slug', $city_slug)->first();
+            if (!$city) {
+                throw new \Exception("City not found");
             }
 
-            $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                ->where('slug', $slug)->first();
+            $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+            $slug = "$category_slug/$city_slug/$location_slug";
 
-            $tag = 'vendors';
-        }
+            if ($venue_category) {
+                $data = Venue::select(
+                    'venues.id',
+                    'venues.name',
+                    'venues.venue_address',
+                    'venues.summary',
+                    'venues.veg_price',
+                    'venues.nonveg_price',
+                    'venues.phone',
+                    'venues.images',
+                    'venues.slug',
+                    'venues.min_capacity',
+                    'venues.max_capacity',
+                    'venues.popular',
+                    'venues.wb_assured',
+                    'venues.place_rating',
+                    'venues.venue_category_ids',
+                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                    ->join('locations', 'locations.id', '=', 'venues.location_id')
+                    ->join('cities', 'cities.id', '=', 'venues.city_id')
+                    ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
 
-        $total_items = $data->count();
-        $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+                if ($location) {
+                    if ($location->is_group) {
+                        $localityIds = explode(',', $location->locality_ids);
+                        if (!in_array($location->id, $localityIds)) {
+                            $localityIds[] = $location->id;
+                        }
+                        $data->whereIn('venues.location_id', $localityIds);
+                    } elseif ($location_slug != 'all') {
+                        $data->where('venues.location_id', $location->id);
+                    }
+                }
 
-        if ($venue_category) {
-            foreach ($venues_or_vendors as $venue_or_vendor) {
-                $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
-                $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-                $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
+                $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
+
+                if ($request->guest) {
+                    $params = explode(',', $request->guest);
+                    $data->whereBetween('max_capacity', [$params[0], $params[1]]);
+                }
+
+                if ($request->per_plate) {
+                    $params = explode(',', $request->per_plate);
+                    $data->whereBetween('veg_price', [$params[0], $params[1]]);
+                }
+
+                if ($request->per_budget) {
+                    $params = explode(',', $request->per_budget);
+                    $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
+                        ->whereBetween('budgets.min', [$params[0], $params[1]]);
+                }
+
+                if ($request->multi_localities) {
+                    $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+                    $arr = $request->multi_localities;
+                    foreach ($group_locations as $list) {
+                        $arr .= ',' . $list->locality_ids;
+                    }
+                    $params = explode(',', $arr);
+                    $data->whereIn('location_id', array_unique($params));
+                }
+
+                if ($request->food_type) {
+                    $food_type = $request->food_type . '_price';
+                    $data->whereNotNull($food_type);
+                }
+
+                $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                    ->where('slug', $slug)->first();
+
+                $tag = 'venues';
+            } else {
+                $data = Vendor::select(
+                    'vendors.id',
+                    'vendors.brand_name',
+                    'vendors.vendor_address',
+                    'vendors.package_price',
+                    'vendors.phone',
+                    'vendors.slug',
+                    'vendors.images',
+                    'vendors.popular',
+                    'vendors.wb_assured',
+                    'locations.name as location_name',
+                    'cities.name as city_name'
+                )
+                    ->join('cities', 'cities.id', '=', 'vendors.city_id')
+                    ->join('locations', 'locations.id', '=', 'vendors.location_id')
+                    ->where([
+                        'vendors.status' => 1,
+                        'cities.slug' => $city_slug,
+                        'vendors.vendor_category_id' => $vendor_category->id
+                    ]);
+
+                if ($location_slug != 'all') {
+                    $data->where('locations.slug', $location_slug);
+                }
+
+                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                    ->where('slug', $slug)->first();
+
+                $tag = 'vendors';
             }
-        }
 
-        $response = [
-            'success' => true,
-            'tag' => $tag,
-            'count' => $total_items,
-            'data' => $venues_or_vendors,
-            'meta' => $meta,
-            'cities' => $cities,
-            'pagination' => [
-                'current_page' => $page_no,
-                'last_page' => ceil($total_items / $items_per_page),
-                'per_page' => $items_per_page,
-                'total' => $total_items,
-            ],
-            'message' => 'Data fetched successfully',
-        ];
-    } catch (\Throwable $th) {
-        Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
-        $response = [
-            'success' => false,
-            'data' => [],
-            'message' => $th->getMessage(),
-        ];
+            $total_items = $data->count();
+            $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+
+            if ($venue_category) {
+                foreach ($venues_or_vendors as $venue_or_vendor) {
+                    $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
+                    $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+                    $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
+                }
+            }
+
+            $response = [
+                'success' => true,
+                'tag' => $tag,
+                'count' => $total_items,
+                'data' => $venues_or_vendors,
+                'meta' => $meta,
+                'cities' => $cities,
+                'pagination' => [
+                    'current_page' => $page_no,
+                    'last_page' => ceil($total_items / $items_per_page),
+                    'per_page' => $items_per_page,
+                    'total' => $total_items,
+                ],
+                'message' => 'Data fetched successfully',
+            ];
+        } catch (\Throwable $th) {
+            Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
+            $response = [
+                'success' => false,
+                'data' => [],
+                'message' => $th->getMessage(),
+            ];
+        }
+        return response()->json($response);
     }
-    return response()->json($response);
-}
 
-public function venue_or_vendor_detailss(string $slug)
+    public function venue_or_vendor_details(string $slug)
     {
         try {
             $data = [];
@@ -1044,8 +1044,7 @@ public function venue_or_vendor_detailss(string $slug)
                 $city_slug = $vendor->get_city->slug;
                 $locality = $vendor->get_locality->slug;
                 $category = $vendor->get_category->slug;
-               $redirect_url = "$category/$city_slug/all";
-
+                $redirect_url = "$category/$city_slug/all";
             }
             $response = [
                 'success' => true,
@@ -1067,44 +1066,44 @@ public function venue_or_vendor_detailss(string $slug)
         return $response;
     }
 
-    public function venue_or_vendor_details(string $slug)
-    {
-        try {
-            $data = [];
-            $venue = Venue::where('slug', $slug)->first();
-            if ($venue) {
-                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(',', $venue->similar_venue_ids))->get();
-                $data['venue'] = $venue;
-                $data['similar_packages'] = $similar_packages;
-                $tag = 'venue';
-                $city = City::where('id', $venue->city_id)->first();
-                $reviews = Review::where('product_id', $venue->id)->get();
-            } else {
-                $vendor = Vendor::where('slug', $slug)->first();
-                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))->get();
-                $data['vendor'] = $vendor;
-                $data['similar_vendors'] = $similar_vendors;
-                $tag = 'vendor';
-                $reviews = '';
-                $city = City::where('id', $vendor->city_id)->first();
-            }
-            $response = [
-                'success' => true,
-                'tag' => $tag,
-                'data' => $data,
-                'city' => $city,
-                'reviews' => $reviews,
-                'message' => 'Data fetched succesfully',
-            ];
-        } catch (\Throwable $th) {
-            $response = [
-                'success' => false,
-                'data' => [],
-                'message' => $th->getMessage(),
-            ];
-        }
-        return $response;
-    }
+    // public function venue_or_vendor_details(string $slug)
+    // {
+    //     try {
+    //         $data = [];
+    //         $venue = Venue::where('slug', $slug)->first();
+    //         if ($venue) {
+    //             $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(',', $venue->similar_venue_ids))->get();
+    //             $data['venue'] = $venue;
+    //             $data['similar_packages'] = $similar_packages;
+    //             $tag = 'venue';
+    //             $city = City::where('id', $venue->city_id)->first();
+    //             $reviews = Review::where('product_id', $venue->id)->get();
+    //         } else {
+    //             $vendor = Vendor::where('slug', $slug)->first();
+    //             $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))->get();
+    //             $data['vendor'] = $vendor;
+    //             $data['similar_vendors'] = $similar_vendors;
+    //             $tag = 'vendor';
+    //             $reviews = '';
+    //             $city = City::where('id', $vendor->city_id)->first();
+    //         }
+    //         $response = [
+    //             'success' => true,
+    //             'tag' => $tag,
+    //             'data' => $data,
+    //             'city' => $city,
+    //             'reviews' => $reviews,
+    //             'message' => 'Data fetched succesfully',
+    //         ];
+    //     } catch (\Throwable $th) {
+    //         $response = [
+    //             'success' => false,
+    //             'data' => [],
+    //             'message' => $th->getMessage(),
+    //         ];
+    //     }
+    //     return $response;
+    // }
 
     public function blog_list(Request $request)
     {

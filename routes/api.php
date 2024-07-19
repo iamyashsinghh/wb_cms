@@ -23,7 +23,6 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('venue_or_vendor_list/{category_slug}/{city_slug}/{location_slug?}/{page_no?}', 'venue_or_vendor_list');
     Route::get('venue_or_vendor_list_data/{category_slug}/{city_slug}/{location_slug?}/{page_no?}', 'venue_or_vendor_list_data');
     Route::get('venue_or_vendor_details/{slug}', 'venue_or_vendor_details');
-    Route::get('venue_or_vendor_detailss/{slug}', 'venue_or_vendor_detailss');
     Route::get('cities', 'cities');
     Route::get('locations/{city_slug}', 'locations');
     Route::get('/budgets', 'budgets');
