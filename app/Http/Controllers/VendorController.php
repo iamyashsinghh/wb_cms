@@ -336,6 +336,14 @@ class VendorController extends Controller {
         }
     }
 
+    public function update_redirect($vendor_id, $value){
+        $vendor = Vendor::find($vendor_id);
+        $vendor->is_redirect = $value;
+        $vendor->save();
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Redirect Updated successfully.']);
+        return redirect()->back();
+    }
+
     // public function login_test() {
     //     // $a = $this->interakt_wa_msg_send('9891340645', 'Test Vendor', 19155, 'login_otp');
     //     // $a = $this->interakt_wa_msg_send('9891340645', 'Test Vendor', '19155', 'login_otp');

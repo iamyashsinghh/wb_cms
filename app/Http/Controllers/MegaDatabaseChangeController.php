@@ -50,102 +50,200 @@ class MegaDatabaseChangeController extends Controller
 
 
 
-public function getLocationCoordinates()
-{
-    $apiKey = 'AIzaSyBrWQqxRrVwgEDFYZdiC_nHlBE0pn5cjTw';
+    public function getLocationCoordinates()
+    {
+        $apiKey = 'AIzaSyBrWQqxRrVwgEDFYZdiC_nHlBE0pn5cjTw';
 
-    $locations = Location::where('latitude', '')->get();
-    $client = new Client();
+        $locations = Location::where('latitude', '')->get();
+        $client = new Client();
 
-    foreach ($locations as $location) {
-        $venue = Venue::where('location_id', $location->id)->first();
+        foreach ($locations as $location) {
+            $venue = Venue::where('location_id', $location->id)->first();
 
-        if ($venue) {
-            $address = $venue->venue_address;
-            $response = $client->get('https://maps.googleapis.com/maps/api/geocode/json', [
-                'query' => [
-                    'address' => $address,
-                    'key' => $apiKey
-                ]
-            ]);
-
-            $data = json_decode($response->getBody(), true);
-
-            if ($data['status'] == 'OK') {
-                $geoLocation = $data['results'][0]['geometry']['location'];
-                $location->latitude = $geoLocation['lat'];
-                $location->longitute = $geoLocation['lng'];
-                $location->save();
-
-                Log::info('Updated location coordinates', [
-                    'location_id' => $location->id,
-                    'latitude' => $location->latitude,
-                    'longitude' => $location->longitude
+            if ($venue) {
+                $address = $venue->venue_address;
+                $response = $client->get('https://maps.googleapis.com/maps/api/geocode/json', [
+                    'query' => [
+                        'address' => $address,
+                        'key' => $apiKey
+                    ]
                 ]);
+
+                $data = json_decode($response->getBody(), true);
+
+                if ($data['status'] == 'OK') {
+                    $geoLocation = $data['results'][0]['geometry']['location'];
+                    $location->latitude = $geoLocation['lat'];
+                    $location->longitute = $geoLocation['lng'];
+                    $location->save();
+
+                    Log::info('Updated location coordinates', [
+                        'location_id' => $location->id,
+                        'latitude' => $location->latitude,
+                        'longitude' => $location->longitude
+                    ]);
+                } else {
+                    Log::error('Geocoding failed', [
+                        'location_id' => $location->id,
+                        'status' => $data['status']
+                    ]);
+                }
             } else {
-                Log::error('Geocoding failed', [
-                    'location_id' => $location->id,
-                    'status' => $data['status']
-                ]);
+                Log::warning('No venue found for location', ['location_id' => $location->id]);
             }
-        } else {
-            Log::warning('No venue found for location', ['location_id' => $location->id]);
         }
     }
 
-}
+    public function get_address()
+    {
+        return Location::where('id', '>', 4)->where('city_id', 1)->count();
+    }
 
 
-public function updateNearbyLocations()
-{
-    $locations = Location::where('id', '>', 4)->get();
+    public function updateNearbyLocations()
+    {
+        set_time_limit(300);
+        $locations = Location::where('id', '>', 4)->where('city_id', 1)->get();
+        $otherLoc = Location::where('id', '>', 4)->where('city_id', 1)->get();
+        foreach ($locations as $location) {
+            $nearbyLocationIds = [];
+            $nearbyLocationNames = [];
 
-    foreach ($locations as $location) {
-        $nearbyLocationIds = [];
+            foreach ($otherLoc as $otherLocation) {
+                if ($location->id !== $otherLocation->id) {
+                    $distance = $this->getDistanceByRoad(
+                        $location->latitude,
+                        $location->longitute,
+                        $otherLocation->latitude,
+                        $otherLocation->longitute
+                    );
 
-        foreach ($locations as $otherLocation) {
-            if ($location->id !== $otherLocation->id) {
-                $distance = $this->calculateDistance(
-                    (float) $location->latitude,
-                    (float) $location->longitude,
-                    (float) $otherLocation->latitude,
-                    (float) $otherLocation->longitude
-                );
+                    // Define the radius within which you consider locations to be nearby (in kilometers)
+                    $radius = 6;
 
-                // Define the radius within which you consider locations to be nearby (in kilometers)
-                $radius = 5;
+                    if ($distance >= 0.01 && $distance <= $radius) {
+                        $nearbyLocationIds[] = $otherLocation->id;
+                        $nearbyLocationNames[] = $otherLocation->name;
+                    }
 
-                if ($distance <= $radius) {
-                    $nearbyLocationIds[] = $otherLocation->id;
+                    // Log the distance for debugging
+                    Log::info('Distance calculated by road', [
+                        'location_id' => $location->id,
+                        'other_location_id' => $otherLocation->id,
+                        'other_location_name' => $otherLocation->name,
+                        'distance' => $distance
+                    ]);
                 }
             }
+
+            $location->locality_ids = implode(',', $nearbyLocationIds);
+            $location->save();
+
+            Log::info('Updated nearby locations', [
+                'location_id' => $location->id,
+                'nearby_location_ids' => $nearbyLocationIds,
+                'nearby_location_names' => $nearbyLocationNames
+            ]);
+                break;
+        }
+    }
+
+    private function getDistanceByRoad($lat1, $lon1, $lat2, $lon2)
+    {
+        $client = new Client();
+        $apiKey = 'AIzaSyBrWQqxRrVwgEDFYZdiC_nHlBE0pn5cjTw';
+        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins={$lat1},{$lon1}&destinations={$lat2},{$lon2}&key={$apiKey}";
+        Log::info($url);
+        try {
+            $response = $client->get($url);
+            $data = json_decode($response->getBody(), true);
+            Log::info($data);
+            if (isset($data['rows'][0]['elements'][0]['status']) && $data['rows'][0]['elements'][0]['status'] == 'OK') {
+                if (isset($data['rows'][0]['elements'][0]['distance']['value'])) {
+                    $distance = $data['rows'][0]['elements'][0]['distance']['value'] / 1000; // Convert meters to kilometers
+                    return $distance;
+                } else {
+                    Log::error('Distance key is missing in the response', [
+                        'response' => $data
+                    ]);
+                }
+            } else {
+                Log::error('Error in the API response status', [
+                    'response' => $data
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Exception when calling Google Maps API', [
+                'exception' => $e->getMessage()
+            ]);
         }
 
-        $location->locality_ids = implode(',', $nearbyLocationIds);
-        $location->save();
-
-        Log::info('Updated nearby locations', [
-            'location_id' => $location->id,
-            'nearby_location_ids' => $nearbyLocationIds
-        ]);
+        return null;
     }
-}
 
-private function calculateDistance($lat1, $lon1, $lat2, $lon2)
-{
-    $earthRadius = 6371; // Radius of the earth in kilometers
 
-    $latDistance = deg2rad($lat2 - $lat1);
-    $lonDistance = deg2rad($lon2 - $lon1);
 
-    $a = sin($latDistance / 2) * sin($latDistance / 2) +
-        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-        sin($lonDistance / 2) * sin($lonDistance / 2);
+    // public function updateNearbyLocations()
+    // {
+    //     $locations = Location::where('id', '>', 4)->get();
 
-    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+    //     foreach ($locations as $location) {
+    //         $nearbyLocationIds = [];
+    //         $nearbyLocationNames = [];
 
-    $distance = $earthRadius * $c; // Distance in kilometers
+    //         foreach ($locations as $otherLocation) {
+    //             if ($location->id !== $otherLocation->id) {
+    //                 $distance = $this->calculateDistance(
+    //                     (float) $location->latitude,
+    //                     (float) $location->longitude,
+    //                     (float) $otherLocation->latitude,
+    //                     (float) $otherLocation->longitude
+    //                 );
 
-    return $distance;
-}
+    //                 // Define the radius within which you consider locations to be nearby (in kilometers)
+    //                 $radius = 5;
+
+    //                 if ($distance <= $radius) {
+    //                     $nearbyLocationIds[] = $otherLocation->id;
+    //                     $nearbyLocationNames[] = $otherLocation->name;
+    //                 }
+
+    //                 // Log the distance for debugging
+    //                 Log::info('Distance calculated', [
+    //                     'location_id' => $location->id,
+    //                     'other_location_id' => $otherLocation->id,
+    //                     'other_location_name' => $otherLocation->name,
+    //                     'distance' => $distance
+    //                 ]);
+    //             }
+    //         }
+
+    //         $location->locality_ids = implode(',', $nearbyLocationIds);
+    //         $location->save();
+
+    //         Log::info('Updated nearby locations', [
+    //             'location_id' => $location->id,
+    //             'nearby_location_ids' => $nearbyLocationIds,
+    //             'nearby_location_names' => $nearbyLocationNames
+    //         ]);
+    //     }
+    // }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // Radius of the earth in kilometers
+
+        $latDistance = deg2rad($lat2 - $lat1);
+        $lonDistance = deg2rad($lon2 - $lon1);
+
+        $a = sin($latDistance / 2) * sin($latDistance / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($lonDistance / 2) * sin($lonDistance / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c;
+
+        return $distance;
+    }
 }

@@ -87,7 +87,6 @@ class AuthController extends Controller
             if ($user->can_add_device === 1) {
                 $device = new Device();
                 $device->member_id = $user->id;
-                $device->type = $request->login_type;
                 $device->device_name = "$browser_name Ver:$browser_version / Platform: $platform";
                 $device->device_id = $cookie_val;
                 $device->save();
@@ -240,7 +239,6 @@ class AuthController extends Controller
                 ]
             ]
         ]);
-        Log::info($response);
         return $response;
     }
 }

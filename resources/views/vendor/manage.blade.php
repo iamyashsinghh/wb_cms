@@ -24,6 +24,11 @@
             <div class="card text-sm">
                 <div class="card-header text-light" style="background-color: var(--wb-renosand)">
                     <h3 class="card-title">Vendor Details</h3>
+                    @if($vendor->id >= 1)
+                    @canany(['super power', 'manage venue_vendor redirect'])
+                    <a class="float-right text-dark" title="{{$vendor->is_redirect == 1 ? 'Diable redirect to listing page': 'Enable redirect to listing page'}}" href="{{route('vendor.update.redirect.manage', [$vendor->id, $vendor->is_redirect == 1 ? 0 : 1])}}" style="font-size: 22px;"><i class="fa {{$vendor->is_redirect == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-light'}}"></i></a>
+                    @endcanany
+                    @endif
                 </div>
                 <form action="{{route('vendor.manage_process', $vendor->id)}}" method="post" enctype="multipart/form-data">
                     @csrf
@@ -46,7 +51,7 @@
                                 <div class="form-group">
                                     <label>Brand Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" placeholder="Enter brand name" name="brand_name" required oninput="generate_slug(this.value)" value="{{$vendor->brand_name}}">
-                                    @error('venue_name')<span class="ml-1 text-sm text-danger">{{$message}}</span>@enderror
+                                    @error('vendor_name')<span class="ml-1 text-sm text-danger">{{$message}}</span>@enderror
                                 </div>
                             </div>
                             <div class="col-sm-4 mb-3">
@@ -169,7 +174,7 @@
                                 </p>
                             </div>
                             <div class="col text-right">
-                                <a href="{{route('venue.list')}}" class="btn btn-sm bg-secondary m-1">Back</a>
+                                <a href="{{route('vendor.list')}}" class="btn btn-sm bg-secondary m-1">Back</a>
                                 <button type="submit" class="btn btn-sm m-1 text-light" style="background-color: var(--wb-dark-red);">Submit</button>
                             </div>
                         </div>

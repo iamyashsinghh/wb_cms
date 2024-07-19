@@ -29,6 +29,11 @@
                 <div class="card text-sm">
                     <div class="card-header text-light" style="background-color: var(--wb-renosand)">
                         <h3 class="card-title">Venue Details</h3>
+                        @if($venue->id >= 1)
+                        @canany(['super power', 'manage venue_vendor redirect'])
+                        <a class="float-right text-dark" title="{{$venue->is_redirect == 1 ? 'Diable redirect to listing page': 'Enable redirect to listing page'}}" href="{{route('venue.update.redirect.manage', [$venue->id, $venue->is_redirect == 1 ? 0 : 1])}}" style="font-size: 22px;"><i class="fa {{$venue->is_redirect == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-light'}}"></i></a>
+                        @endcanany
+                        @endif
                     </div>
                     <form action="{{ route('venue.manage_process', $venue->id) }}" method="post"
                         enctype="multipart/form-data">
@@ -553,7 +558,7 @@
                 .replace(/\s+/g, '-')
                 document.getElementById('slug_inp').value = fixedSlug;
             }
-            
+
             localitySelect.addEventListener('change', updateSlug);
             citySelect.addEventListener('change', updateSlug);
 

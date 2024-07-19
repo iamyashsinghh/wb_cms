@@ -12,4 +12,15 @@ class Venue extends Model {
     {
         return $this->belongsToMany(Review::class, 'vendor_venue_review', 'venue_id', 'review_id');
     }
+    public function get_city() {
+        return $this->hasOne(City::class, 'id', 'city_id');
+    }
+    public function get_locality() {
+        return $this->hasOne(Location::class, 'id', 'location_id');
+    }
+    public function get_category()
+{
+    $firstCategoryId = $this->venue_category_ids[0] ?? null;
+    return $this->hasOne(VenueCategory::class, 'id', 'venue_category_ids')->where('id', $firstCategoryId);
+}
 }

@@ -95,6 +95,7 @@ class VenueController extends Controller {
                 'start_time_evening' => '',
                 'end_time_evening' => '',
                 'place_rating'=> '',
+                'is_redirect'=> 0,
                 'area_capacity' => '{}',
             ]));
         }
@@ -448,7 +449,7 @@ class VenueController extends Controller {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.', 'errors' => $th->getMessage()]);
         }
     }
-    
+
     public function update_images_sorting(Request $request, $venue_id) {
         try {
             $images = implode(",", $request->images);
@@ -477,5 +478,13 @@ class VenueController extends Controller {
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.', $th->getMessage()]);
         }
+    }
+
+    public function update_redirect($venue_id, $value){
+        $venue = Venue::find($venue_id);
+        $venue->is_redirect = $value;
+        $venue->save();
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Redirect Updated successfully.']);
+        return redirect()->back();
     }
 }

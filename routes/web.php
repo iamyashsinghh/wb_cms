@@ -10,6 +10,7 @@ use App\Http\Controllers\FroalaController;
 use App\Http\Controllers\MegaDatabaseChangeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Models\Venue;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,7 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
 Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
 Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
+Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
 Route::get('hi_done', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
 
 
@@ -174,6 +176,8 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
             Route::post('/update_phone_number/{venue_id?}', 'update_phone_number')->name('venue.update_phoneNumber');
             Route::post('/update_meta/{venue_id?}', 'update_meta')->name('venue.update_meta');
             Route::post('/update_faq/{venue_id?}', 'update_faq')->name('venue.update_faq');
+            // Venue Redirect manage
+            Route::get('/update_redirect/{venue_id?}/{value?}', 'update_redirect')->name('venue.update.redirect.manage');
             // delete venue
             Route::delete('/destroy/{id}', 'destroy')->name('venue.destroy');
             //ajax route
@@ -319,6 +323,8 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
             Route::get('/delete/{vendor_id?}', 'delete')->name('vendor.delete');
             Route::post('/manage_process/{vendor_id}', 'manage_process')->name('vendor.manage_process');
             Route::post('/update_meta/{vendor_id?}', 'update_meta')->name('vendor.update_meta');
+            // Venue Redirect manage
+            Route::get('/update_redirect/{vendor_id?}/{value?}', 'update_redirect')->name('vendor.update.redirect.manage');
             // delete vendor
             Route::delete('/destroy/{id}', 'destroy')->name('vendor.destroy');
             //ajax route
