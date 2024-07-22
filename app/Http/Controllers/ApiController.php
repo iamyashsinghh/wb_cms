@@ -541,7 +541,11 @@ class ApiController extends Controller
             }
 
             $total_items = $data->count();
+            if ($location_slug != 'all') {
             $venues_or_vendors = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+            }else{
+            $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+            }
 
             if ($venue_category) {
                 foreach ($venues_or_vendors as $venue_or_vendor) {
