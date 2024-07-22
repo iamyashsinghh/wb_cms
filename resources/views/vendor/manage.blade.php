@@ -140,6 +140,14 @@
 
                                 </div>
                             </div>
+                            
+                            <div class="col-sm-8 mb-3">
+                                <div class="form-group">
+                                    <label>Meta Keywords</label>
+                                    <textarea type="text" class="form-control" placeholder="Enter meta keyword"  name="meta_keywords">{{$vendor->meta_keywords}}</textarea>
+                                </div>
+                            </div>
+
                             <div class="col-sm-12 mb-3">
                                 <div class="form-group">
                                     <label>Summary</label>

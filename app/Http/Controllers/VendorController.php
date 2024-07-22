@@ -83,6 +83,7 @@ class VendorController extends Controller {
                 'vendor_address' => '',
                 'package_price' => '',
                 'meta_title' => '',
+                'meta_keywords' => '',
                 'meta_description' => '',
                 'summary' => '',
                 'similar_vendor_ids' => '',
@@ -116,6 +117,7 @@ class VendorController extends Controller {
             $vendor->event_completed = $request->event_completed;
             $vendor->meta_title = $request->meta_title;
             $vendor->meta_description = $request->meta_description;
+            $vendor->meta_keywords = $request->meta_keywords;
             $vendor->summary = $request->summary;
             $vendor->similar_vendor_ids = $request->similar_vendors ? implode(",", $request->similar_vendors) : null;
             $vendor->package_option = is_array($request->package_option) ? implode(",", $request->package_option) : null;
