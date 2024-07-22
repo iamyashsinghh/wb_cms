@@ -450,7 +450,8 @@ class ApiController extends Controller
                     'venues.venue_category_ids',
                     DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
                     'locations.name as location_name',
-                    'cities.name as city_name'
+                    'cities.name as city_name',
+                'locations.id as locationid',
                 )
                     ->join('locations', 'locations.id', '=', 'venues.location_id')
                     ->join('cities', 'cities.id', '=', 'venues.city_id')
@@ -493,7 +494,7 @@ class ApiController extends Controller
                         $arr .= ',' . $list->locality_ids;
                     }
                     $params = explode(',', $arr);
-                    $data->whereIn('location_id', array_unique($params));
+                    $data->whereIn('location_', array_unique($params));
                 }
 
                 if ($request->food_type) {
@@ -517,7 +518,8 @@ class ApiController extends Controller
                     'vendors.popular',
                     'vendors.wb_assured',
                     'locations.name as location_name',
-                    'cities.name as city_name'
+                    'cities.name as city_name',
+                'locations.id as locationid',
                 )
                     ->join('cities', 'cities.id', '=', 'vendors.city_id')
                     ->join('locations', 'locations.id', '=', 'vendors.location_id')
@@ -530,6 +532,7 @@ class ApiController extends Controller
                 if ($location_slug != 'all') {
                     $data->where('locations.slug', $location_slug);
                 }
+                $data->orderBy('vendors.location_id', 'asc');
 
                 $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
                     ->where('slug', $slug)->first();
@@ -538,7 +541,7 @@ class ApiController extends Controller
             }
 
             $total_items = $data->count();
-            $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+            $venues_or_vendors = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
 
             if ($venue_category) {
                 foreach ($venues_or_vendors as $venue_or_vendor) {
