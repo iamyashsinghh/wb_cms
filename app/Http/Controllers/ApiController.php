@@ -1015,37 +1015,103 @@ class ApiController extends Controller
         return response()->json($response);
     }
 
+    // public function venue_or_vendor_details(string $slug)
+    // {
+    //     try {
+    //         $data = [];
+    //         $venue = Venue::where('slug', $slug)->first();
+    //         Log::info($venue);
+    //         if ($venue) {
+    //             $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(',', $venue->similar_venue_ids))->get();
+    //             $data['venue'] = $venue;
+    //             $data['similar_packages'] = $similar_packages;
+    //             $tag = 'venue';
+    //             $city = City::where('id', $venue->city_id)->first();
+    //             $reviews = Review::where('product_id', $venue->id)->get();
+    //             $is_redirect = $venue->is_redirect;
+    //             $city_slug = $venue->get_city->slug;
+    //             $locality = $venue->get_locality->slug;
+    //             $category = $venue->get_category->slug;
+    //             $redirect_url = "$category/$city_slug/$locality";
+    //         } else {
+    //             $vendor = Vendor::where('slug', $slug)->first();
+    //             $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))->get();
+    //             $data['vendor'] = $vendor;
+    //             $data['similar_vendors'] = $similar_vendors;
+    //             $tag = 'vendor';
+    //             $reviews = '';
+    //             $city = City::where('id', $vendor->city_id)->first();
+    //             $is_redirect = $vendor->is_redirect;
+    //             $city_slug = $vendor->get_city->slug;
+    //             $locality = $vendor->get_locality->slug;
+    //             $category = $vendor->get_category->slug;
+    //             $redirect_url = "$category/$city_slug/all";
+    //         }
+    //         $response = [
+    //             'success' => true,
+    //             'tag' => $tag,
+    //             'data' => $data,
+    //             'city' => $city,
+    //             'reviews' => $reviews,
+    //             'is_redirect' => $is_redirect,
+    //             'redirect_url' => $redirect_url,
+    //             'message' => 'Data fetched succesfully',
+    //         ];
+    //     } catch (\Throwable $th) {
+    //         $response = [
+    //             'success' => false,
+    //             'data' => [],
+    //             'message' => $th->getMessage(),
+    //         ];
+    //     }
+    //     return $response;
+    // }
+
     public function venue_or_vendor_details(string $slug)
     {
         try {
             $data = [];
+
             $venue = Venue::where('slug', $slug)->first();
             if ($venue) {
-                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')->whereIn('id', explode(',', $venue->similar_venue_ids))->get();
+                $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')
+                    ->whereIn('id', explode(',', $venue->similar_venue_ids))
+                    ->get();
+
                 $data['venue'] = $venue;
                 $data['similar_packages'] = $similar_packages;
                 $tag = 'venue';
                 $city = City::where('id', $venue->city_id)->first();
                 $reviews = Review::where('product_id', $venue->id)->get();
                 $is_redirect = $venue->is_redirect;
-                $city_slug = $venue->get_city->slug;
-                $locality = $venue->get_locality->slug;
-                $category = $venue->get_category->slug;
+
+                $city_slug = $venue->get_city ? $venue->get_city->slug : '';
+                $locality = $venue->get_locality ? $venue->get_locality->slug : '';
+                $category = $venue->get_category ? $venue->get_category->slug : '';
+
                 $redirect_url = "$category/$city_slug/$locality";
             } else {
+
                 $vendor = Vendor::where('slug', $slug)->first();
-                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))->get();
+
+                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')
+                    ->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))
+                    ->get();
+
                 $data['vendor'] = $vendor;
                 $data['similar_vendors'] = $similar_vendors;
                 $tag = 'vendor';
                 $reviews = '';
                 $city = City::where('id', $vendor->city_id)->first();
                 $is_redirect = $vendor->is_redirect;
-                $city_slug = $vendor->get_city->slug;
-                $locality = $vendor->get_locality->slug;
-                $category = $vendor->get_category->slug;
+
+                $city_slug = $vendor->get_city ? $vendor->get_city->slug : '';
+                $locality = $vendor->get_locality ? $vendor->get_locality->slug : '';
+                $category = $vendor->get_category ? $vendor->get_category->slug : '';
+
                 $redirect_url = "$category/$city_slug/all";
             }
+
             $response = [
                 'success' => true,
                 'tag' => $tag,
@@ -1054,7 +1120,7 @@ class ApiController extends Controller
                 'reviews' => $reviews,
                 'is_redirect' => $is_redirect,
                 'redirect_url' => $redirect_url,
-                'message' => 'Data fetched succesfully',
+                'message' => 'Data fetched successfully',
             ];
         } catch (\Throwable $th) {
             $response = [
@@ -1062,6 +1128,7 @@ class ApiController extends Controller
                 'data' => [],
                 'message' => $th->getMessage(),
             ];
+            Log::error('Error fetching venue or vendor details: ' . $th->getMessage());
         }
         return $response;
     }
