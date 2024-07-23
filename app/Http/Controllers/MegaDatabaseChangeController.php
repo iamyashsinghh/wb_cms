@@ -100,12 +100,11 @@ class MegaDatabaseChangeController extends Controller
     }
 
 
-    public function updateNearbyLocations()
+    public function updateNearbyLocations($location_id)
     {
         set_time_limit(300);
-        $locations = Location::where('id', '>', 4)->where('city_id', 1)->get();
+        $location = Location::where('id', '>', $location_id)->where('city_id', 1)->first();
         $otherLoc = Location::where('id', '>', 4)->where('city_id', 1)->get();
-        foreach ($locations as $location) {
             $nearbyLocationIds = [];
             $nearbyLocationNames = [];
 
@@ -119,7 +118,7 @@ class MegaDatabaseChangeController extends Controller
                     );
 
                     // Define the radius within which you consider locations to be nearby (in kilometers)
-                    $radius = 6;
+                    $radius = 5;
 
                     if ($distance >= 0.01 && $distance <= $radius) {
                         $nearbyLocationIds[] = $otherLocation->id;
@@ -144,8 +143,6 @@ class MegaDatabaseChangeController extends Controller
                 'nearby_location_ids' => $nearbyLocationIds,
                 'nearby_location_names' => $nearbyLocationNames
             ]);
-                break;
-        }
     }
 
     private function getDistanceByRoad($lat1, $lon1, $lat2, $lon2)

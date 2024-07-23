@@ -325,12 +325,12 @@ class ApiController extends Controller
 
                 if ($request->guest) {
                     $params = explode(',', $request->guest);
-                    $data->whereBetween('max_capacity', [$params[0], $params[1]]);
+                    $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
                 }
 
                 if ($request->per_plate) {
                     $params = explode(',', $request->per_plate);
-                    $data->whereBetween('veg_price', [$params[0], $params[1]]);
+                    $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
                 }
 
                 if ($request->per_budget) {
@@ -346,7 +346,7 @@ class ApiController extends Controller
                         $arr .= ',' . $list->locality_ids;
                     }
                     $params = explode(',', $arr);
-                    $data->whereIn('location_', array_unique($params));
+                    $data->whereIn('venues.location_id', array_unique($params));
                 }
 
                 if ($request->food_type) {

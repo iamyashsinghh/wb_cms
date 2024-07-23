@@ -29,7 +29,7 @@ Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeControlle
 Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
 Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
 Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
-Route::get('hi_done', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
+Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
 
 
 Route::group(['middleware' => 'AuthCheck'], function () {
