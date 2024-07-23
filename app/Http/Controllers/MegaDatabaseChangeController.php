@@ -143,6 +143,7 @@ class MegaDatabaseChangeController extends Controller
                 'nearby_location_ids' => $nearbyLocationIds,
                 'nearby_location_names' => $nearbyLocationNames
             ]);
+           return "<a href=\"https://cms.wbcrm.in/hi_done/$location->id\">Open Link</a>";
     }
 
     private function getDistanceByRoad($lat1, $lon1, $lat2, $lon2)
