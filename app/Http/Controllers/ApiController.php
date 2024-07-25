@@ -367,6 +367,8 @@ class ApiController extends Controller
                     'vendors.phone',
                     'vendors.slug',
                     'vendors.summary',
+                    'vendors.yrs_exp',
+                    'vendors.event_completed',
                     'vendors.images',
                     'vendors.popular',
                     'vendors.wb_assured',
