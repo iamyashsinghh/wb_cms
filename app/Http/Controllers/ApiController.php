@@ -366,12 +366,13 @@ class ApiController extends Controller
                     'vendors.package_price',
                     'vendors.phone',
                     'vendors.slug',
+                    'vendors.summary',
                     'vendors.images',
                     'vendors.popular',
                     'vendors.wb_assured',
                     'locations.name as location_name',
                     'cities.name as city_name',
-                'locations.id as locationid',
+                    'locations.id as locationid',
                 )
                     ->join('cities', 'cities.id', '=', 'vendors.city_id')
                     ->join('locations', 'locations.id', '=', 'vendors.location_id')
