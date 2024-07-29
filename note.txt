@@ -1,20 +1,3 @@
-We have to ranking again of all vendors listing pages.
--> destination-weddings
+add ip in bussinss user listing
 
-
-Category need to be update/change as per M.D Requirements
-1. 4 Star and above Hotels -> 5 Start Wedding Hotels
-2. Corporate Events & Cocktail Party Hall -> Corporate Events
-3. Marriage Gardens / Lawns -> Marriage Gardens
-4. Kalyana mandapam -> delete.
-5. Wedding resorts ->delete.
-
-
-vendor category wise count is missing in normal user panel.
-when updating user and return the response the city slug is mismatch.
-
-
-Refactored based on meta_keywords:-
-venue_listing_metas
-vendor_listing_metas
-venues;
+remove filters h2 tags in locality filters  ---> done

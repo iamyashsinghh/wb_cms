@@ -14,8 +14,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class VendorController extends Controller {
-    public function ajax_list() {
+class VendorController extends Controller
+{
+    public function ajax_list()
+    {
         $vendors = Vendor::select(
             'vendors.id',
             'vendors.brand_name',
@@ -51,7 +53,8 @@ class VendorController extends Controller {
 
         // return response()->json(['message' => '']);
     }
-    public function manage($vendor_id = 0) {
+    public function manage($vendor_id = 0)
+    {
         $cities = City::select('id', 'name')->orderby('name', 'asc')->get();
         $vendor_categories = VendorCategory::select('id', 'name')->orderBy('name', 'asc')->get();
         if ($vendor_id > 0) {
@@ -64,10 +67,10 @@ class VendorController extends Controller {
             $locations = Location::select('id', 'name')->where('city_id', $vendor->city_id)->get();
         } else {
             $nextCompanyNumber = C_Number::where('is_next', 1)->first();
-    if (!$nextCompanyNumber) {
-        // If no company number is marked as next, default to the first one
-        $nextCompanyNumber = C_Number::orderBy('id')->first();
-    }
+            if (!$nextCompanyNumber) {
+                // If no company number is marked as next, default to the first one
+                $nextCompanyNumber = C_Number::orderBy('id')->first();
+            }
             $page_heading = "Add Vendor";
             $vendor = json_decode(json_encode([
                 'id' => 0,
@@ -83,6 +86,8 @@ class VendorController extends Controller {
                 'vendor_address' => '',
                 'package_price' => '',
                 'meta_title' => '',
+                'services' => [],
+                'occasions' => [],
                 'meta_keywords' => '',
                 'meta_description' => '',
                 'summary' => '',
@@ -95,7 +100,8 @@ class VendorController extends Controller {
         // return $vendor;
         return view('vendor.manage', compact('cities', 'locations', 'page_heading', 'vendor_categories', 'similar_vendors', 'vendor'));
     }
-    public function manage_process(Request $request, $vendor_id = 0) {
+    public function manage_process(Request $request, $vendor_id = 0)
+    {
         if ($vendor_id > 0) {
             $vendor = Vendor::find($vendor_id);
             $msg = "Vendor updated successfully.";
@@ -118,22 +124,24 @@ class VendorController extends Controller {
             $vendor->meta_title = $request->meta_title;
             $vendor->meta_description = $request->meta_description;
             $vendor->meta_keywords = $request->meta_keywords;
+            $vendor->services = $request->services;
+            $vendor->occasions = $request->occasions;
             $vendor->summary = $request->summary;
             $vendor->similar_vendor_ids = $request->similar_vendors ? implode(",", $request->similar_vendors) : null;
             $vendor->package_option = is_array($request->package_option) ? implode(",", $request->package_option) : null;
             $vendor->save();
             $nextCompanyNumber = C_Number::where('is_next', 1)->first();
-        if (!$nextCompanyNumber) {
-            $nextCompanyNumber = C_Number::orderBy('id')->first();
-        }
-        $nextCompanyNumber->is_next = 0;
-        $nextCompanyNumber->save();
-        $nextCompanyNumber = C_Number::where('id', '>', $nextCompanyNumber->id)->first();
-        if (!$nextCompanyNumber) {
-        $nextCompanyNumber = C_Number::orderBy('id')->first();
-        }
-        $nextCompanyNumber->is_next = 1;
-        $nextCompanyNumber->save();
+            if (!$nextCompanyNumber) {
+                $nextCompanyNumber = C_Number::orderBy('id')->first();
+            }
+            $nextCompanyNumber->is_next = 0;
+            $nextCompanyNumber->save();
+            $nextCompanyNumber = C_Number::where('id', '>', $nextCompanyNumber->id)->first();
+            if (!$nextCompanyNumber) {
+                $nextCompanyNumber = C_Number::orderBy('id')->first();
+            }
+            $nextCompanyNumber->is_next = 1;
+            $nextCompanyNumber->save();
 
             $migrated_data = $vendor->makeHidden('id', 'slug', 'phone', 'summary', 'similar_vendor_ids', 'popular', 'status', 'deleted_at', 'meta_title', 'meta_description', 'created_at', 'updated_at')->toArray();
             $vendor['vendor_id'] = $request->vendor;
@@ -151,7 +159,8 @@ class VendorController extends Controller {
         }
         return redirect()->route('vendor.list');
     }
-    public function update_status($vendor_id, $status) {
+    public function update_status($vendor_id, $status)
+    {
         try {
             $vendor = Vendor::find($vendor_id);
             $vendor->status = $status;
@@ -162,7 +171,8 @@ class VendorController extends Controller {
         }
         return $res;
     }
-    public function update_popular_status($vendor_id, $status) {
+    public function update_popular_status($vendor_id, $status)
+    {
         try {
             $vendor = Vendor::find($vendor_id);
             $vendor->popular = $status;
@@ -173,7 +183,8 @@ class VendorController extends Controller {
         }
         return $res;
     }
-    public function update_wb_assured_status($vendor_id, $status) {
+    public function update_wb_assured_status($vendor_id, $status)
+    {
         try {
             $vendor = Vendor::find($vendor_id);
             $vendor->wb_assured = $status;
@@ -184,7 +195,8 @@ class VendorController extends Controller {
         }
         return $res;
     }
-    public function update_phone_number(Request $request, $vendor_id) {
+    public function update_phone_number(Request $request, $vendor_id)
+    {
         $validate = Validator::make($request->all(), [
             'phone_number' => 'required|min_digits:10|max_digits:11',
         ]);
@@ -201,7 +213,8 @@ class VendorController extends Controller {
     }
 
     //for seo methods
-    public function fetch_meta($vendor_id) {
+    public function fetch_meta($vendor_id)
+    {
         try {
             $meta = Vendor::select('meta_title', 'meta_description')->where('id', $vendor_id)->first();
             if ($meta) {
@@ -214,7 +227,8 @@ class VendorController extends Controller {
         }
         return $response;
     }
-    public function update_meta(Request $request, $vendor_id) {
+    public function update_meta(Request $request, $vendor_id)
+    {
         $validate = Validator::make($request->all(), [
             'meta_title' => 'required|string|max:255',
             'meta_title' => 'required|string'
@@ -240,7 +254,8 @@ class VendorController extends Controller {
     }
 
 
-    public function get_similar_vendors(int $category_id, int $city_id) {
+    public function get_similar_vendors(int $category_id, int $city_id)
+    {
         try {
             $vendors = Vendor::select('vendors.id', 'cities.name as city', 'vendors.brand_name', 'vendor_categories.name as vendor_category')
                 ->join('vendor_categories', 'vendor_categories.id', 'vendors.vendor_category_id')
@@ -252,15 +267,16 @@ class VendorController extends Controller {
         }
     }
 
-    //for images
-    public function manage_images(int $vendor_id) {
+    public function manage_images(int $vendor_id)
+    {
         $data = Vendor::select('id', 'brand_name as name', 'images')->where('id', $vendor_id)->first();
         $view_used_for = "vendor";
         $page_heading = "Vendor Images";
         return view('common.manage_images', compact('data', 'view_used_for', 'page_heading'));
     }
 
-    public function images_manage_process(Request $request, int $vendor_id) {
+    public function images_manage_process(Request $request, int $vendor_id)
+    {
         try {
             if ($request->user_id > 0) {
                 $business_user = BusinessUser::find($request->user_id);
@@ -301,7 +317,8 @@ class VendorController extends Controller {
         return redirect()->back();
     }
 
-    public function image_delete(Request $request, $vendor_id) {
+    public function image_delete(Request $request, $vendor_id)
+    {
         try {
             $vendor = Vendor::find($vendor_id);
             $images_arr = explode(",", $vendor->images);
@@ -324,7 +341,8 @@ class VendorController extends Controller {
         }
     }
 
-    public function update_images_sorting(Request $request, $vendor_id) {
+    public function update_images_sorting(Request $request, $vendor_id)
+    {
         try {
             $vendor = Vendor::find($vendor_id);
             $vendor->images = implode(",", $request->images);
@@ -338,18 +356,12 @@ class VendorController extends Controller {
         }
     }
 
-    public function update_redirect($vendor_id, $value){
+    public function update_redirect($vendor_id, $value)
+    {
         $vendor = Vendor::find($vendor_id);
         $vendor->is_redirect = $value;
         $vendor->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Redirect Updated successfully.']);
         return redirect()->back();
     }
-
-    // public function login_test() {
-    //     // $a = $this->interakt_wa_msg_send('9891340645', 'Test Vendor', 19155, 'login_otp');
-    //     // $a = $this->interakt_wa_msg_send('9891340645', 'Test Vendor', '19155', 'login_otp');
-    //     $a = $this->interakt_wa_msg_send(9891340645, 'Test Vendor', '19155', 'login_otp');
-    //     return $a;
-    // }
 }
