@@ -232,29 +232,18 @@
                                                 }
                                                 $occasions = array_map('trim', $occasions);
                                             @endphp
-                                            <option value="wedding-engagement"
-                                                {{ in_array('wedding-engagement', $occasions) ? 'selected' : '' }}>Wedding
-                                                & engagement</option>
-                                            <option value="engagement-photography"
-                                                {{ in_array('engagement-photography', $occasions) ? 'selected' : '' }}>
-                                                Engagement photography</option>
-                                            <option value="mehndi-sangeet"
-                                                {{ in_array('mehndi-sangeet', $occasions) ? 'selected' : '' }}>Mehndi &
-                                                sangeet</option>
-                                            <option value="couple-pre-wedding"
-                                                {{ in_array('couple-pre-wedding', $occasions) ? 'selected' : '' }}>Couple
-                                                pre-wedding</option>
-                                            <option value="parties"
-                                                {{ in_array('parties', $occasions) ? 'selected' : '' }}>Parties</option>
-                                            <option value="corporate-events"
-                                                {{ in_array('corporate-events', $occasions) ? 'selected' : '' }}>Corporate
-                                                events</option>
-                                            <option value="maternity-shoot"
-                                                {{ in_array('maternity-shoot', $occasions) ? 'selected' : '' }}>Maternity
-                                                shoot</option>
-                                            <option value="baby-shoot"
-                                                {{ in_array('baby-shoot', $occasions) ? 'selected' : '' }}>Baby shoot
-                                            </option>
+                                            <option value="roka" {{ in_array('roka', $occasions) ? 'selected' : '' }}>Roka</option>
+                                            <option value="sagan" {{ in_array('sagan', $occasions) ? 'selected' : '' }}>Sagan</option>
+                                            <option value="engagement" {{ in_array('engagement', $occasions) ? 'selected' : '' }}>Engagement</option>
+                                            <option value="haldi-mehndi" {{ in_array('haldi-mehndi', $occasions) ? 'selected' : '' }}>Haldi & Mehndi</option>
+                                            <option value="cocktail" {{ in_array('cocktail', $occasions) ? 'selected' : '' }}>Cocktail</option>
+                                            <option value="wedding" {{ in_array('wedding', $occasions) ? 'selected' : '' }}>Wedding</option>
+                                            <option value="reception" {{ in_array('reception', $occasions) ? 'selected' : '' }}>Reception</option>
+                                            <option value="anniversary" {{ in_array('anniversary', $occasions) ? 'selected' : '' }}>Anniversary</option>
+                                            <option value="mata-ki-chowki" {{ in_array('mata-ki-chowki', $occasions) ? 'selected' : '' }}>Mata ki Chowki</option>
+                                            <option value="birthday" {{ in_array('birthday', $occasions) ? 'selected' : '' }}>Birthday</option>
+                                            <option value="corporate-event" {{ in_array('corporate-event', $occasions) ? 'selected' : '' }}>Corporate Event</option>
+                                            <option value="baby-shower" {{ in_array('baby-shower', $occasions) ? 'selected' : '' }}>Baby Shower</option>
                                         </select>
                                     </div>
                                 </div>
