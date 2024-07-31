@@ -385,10 +385,11 @@
                 document.querySelector('#occasions').setAttribute('required', 'required');
             } else if (category_id == 2) {
                 makeupserviceSection.style.display = 'block';
-                occasionSection.style.display = 'none';
+                occasionSection.style.display = 'block';
                 document.querySelectorAll('.makeup_service select').forEach(select => {
                     select.setAttribute('required', 'required');
                 });
+                document.querySelector('#occasions').setAttribute('required', 'required');
             }
         }
 
