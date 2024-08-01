@@ -999,11 +999,7 @@ class ApiController extends Controller
                 $total_items = $data->count();
 
                 // Apply pagination to the filtered items
-                if ($location_slug != 'all') {
-                    $filtered_items = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
-                } else {
-                    $filtered_items = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
-                }
+                $filtered_items = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
 
                 // Process venue categories
                 foreach ($filtered_items as $item) {
@@ -1121,10 +1117,15 @@ class ApiController extends Controller
                     ->where('slug', $slug)->first();
 
                 $tag = 'vendors';
-                $all_items = $data->get();
+
+                // Get total items count after filtering
+                $total_items = $data->count();
+
+                // Apply pagination to the filtered items
+                $filtered_items = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
 
                 // Apply services and occasions filtering
-                $all_items = $all_items->map(function ($vendor) {
+                $filtered_items = $filtered_items->map(function ($vendor) {
                     $services = json_decode($vendor->services, true);
                     $occasions = json_decode($vendor->occasions, true);
 
@@ -1148,7 +1149,7 @@ class ApiController extends Controller
                     $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
                     $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
 
-                    $all_items = $all_items->filter(function ($vendor) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
+                    $filtered_items = $filtered_items->filter(function ($vendor) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
                         $vendorServices = $vendor->services ? json_decode($vendor->services, true) : [];
                         $vendorOccasions = $vendor->occasions ? json_decode($vendor->occasions, true) : [];
                         $matchesPhotographerService = !empty(array_intersect($photographerService, $vendorServices));
@@ -1160,15 +1161,7 @@ class ApiController extends Controller
                     });
                 }
 
-                // Get total items count after filtering
-                $total_items = $all_items->count();
-
-                // Apply pagination to the filtered items
-                if ($location_slug != 'all') {
-                    $filtered_items = $all_items->sortBy('locationid')->sortByDesc('popular')->sortByDesc('id')->slice($offset, $items_per_page)->values();
-                } else {
-                    $filtered_items = $all_items->sortByDesc('popular')->sortByDesc('id')->slice($offset, $items_per_page)->values();
-                }
+                $all_items = $filtered_items->values();
             }
 
             $response = [
