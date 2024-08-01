@@ -264,348 +264,643 @@ class ApiController extends Controller
         return $response;
     }
 
+    // public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
+    // {
+    //     try {
+    //         $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+
+    //         $items_per_page = 9;
+    //         $offset = ($page_no - 1) * $items_per_page;
+
+    //         $venue_category = VenueCategory::where('slug', $category_slug)->first();
+    //         $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+
+    //         $city = City::where('slug', $city_slug)->first();
+    //         if (!$city) {
+    //             throw new \Exception("City not found");
+    //         }
+
+    //         $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+    //         $slug = "$category_slug/$city_slug/$location_slug";
+
+    //         if ($venue_category) {
+    //             $data = Venue::select(
+    //                 'venues.id',
+    //                 'venues.name',
+    //                 'venues.venue_address',
+    //                 'venues.summary',
+    //                 'venues.veg_price',
+    //                 'venues.nonveg_price',
+    //                 'venues.phone',
+    //                 'venues.images',
+    //                 'venues.slug',
+    //                 'venues.min_capacity',
+    //                 'venues.max_capacity',
+    //                 'venues.popular',
+    //                 'venues.wb_assured',
+    //                 'venues.place_rating',
+    //                 'venues.venue_category_ids',
+    //                 DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+    //                 'locations.name as location_name',
+    //                 'cities.name as city_name',
+    //                 'locations.id as locationid',
+    //             )
+    //                 ->join('locations', 'locations.id', '=', 'venues.location_id')
+    //                 ->join('cities', 'cities.id', '=', 'venues.city_id')
+    //                 ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
+
+    //             if ($location) {
+    //                 if ($location->is_group) {
+    //                     $localityIds = explode(',', $location->locality_ids);
+    //                     if (!in_array($location->id, $localityIds)) {
+    //                         $localityIds[] = $location->id;
+    //                     }
+    //                     $data->whereIn('venues.location_id', $localityIds);
+    //                 } elseif ($location_slug != 'all') {
+    //                     $data->where('venues.location_id', $location->id);
+    //                 }
+    //             }
+
+    //             $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
+
+    //             if ($request->guest) {
+    //                 $params = explode(',', $request->guest);
+    //                 $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
+    //             }
+
+    //             if ($request->per_plate) {
+    //                 $params = explode(',', $request->per_plate);
+    //                 $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
+    //             }
+
+    //             if ($request->per_budget) {
+    //                 $params = explode(',', $request->per_budget);
+    //                 $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
+    //                     ->whereBetween('budgets.min', [$params[0], $params[1]]);
+    //             }
+
+    //             if ($request->multi_localities) {
+    //                 $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+    //                 $arr = $request->multi_localities;
+    //                 foreach ($group_locations as $list) {
+    //                     $arr .= ',' . $list->locality_ids;
+    //                 }
+    //                 $params = explode(',', $arr);
+    //                 $data->whereIn('venues.location_id', array_unique($params));
+    //             }
+
+    //             if ($request->food_type) {
+    //                 $food_type = $request->food_type . '_price';
+    //                 $data->whereNotNull($food_type);
+    //             }
+
+    //             $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+    //                 ->where('slug', $slug)->first();
+
+    //             $tag = 'venues';
+    //         } else {
+    //             $data = Vendor::select(
+    //                 'vendors.id',
+    //                 'vendors.brand_name',
+    //                 'vendors.vendor_address',
+    //                 'vendors.package_price',
+    //                 'vendors.phone',
+    //                 'vendors.slug',
+    //                 'vendors.summary',
+    //                 'vendors.yrs_exp',
+    //                 'vendors.event_completed',
+    //                 'vendors.images',
+    //                 'vendors.popular',
+    //                 'vendors.wb_assured',
+    //                 'locations.name as location_name',
+    //                 'cities.name as city_name',
+    //                 'locations.id as locationid',
+    //                 'vendors.services',
+    //                 'vendors.occasions',
+    //             )
+    //                 ->join('cities', 'cities.id', '=', 'vendors.city_id')
+    //                 ->join('locations', 'locations.id', '=', 'vendors.location_id')
+    //                 ->where([
+    //                     'vendors.status' => 1,
+    //                     'cities.slug' => $city_slug,
+    //                     'vendors.vendor_category_id' => $vendor_category->id
+    //                 ]);
+
+    //             if ($location) {
+    //                 if ($location->is_group) {
+    //                     $localityIds = explode(',', $location->locality_ids);
+    //                     if (!in_array($location->id, $localityIds)) {
+    //                         $localityIds[] = $location->id;
+    //                     }
+    //                     $data->whereIn('vendors.location_id', $localityIds);
+    //                 } elseif ($location_slug != 'all') {
+    //                     $data->where('vendors.location_id', $location->id);
+    //                 }
+    //             }
+
+    //             if ($request->multi_localities) {
+    //                 $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+    //                 $arr = $request->multi_localities;
+    //                 foreach ($group_locations as $list) {
+    //                     $arr .= ',' . $list->locality_ids;
+    //                 }
+    //                 $params = explode(',', $arr);
+    //                 $data->whereIn('vendors.location_id', array_unique($params));
+    //             }
+
+    //             if ($request->makeup_bridal_budget) {
+    //                 $budgetRange = explode(',', $request->makeup_bridal_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->makeup_engagement_budget) {
+    //                 $budgetRange = explode(',', $request->makeup_engagement_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->photographer_service_budget) {
+    //                 $budgetRange = explode(',', $request->photographer_service_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->mehndi_package_budget) {
+    //                 $budgetRange = explode(',', $request->mehndi_package_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->banquet_decor_package_budget) {
+    //                 $budgetRange = explode(',', $request->banquet_decor_package_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->home_decor_package_budget) {
+    //                 $budgetRange = explode(',', $request->home_decor_package_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->band_baja_ghodiwala_budget) {
+    //                 $budgetRange = explode(',', $request->band_baja_ghodiwala_budget);
+    //                 $data->where(function ($query) use ($budgetRange) {
+    //                     $query->whereBetween('vendors.package_price', $budgetRange)
+    //                         ->orWhereNull('vendors.package_price')
+    //                         ->orWhere('vendors.package_price', 0)
+    //                         ->orWhere('vendors.package_price', '');
+    //                 });
+    //             }
+
+    //             if ($request->experience) {
+    //                 $expRange = explode(',', $request->experience);
+    //                 $minExp = $expRange[0];
+    //                 $maxExp = $expRange[1];
+
+    //                 $data->where(function ($query) use ($minExp, $maxExp) {
+    //                     $query->whereBetween('vendors.yrs_exp', [$minExp, $maxExp]);
+    //                     if ($maxExp == 500) {
+    //                         $query->orWhere('vendors.yrs_exp', '>=', $maxExp);
+    //                     }
+    //                     $query->orWhereNull('vendors.yrs_exp')
+    //                         ->orWhere('vendors.yrs_exp', 0)
+    //                         ->orWhere('vendors.yrs_exp', '');
+    //                 });
+    //             }
+
+    //             if ($request->events_completed) {
+    //                 $eventCompletedRange = explode(',', $request->events_completed);
+    //                 $minEvents = $eventCompletedRange[0];
+    //                 $maxEvents = $eventCompletedRange[1];
+
+    //                 $data->where(function ($query) use ($minEvents, $maxEvents) {
+    //                     $query->whereBetween('vendors.event_completed', [$minEvents, $maxEvents]);
+    //                     if ($maxEvents == 500) {
+    //                         $query->orWhere('vendors.event_completed', '>=', $maxEvents);
+    //                     }
+    //                     $query->orWhereNull('vendors.event_completed')
+    //                         ->orWhere('vendors.event_completed', 0)
+    //                         ->orWhere('vendors.event_completed', '');
+    //                 });
+    //             }
+
+    //             $data->orderBy('vendors.location_id', 'asc');
+
+    //             $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+    //                 ->where('slug', $slug)->first();
+
+    //             $tag = 'vendors';
+    //         }
+
+    //         $total_items = $data->count();
+    //         if ($location_slug != 'all') {
+    //             $venues_or_vendors = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+    //         } else {
+    //             $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+    //         }
+
+    //         if ($venue_category) {
+    //             foreach ($venues_or_vendors as $venue_or_vendor) {
+    //                 $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
+    //                 $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+    //                 $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
+    //             }
+    //         }
+
+    //         if ($tag == 'vendors') {
+    //             $venues_or_vendors = $venues_or_vendors->map(function ($vendor) {
+    //                 $services = json_decode($vendor->services, true);
+    //                 $occasions = json_decode($vendor->occasions, true);
+
+    //                 if (is_array($services)) {
+    //                     foreach ($services as $service) {
+    //                         $vendor->{$service} = 1;
+    //                     }
+    //                 }
+
+    //                 if (is_array($occasions)) {
+    //                     foreach ($occasions as $occasion) {
+    //                         $vendor->{$occasion} = 1;
+    //                     }
+    //                 }
+    //                 return $vendor;
+    //             });
+
+    //             if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
+    //                 $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
+    //                 $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
+    //                 $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
+    //                 $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
+
+    //                 $venues_or_vendors = $venues_or_vendors->filter(function ($venue_or_vendor) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
+
+    //                     $vendorServices = $venue_or_vendor->services ? json_decode($venue_or_vendor->services, true) : [];
+    //                     $vendorOccasions = $venue_or_vendor->occasions ? json_decode($venue_or_vendor->occasions, true) : [];
+    //                     $vendorPhotographerService = $vendorServices;
+    //                     $vendorPhotographerOccasion = $vendorOccasions;
+    //                     $vendorMakeupService = $vendorServices;
+    //                     $vendorMakeupOccasion = $vendorOccasions;
+    //                     $matchesPhotographerService = !empty(array_intersect($photographerService, $vendorPhotographerService));
+    //                     $matchesPhotographerOccasion = !empty(array_intersect($photographerOccasion, $vendorPhotographerOccasion));
+    //                     $matchesMakeupService = !empty(array_intersect($makeupService, $vendorMakeupService));
+    //                     $matchesMakeupOccasion = !empty(array_intersect($makeupOccasion, $vendorMakeupOccasion));
+
+    //                     return $matchesPhotographerService || $matchesPhotographerOccasion || $matchesMakeupService || $matchesMakeupOccasion;
+    //                 });
+
+    //                 $total_items = $venues_or_vendors->count();
+    //             }
+
+    //         }
+
+    //         $response = [
+    //             'success' => true,
+    //             'tag' => $tag,
+    //             'count' => $total_items,
+    //             'data' => $venues_or_vendors,
+    //             'meta' => $meta,
+    //             'cities' => $cities,
+    //             'pagination' => [
+    //                 'current_page' => $page_no,
+    //                 'last_page' => ceil($total_items / $items_per_page),
+    //                 'per_page' => $items_per_page,
+    //                 'total' => $total_items,
+    //             ],
+    //             'message' => 'Data fetched successfully',
+    //         ];
+    //     } catch (\Throwable $th) {
+    //         Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
+    //         $response = [
+    //             'success' => false,
+    //             'data' => [],
+    //             'message' => $th->getMessage(),
+    //         ];
+    //     }
+    //     return response()->json($response);
+    // }
+
     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-    {
-        try {
-            $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+{
+    try {
+        $cities = City::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
 
-            $items_per_page = 9;
-            $offset = ($page_no - 1) * $items_per_page;
+        $items_per_page = 9;
+        $offset = ($page_no - 1) * $items_per_page;
 
-            $venue_category = VenueCategory::where('slug', $category_slug)->first();
-            $vendor_category = VendorCategory::where('slug', $category_slug)->first();
+        $venue_category = VenueCategory::where('slug', $category_slug)->first();
+        $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
-            $city = City::where('slug', $city_slug)->first();
-            if (!$city) {
-                throw new \Exception("City not found");
-            }
-
-            $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
-            $slug = "$category_slug/$city_slug/$location_slug";
-
-            if ($venue_category) {
-                $data = Venue::select(
-                    'venues.id',
-                    'venues.name',
-                    'venues.venue_address',
-                    'venues.summary',
-                    'venues.veg_price',
-                    'venues.nonveg_price',
-                    'venues.phone',
-                    'venues.images',
-                    'venues.slug',
-                    'venues.min_capacity',
-                    'venues.max_capacity',
-                    'venues.popular',
-                    'venues.wb_assured',
-                    'venues.place_rating',
-                    'venues.venue_category_ids',
-                    DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
-                    'locations.name as location_name',
-                    'cities.name as city_name',
-                    'locations.id as locationid',
-                )
-                    ->join('locations', 'locations.id', '=', 'venues.location_id')
-                    ->join('cities', 'cities.id', '=', 'venues.city_id')
-                    ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
-
-                if ($location) {
-                    if ($location->is_group) {
-                        $localityIds = explode(',', $location->locality_ids);
-                        if (!in_array($location->id, $localityIds)) {
-                            $localityIds[] = $location->id;
-                        }
-                        $data->whereIn('venues.location_id', $localityIds);
-                    } elseif ($location_slug != 'all') {
-                        $data->where('venues.location_id', $location->id);
-                    }
-                }
-
-                $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
-
-                if ($request->guest) {
-                    $params = explode(',', $request->guest);
-                    $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
-                }
-
-                if ($request->per_plate) {
-                    $params = explode(',', $request->per_plate);
-                    $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
-                }
-
-                if ($request->per_budget) {
-                    $params = explode(',', $request->per_budget);
-                    $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
-                        ->whereBetween('budgets.min', [$params[0], $params[1]]);
-                }
-
-                if ($request->multi_localities) {
-                    $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-                    $arr = $request->multi_localities;
-                    foreach ($group_locations as $list) {
-                        $arr .= ',' . $list->locality_ids;
-                    }
-                    $params = explode(',', $arr);
-                    $data->whereIn('venues.location_id', array_unique($params));
-                }
-
-                if ($request->food_type) {
-                    $food_type = $request->food_type . '_price';
-                    $data->whereNotNull($food_type);
-                }
-
-                $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                    ->where('slug', $slug)->first();
-
-                $tag = 'venues';
-            } else {
-                $data = Vendor::select(
-                    'vendors.id',
-                    'vendors.brand_name',
-                    'vendors.vendor_address',
-                    'vendors.package_price',
-                    'vendors.phone',
-                    'vendors.slug',
-                    'vendors.summary',
-                    'vendors.yrs_exp',
-                    'vendors.event_completed',
-                    'vendors.images',
-                    'vendors.popular',
-                    'vendors.wb_assured',
-                    'locations.name as location_name',
-                    'cities.name as city_name',
-                    'locations.id as locationid',
-                    'vendors.services',
-                    'vendors.occasions',
-                )
-                    ->join('cities', 'cities.id', '=', 'vendors.city_id')
-                    ->join('locations', 'locations.id', '=', 'vendors.location_id')
-                    ->where([
-                        'vendors.status' => 1,
-                        'cities.slug' => $city_slug,
-                        'vendors.vendor_category_id' => $vendor_category->id
-                    ]);
-
-                if ($location) {
-                    if ($location->is_group) {
-                        $localityIds = explode(',', $location->locality_ids);
-                        if (!in_array($location->id, $localityIds)) {
-                            $localityIds[] = $location->id;
-                        }
-                        $data->whereIn('vendors.location_id', $localityIds);
-                    } elseif ($location_slug != 'all') {
-                        $data->where('vendors.location_id', $location->id);
-                    }
-                }
-
-                if ($request->multi_localities) {
-                    $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-                    $arr = $request->multi_localities;
-                    foreach ($group_locations as $list) {
-                        $arr .= ',' . $list->locality_ids;
-                    }
-                    $params = explode(',', $arr);
-                    $data->whereIn('vendors.location_id', array_unique($params));
-                }
-
-                if ($request->makeup_bridal_budget) {
-                    $budgetRange = explode(',', $request->makeup_bridal_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->makeup_engagement_budget) {
-                    $budgetRange = explode(',', $request->makeup_engagement_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->photographer_service_budget) {
-                    $budgetRange = explode(',', $request->photographer_service_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->mehndi_package_budget) {
-                    $budgetRange = explode(',', $request->mehndi_package_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->banquet_decor_package_budget) {
-                    $budgetRange = explode(',', $request->banquet_decor_package_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->home_decor_package_budget) {
-                    $budgetRange = explode(',', $request->home_decor_package_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->band_baja_ghodiwala_budget) {
-                    $budgetRange = explode(',', $request->band_baja_ghodiwala_budget);
-                    $data->where(function ($query) use ($budgetRange) {
-                        $query->whereBetween('vendors.package_price', $budgetRange)
-                            ->orWhereNull('vendors.package_price')
-                            ->orWhere('vendors.package_price', 0)
-                            ->orWhere('vendors.package_price', '');
-                    });
-                }
-
-                if ($request->experience) {
-                    $expRange = explode(',', $request->experience);
-                    $minExp = $expRange[0];
-                    $maxExp = $expRange[1];
-
-                    $data->where(function ($query) use ($minExp, $maxExp) {
-                        $query->whereBetween('vendors.yrs_exp', [$minExp, $maxExp]);
-                        if ($maxExp == 500) {
-                            $query->orWhere('vendors.yrs_exp', '>=', $maxExp);
-                        }
-                        $query->orWhereNull('vendors.yrs_exp')
-                            ->orWhere('vendors.yrs_exp', 0)
-                            ->orWhere('vendors.yrs_exp', '');
-                    });
-                }
-
-                if ($request->events_completed) {
-                    $eventCompletedRange = explode(',', $request->events_completed);
-                    $minEvents = $eventCompletedRange[0];
-                    $maxEvents = $eventCompletedRange[1];
-
-                    $data->where(function ($query) use ($minEvents, $maxEvents) {
-                        $query->whereBetween('vendors.event_completed', [$minEvents, $maxEvents]);
-                        if ($maxEvents == 500) {
-                            $query->orWhere('vendors.event_completed', '>=', $maxEvents);
-                        }
-                        $query->orWhereNull('vendors.event_completed')
-                            ->orWhere('vendors.event_completed', 0)
-                            ->orWhere('vendors.event_completed', '');
-                    });
-                }
-
-                $data->orderBy('vendors.location_id', 'asc');
-
-                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                    ->where('slug', $slug)->first();
-
-                $tag = 'vendors';
-            }
-
-            $total_items = $data->count();
-            if ($location_slug != 'all') {
-                $venues_or_vendors = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
-            } else {
-                $venues_or_vendors = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
-            }
-
-            if ($venue_category) {
-                foreach ($venues_or_vendors as $venue_or_vendor) {
-                    $category_ids = explode(',', $venue_or_vendor->venue_category_ids);
-                    $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-                    $venue_or_vendor->venue_category_ids = implode(', ', $category_names);
-                }
-            }
-
-            if ($tag == 'vendors') {
-                $venues_or_vendors = $venues_or_vendors->map(function ($vendor) {
-                    $services = json_decode($vendor->services, true);
-                    $occasions = json_decode($vendor->occasions, true);
-
-                    if (is_array($services)) {
-                        foreach ($services as $service) {
-                            $vendor->{$service} = 1;
-                        }
-                    }
-
-                    if (is_array($occasions)) {
-                        foreach ($occasions as $occasion) {
-                            $vendor->{$occasion} = 1;
-                        }
-                    }
-                    return $vendor;
-                });
-
-                if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
-                    $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
-                    $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
-                    $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
-                    $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
-
-                    $venues_or_vendors = $venues_or_vendors->filter(function ($venue_or_vendor) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
-
-                        $vendorServices = $venue_or_vendor->services ? json_decode($venue_or_vendor->services, true) : [];
-                        $vendorOccasions = $venue_or_vendor->occasions ? json_decode($venue_or_vendor->occasions, true) : [];
-                        $vendorPhotographerService = $vendorServices;
-                        $vendorPhotographerOccasion = $vendorOccasions;
-                        $vendorMakeupService = $vendorServices;
-                        $vendorMakeupOccasion = $vendorOccasions;
-                        $matchesPhotographerService = !empty(array_intersect($photographerService, $vendorPhotographerService));
-                        $matchesPhotographerOccasion = !empty(array_intersect($photographerOccasion, $vendorPhotographerOccasion));
-                        $matchesMakeupService = !empty(array_intersect($makeupService, $vendorMakeupService));
-                        $matchesMakeupOccasion = !empty(array_intersect($makeupOccasion, $vendorMakeupOccasion));
-
-                        return $matchesPhotographerService || $matchesPhotographerOccasion || $matchesMakeupService || $matchesMakeupOccasion;
-                    });
-
-                    $total_items = $venues_or_vendors->count();
-                }
-
-            }
-
-            $response = [
-                'success' => true,
-                'tag' => $tag,
-                'count' => $total_items,
-                'data' => $venues_or_vendors,
-                'meta' => $meta,
-                'cities' => $cities,
-                'pagination' => [
-                    'current_page' => $page_no,
-                    'last_page' => ceil($total_items / $items_per_page),
-                    'per_page' => $items_per_page,
-                    'total' => $total_items,
-                ],
-                'message' => 'Data fetched successfully',
-            ];
-        } catch (\Throwable $th) {
-            Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
-            $response = [
-                'success' => false,
-                'data' => [],
-                'message' => $th->getMessage(),
-            ];
+        $city = City::where('slug', $city_slug)->first();
+        if (!$city) {
+            throw new \Exception("City not found");
         }
-        return response()->json($response);
+
+        $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+        $slug = "$category_slug/$city_slug/$location_slug";
+
+        $meta = null;
+        $tag = null;
+        $all_items = collect();
+
+        if ($venue_category) {
+            $data = Venue::select(
+                'venues.id',
+                'venues.name',
+                'venues.venue_address',
+                'venues.summary',
+                'venues.veg_price',
+                'venues.nonveg_price',
+                'venues.phone',
+                'venues.images',
+                'venues.slug',
+                'venues.min_capacity',
+                'venues.max_capacity',
+                'venues.popular',
+                'venues.wb_assured',
+                'venues.place_rating',
+                'venues.venue_category_ids',
+                DB::raw('COALESCE((SELECT COUNT(*) FROM reviews WHERE reviews.product_id = venues.id), 158) as reviews_count'),
+                'locations.name as location_name',
+                'cities.name as city_name',
+                'locations.id as locationid'
+            )
+            ->join('locations', 'locations.id', '=', 'venues.location_id')
+            ->join('cities', 'cities.id', '=', 'venues.city_id')
+            ->where(['venues.status' => 1, 'venues.city_id' => $city->id]);
+
+            if ($location) {
+                if ($location->is_group) {
+                    $localityIds = explode(',', $location->locality_ids);
+                    if (!in_array($location->id, $localityIds)) {
+                        $localityIds[] = $location->id;
+                    }
+                    $data->whereIn('venues.location_id', $localityIds);
+                } elseif ($location_slug != 'all') {
+                    $data->where('venues.location_id', $location->id);
+                }
+            }
+
+            $data->whereRaw("find_in_set(?, venues.venue_category_ids)", [$venue_category->id]);
+
+            if ($request->guest) {
+                $params = explode(',', $request->guest);
+                $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
+            }
+
+            if ($request->per_plate) {
+                $params = explode(',', $request->per_plate);
+                $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
+            }
+
+            if ($request->per_budget) {
+                $params = explode(',', $request->per_budget);
+                $data->join('budgets', 'budgets.id', '=', 'venues.budget_id')
+                    ->whereBetween('budgets.min', [$params[0], $params[1]]);
+            }
+
+            if ($request->multi_localities) {
+                $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+                $arr = $request->multi_localities;
+                foreach ($group_locations as $list) {
+                    $arr .= ',' . $list->locality_ids;
+                }
+                $params = explode(',', $arr);
+                $data->whereIn('venues.location_id', array_unique($params));
+            }
+
+            if ($request->food_type) {
+                $food_type = $request->food_type . '_price';
+                $data->whereNotNull($food_type);
+            }
+
+            $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                ->where('slug', $slug)->first();
+
+            $tag = 'venues';
+            $all_items = $data->get();
+
+            if ($location_slug != 'all') {
+                            $all_items = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+                        } else {
+                            $all_items = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+                        }
+            // Process venue categories
+            foreach ($all_items as $item) {
+                $category_ids = explode(',', $item->venue_category_ids);
+                $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+                $item->venue_category_ids = implode(', ', $category_names);
+            }
+
+
+        } else if ($vendor_category) {
+            $data = Vendor::select(
+                'vendors.id',
+                'vendors.brand_name',
+                'vendors.vendor_address',
+                'vendors.package_price',
+                'vendors.phone',
+                'vendors.slug',
+                'vendors.summary',
+                'vendors.yrs_exp',
+                'vendors.event_completed',
+                'vendors.images',
+                'vendors.popular',
+                'vendors.wb_assured',
+                'locations.name as location_name',
+                'cities.name as city_name',
+                'locations.id as locationid',
+                'vendors.services',
+                'vendors.occasions'
+            )
+            ->join('cities', 'cities.id', '=', 'vendors.city_id')
+            ->join('locations', 'locations.id', '=', 'vendors.location_id')
+            ->where([
+                'vendors.status' => 1,
+                'cities.slug' => $city_slug,
+                'vendors.vendor_category_id' => $vendor_category->id
+            ]);
+
+            if ($location) {
+                if ($location->is_group) {
+                    $localityIds = explode(',', $location->locality_ids);
+                    if (!in_array($location->id, $localityIds)) {
+                        $localityIds[] = $location->id;
+                    }
+                    $data->whereIn('vendors.location_id', $localityIds);
+                } elseif ($location_slug != 'all') {
+                    $data->where('vendors.location_id', $location->id);
+                }
+            }
+
+            if ($request->multi_localities) {
+                $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+                $arr = $request->multi_localities;
+                foreach ($group_locations as $list) {
+                    $arr .= ',' . $list->locality_ids;
+                }
+                $params = explode(',', $arr);
+                $data->whereIn('vendors.location_id', array_unique($params));
+            }
+
+            $budget_filters = [
+                'makeup_bridal_budget',
+                'makeup_engagement_budget',
+                'photographer_service_budget',
+                'mehndi_package_budget',
+                'banquet_decor_package_budget',
+                'home_decor_package_budget',
+                'band_baja_ghodiwala_budget'
+            ];
+
+            foreach ($budget_filters as $filter) {
+                if ($request->$filter) {
+                    $budgetRange = explode(',', $request->$filter);
+                    $data->where(function ($query) use ($budgetRange) {
+                        $query->whereBetween('vendors.package_price', $budgetRange)
+                            ->orWhereNull('vendors.package_price')
+                            ->orWhere('vendors.package_price', 0)
+                            ->orWhere('vendors.package_price', '');
+                    });
+                }
+            }
+
+            if ($request->experience) {
+                $expRange = explode(',', $request->experience);
+                $minExp = $expRange[0];
+                $maxExp = $expRange[1];
+
+                $data->where(function ($query) use ($minExp, $maxExp) {
+                    $query->whereBetween('vendors.yrs_exp', [$minExp, $maxExp]);
+                    if ($maxExp == 500) {
+                        $query->orWhere('vendors.yrs_exp', '>=', $maxExp);
+                    }
+                    $query->orWhereNull('vendors.yrs_exp')
+                        ->orWhere('vendors.yrs_exp', 0)
+                        ->orWhere('vendors.yrs_exp', '');
+                });
+            }
+
+            if ($request->events_completed) {
+                $eventCompletedRange = explode(',', $request->events_completed);
+                $minEvents = $eventCompletedRange[0];
+                $maxEvents = $eventCompletedRange[1];
+
+                $data->where(function ($query) use ($minEvents, $maxEvents) {
+                    $query->whereBetween('vendors.event_completed', [$minEvents, $maxEvents]);
+                    if ($maxEvents == 500) {
+                        $query->orWhere('vendors.event_completed', '>=', $maxEvents);
+                    }
+                    $query->orWhereNull('vendors.event_completed')
+                        ->orWhere('vendors.event_completed', 0)
+                        ->orWhere('vendors.event_completed', '');
+                });
+            }
+
+            $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                ->where('slug', $slug)->first();
+
+            $tag = 'vendors';
+            $all_items = $data->get();
+
+            // Apply services and occasions filtering
+            $all_items = $all_items->map(function ($vendor) {
+                $services = json_decode($vendor->services, true);
+                $occasions = json_decode($vendor->occasions, true);
+
+                if (is_array($services)) {
+                    foreach ($services as $service) {
+                        $vendor->{$service} = 1;
+                    }
+                }
+
+                if (is_array($occasions)) {
+                    foreach ($occasions as $occasion) {
+                        $vendor->{$occasion} = 1;
+                    }
+                }
+                return $vendor;
+            });
+
+            if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
+                $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
+                $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
+                $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
+                $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
+
+                $all_items = $all_items->filter(function ($vendor) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
+                    $vendorServices = $vendor->services ? json_decode($vendor->services, true) : [];
+                    $vendorOccasions = $vendor->occasions ? json_decode($vendor->occasions, true) : [];
+                    $matchesPhotographerService = !empty(array_intersect($photographerService, $vendorServices));
+                    $matchesPhotographerOccasion = !empty(array_intersect($photographerOccasion, $vendorOccasions));
+                    $matchesMakeupService = !empty(array_intersect($makeupService, $vendorServices));
+                    $matchesMakeupOccasion = !empty(array_intersect($makeupOccasion, $vendorOccasions));
+
+                    return $matchesPhotographerService || $matchesPhotographerOccasion || $matchesMakeupService || $matchesMakeupOccasion;
+                });
+            }
+
+            if ($location_slug != 'all') {
+                $filtered_items = $all_items->sortBy('locationid')->sortByDesc('popular')->sortByDesc('id')->slice($offset, $items_per_page)->values();
+            } else {
+                $filtered_items = $all_items->sortByDesc('popular')->sortByDesc('id')->slice($offset, $items_per_page)->values();
+            }
+        }
+
+        // Get total items count after filtering
+        $total_items = $all_items->count();
+
+
+        $response = [
+            'success' => true,
+            'tag' => $tag,
+            'count' => $total_items,
+            'data' => $filtered_items->all(), // Reset the keys of the collection
+            'meta' => $meta,
+            'cities' => $cities,
+            'pagination' => [
+                'current_page' => $page_no,
+                'last_page' => ceil($total_items / $items_per_page),
+                'per_page' => $items_per_page,
+                'total' => $total_items,
+            ],
+            'message' => 'Data fetched successfully',
+        ];
+    } catch (\Throwable $th) {
+        Log::error("Error in venue_or_vendor_list_data: " . $th->getMessage());
+        $response = [
+            'success' => false,
+            'data' => [],
+            'message' => $th->getMessage(),
+        ];
     }
-
-
+    return response()->json($response);
+}
 
 
     public function venue_or_vendor_list_data(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
