@@ -552,25 +552,31 @@ class ApiController extends Controller
                     return $vendor;
                 });
 
-                if ($request->photographer_service || $request->photographer_occation || $request->makeup_service) {
-                    $photographerService = explode(',', $request->photographer_service);
-                    $photographerOccasion = explode(',', $request->photographer_occation);
-                    $makeupService = explode(',', $request->makeup_service);
+                if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
+                    $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
+                    $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
+                    $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
+                    $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
 
-                    $venues_or_vendors = $venues_or_vendors->filter(function ($venue_or_vendor) use ($photographerService, $photographerOccasion, $makeupService) {
+                    $venues_or_vendors = $venues_or_vendors->filter(function ($venue_or_vendor) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
 
-                        $venuePhotographerService = $venue_or_vendor->services ? json_decode($venue_or_vendor->services, true) : [];
-                        $venuePhotographerOccasion = $venue_or_vendor->occasions ? json_decode($venue_or_vendor->occasions, true) : [];
-                        $venueMakeupService = $venue_or_vendor->services ? json_decode($venue_or_vendor->services, true) : [];
+                        $vendorServices = $venue_or_vendor->services ? json_decode($venue_or_vendor->services, true) : [];
+                        $vendorOccasions = $venue_or_vendor->occasions ? json_decode($venue_or_vendor->occasions, true) : [];
+                        $vendorPhotographerService = $vendorServices;
+                        $vendorPhotographerOccasion = $vendorOccasions;
+                        $vendorMakeupService = $vendorServices;
+                        $vendorMakeupOccasion = $vendorOccasions;
+                        $matchesPhotographerService = !empty(array_intersect($photographerService, $vendorPhotographerService));
+                        $matchesPhotographerOccasion = !empty(array_intersect($photographerOccasion, $vendorPhotographerOccasion));
+                        $matchesMakeupService = !empty(array_intersect($makeupService, $vendorMakeupService));
+                        $matchesMakeupOccasion = !empty(array_intersect($makeupOccasion, $vendorMakeupOccasion));
 
-                        $matchesPhotographerService = !empty(array_intersect($photographerService, $venuePhotographerService));
-                        $matchesPhotographerOccasion = !empty(array_intersect($photographerOccasion, $venuePhotographerOccasion));
-                        $matchesMakeupService = !empty(array_intersect($makeupService, $venueMakeupService));
-
-                        return $matchesPhotographerService || $matchesPhotographerOccasion || $matchesMakeupService;
+                        return $matchesPhotographerService || $matchesPhotographerOccasion || $matchesMakeupService || $matchesMakeupOccasion;
                     });
+
                     $total_items = $venues_or_vendors->count();
                 }
+
             }
 
             $response = [
