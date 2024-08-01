@@ -998,7 +998,7 @@ class ApiController extends Controller
             $total_items = $data->count();
 
             // Apply pagination to the filtered items
-            $filtered_items = $data->orderBy('locationid', 'asc')->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
+            $filtered_items = $data->orderBy('popular', 'desc')->orderBy('id', 'desc')->skip($offset)->take($items_per_page)->get();
 
             // Process venue categories
             foreach ($filtered_items as $item) {
