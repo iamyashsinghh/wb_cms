@@ -25,6 +25,7 @@ use App\Models\VenueListingMeta;
 use App\Models\VenueUserContent;
 use App\Models\WebAnalytics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -1169,7 +1170,7 @@ class ApiController extends Controller
             'success' => true,
             'tag' => $tag,
             'count' => $total_items,
-            'data' => $filtered_items->all(), // Reset the keys of the collection
+            'data' => $filtered_items->all(),
             'meta' => $meta,
             'cities' => $cities,
             'pagination' => [
