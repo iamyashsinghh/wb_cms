@@ -82,9 +82,14 @@ class ApiController extends Controller
     public function locations(string $city_slug)
     {
         try {
-            $locations = Location::select('locations.id', 'locations.name', 'locations.slug', 'locations.is_group')
+            if($city_slug === 'all'){
+                $locations = Location::all();
+            }else{
+                $locations = Location::select('locations.id', 'locations.name', 'locations.slug', 'locations.is_group')
                 ->join('cities', 'cities.id', 'locations.city_id')
                 ->where('cities.slug', $city_slug)->get();
+            }
+
             $response = [
                 'success' => true,
                 'data' => $locations,
