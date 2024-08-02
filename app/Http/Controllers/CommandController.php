@@ -21,7 +21,8 @@ class CommandController extends Controller
         $output = shell_exec($command);
         // return $output;
         return response()->json([
-            'output' => $output
+            'output' => nl2br($output)
         ]);
+
     }
 }
