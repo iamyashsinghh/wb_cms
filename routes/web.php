@@ -4,6 +4,7 @@ use App\Http\Controllers;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CommandController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\FroalaController;
@@ -30,6 +31,8 @@ Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remov
 Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
 Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
 Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
+
+Route::get('run', [CommandController::class, 'runCommand']);
 
 
 Route::group(['middleware' => 'AuthCheck'], function () {
