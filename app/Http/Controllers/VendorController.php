@@ -57,6 +57,18 @@ class VendorController extends Controller
     {
         $cities = City::select('id', 'name')->orderby('name', 'asc')->get();
         $vendor_categories = VendorCategory::select('id', 'name')->orderBy('name', 'asc')->get();
+        $all_services = [
+            'traditional', 'candid', 'pre-wedding', 'cinematographic', 'drone-shoots', 'photobooth', 'live-screening',
+            'airbrush-makeup', 'party-makeup', 'hd-makeup', 'birdal-makeup', 'engagement-makeup', 'outstation-makeup', 'haldimakeup-mehndi-cocktail-roka'
+        ];
+
+        $all_occasions = [
+            'roka', 'sagan', 'engagement', 'haldi-mehndi', 'cocktail', 'wedding', 'reception', 'anniversary', 'mata-ki-chowki',
+            'birthday', 'corporate-event', 'baby-shower'
+        ];
+        $all_services = json_encode($all_services);
+        $all_occasions = json_encode($all_occasions);
+
         if ($vendor_id > 0) {
             $page_heading = "Edit Vendor";
             $vendor = Vendor::find($vendor_id);
@@ -86,8 +98,8 @@ class VendorController extends Controller
                 'vendor_address' => '',
                 'package_price' => '',
                 'meta_title' => '',
-                'services' => [],
-                'occasions' => [],
+                'services' => $all_services,
+                'occasions' => $all_occasions,
                 'meta_keywords' => '',
                 'meta_description' => '',
                 'summary' => '',
@@ -124,8 +136,25 @@ class VendorController extends Controller
             $vendor->meta_title = $request->meta_title;
             $vendor->meta_description = $request->meta_description;
             $vendor->meta_keywords = $request->meta_keywords;
-            $vendor->services = $request->services;
-            $vendor->occasions = $request->occasions;
+            if ($request->vendor_category == 1 || $request->vendor_category == 2) {
+                if ($vendor_id == 0) { // New vendor
+                    if ($request->vendor_category == 1) {
+                        $vendor->services = json_encode(['traditional', 'candid', 'pre-wedding', 'cinematographic', 'drone-shoots', 'photobooth', 'live-screening']);
+                    } else if ($request->vendor_category == 2) {
+                        $vendor->services = json_encode(['airbrush-makeup', 'party-makeup', 'hd-makeup', 'bridal-makeup', 'engagement-makeup', 'outstation-makeup', 'haldimakeup-mehndi-cocktail-roka']);
+                    }
+                    $vendor->occasions = json_encode([
+                        'roka', 'sagan', 'engagement', 'haldi-mehndi', 'cocktail', 'wedding', 'reception', 'anniversary', 'mata-ki-chowki',
+                        'birthday', 'corporate-event', 'baby-shower'
+                    ]);
+                } else {
+                    $vendor->services = json_encode($request->services);
+                    $vendor->occasions = json_encode($request->occasions);
+                }
+            } else {
+                $vendor->services = null;
+                $vendor->occasions = null;
+            }
             $vendor->summary = $request->summary;
             $vendor->similar_vendor_ids = $request->similar_vendors ? implode(",", $request->similar_vendors) : null;
             $vendor->package_option = is_array($request->package_option) ? implode(",", $request->package_option) : null;

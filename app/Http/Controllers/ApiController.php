@@ -265,7 +265,7 @@ class ApiController extends Controller
         return $response;
     }
 
-// listing start
+    // listing start
     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
     {
         try {
@@ -319,7 +319,7 @@ class ApiController extends Controller
 
                 $vendor_ids = $filtered_items->pluck('id')->toArray();
                 $full_vendors = Vendor::whereIn('id', $vendor_ids)
-                ->with(['get_locality', 'get_city'])
+                    ->with(['get_locality', 'get_city'])
                     ->get();
 
                 $full_vendors = $this->mapVendorServicesAndOccasions($full_vendors);
@@ -374,11 +374,11 @@ class ApiController extends Controller
             'cities.name as city_name',
             'locations.id as locationid'
         )
-        ->join('locations', 'locations.id', '=', 'venues.location_id')
-        ->join('cities', 'cities.id', '=', 'venues.city_id')
-        ->where('venues.status', 1)
-        ->where('venues.city_id', $city_id)
-        ->whereRaw("FIND_IN_SET(?, venues.venue_category_ids)", [$venue_category_id]);
+            ->join('locations', 'locations.id', '=', 'venues.location_id')
+            ->join('cities', 'cities.id', '=', 'venues.city_id')
+            ->where('venues.status', 1)
+            ->where('venues.city_id', $city_id)
+            ->whereRaw("FIND_IN_SET(?, venues.venue_category_ids)", [$venue_category_id]);
 
         if ($location) {
             if ($location->is_group) {
@@ -411,11 +411,11 @@ class ApiController extends Controller
             'vendors.services',
             'vendors.occasions'
         )
-        ->join('cities', 'cities.id', '=', 'vendors.city_id')
-        ->join('locations', 'locations.id', '=', 'vendors.location_id')
-        ->where('vendors.status', 1)
-        ->where('vendors.city_id', $city_id)
-        ->where('vendors.vendor_category_id', $vendor_category_id);
+            ->join('cities', 'cities.id', '=', 'vendors.city_id')
+            ->join('locations', 'locations.id', '=', 'vendors.location_id')
+            ->where('vendors.status', 1)
+            ->where('vendors.city_id', $city_id)
+            ->where('vendors.vendor_category_id', $vendor_category_id);
 
         if ($location) {
             if ($location->is_group) {
