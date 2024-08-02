@@ -19,9 +19,9 @@ class CommandController extends Controller
         $command = "cd $targetDirectory && " . implode(' && ', $commands) . " 2>&1";
 
         $output = shell_exec($command);
-
-        return response()->json([
-            'output' => nl2br($output)
-        ]);
+        return $output;
+        // return response()->json([
+        //     'output' => nl2br($output)
+        // ]);
     }
 }
