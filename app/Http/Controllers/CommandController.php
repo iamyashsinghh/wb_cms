@@ -14,6 +14,7 @@ class CommandController extends Controller
             'ls',
             'git pull',
             'php artisan optimize:clear',
+            'ls'
         ];
 
         $command = "cd $targetDirectory && " . implode(' && ', $commands) . " 2>&1";
