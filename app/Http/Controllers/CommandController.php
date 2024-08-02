@@ -11,9 +11,9 @@ class CommandController extends Controller
         $targetDirectory = '/var/www/cms/wb_cms';
 
         $commands = [
-            'ls -l',
-            'pwd',
-            'whoami',
+            'ls',
+            'git pull',
+            'php artisan optimize:clear',
         ];
 
         $command = "cd $targetDirectory && " . implode(' && ', $commands) . " 2>&1";
