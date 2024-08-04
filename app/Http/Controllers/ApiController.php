@@ -82,12 +82,12 @@ class ApiController extends Controller
     public function locations(string $city_slug)
     {
         try {
-            if($city_slug === 'all'){
+            if ($city_slug === 'all') {
                 $locations = Location::all();
-            }else{
+            } else {
                 $locations = Location::select('locations.id', 'locations.name', 'locations.slug', 'locations.is_group')
-                ->join('cities', 'cities.id', 'locations.city_id')
-                ->where('cities.slug', $city_slug)->get();
+                    ->join('cities', 'cities.id', 'locations.city_id')
+                    ->where('cities.slug', $city_slug)->get();
             }
 
             $response = [
@@ -271,334 +271,374 @@ class ApiController extends Controller
     }
 
     public function venue_or_vendor_list(Request $request, string $category_slug, string $city_slug, string $location_slug = 'all', int $page_no = 1)
-{
-    try {
-        $items_per_page = 9;
-        $offset = ($page_no - 1) * $items_per_page;
+    {
+        try {
+            $items_per_page = 9;
+            $offset = ($page_no - 1) * $items_per_page;
 
-        $city = City::where('slug', $city_slug)->first();
-        if (!$city) {
-            throw new \Exception("City not found");
-        }
-
-        $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
-        $slug = "$category_slug/$city_slug/$location_slug";
-
-        $venue_category = VenueCategory::where('slug', $category_slug)->first();
-        $vendor_category = VendorCategory::where('slug', $category_slug)->first();
-
-        $meta = null;
-        $tag = null;
-        $filtered_items = collect();
-        $total_items = 0;
-
-        if ($venue_category) {
-            $data = $this->fetchMinimalVenueData($city->id, $venue_category->id, $location, $location_slug, $request);
-            $filtered_items = $this->applyVenueFilters($data, $request);
-            $total_items = $filtered_items->count();
-
-            $filtered_items = $this->paginateAndOrderData($filtered_items, $location, $offset, $items_per_page);
-
-            $venue_ids = $filtered_items->pluck('id')->toArray();
-            $full_venues = Venue::whereIn('id', $venue_ids)
-                ->with(['get_locality', 'get_city'])
-                ->get();
-
-            foreach ($full_venues as $item) {
-                $category_ids = explode(',', $item->venue_category_ids);
-                $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
-                $item->venue_category_ids = implode(', ', $category_names);
+            $city = City::where('slug', $city_slug)->first();
+            if (!$city) {
+                throw new \Exception("City not found");
             }
 
-            $filtered_items = $full_venues;
-            $tag = 'venues';
-            $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                ->where('slug', $slug)->first();
-        } elseif ($vendor_category) {
-            $data = $this->fetchMinimalVendorData($city->id, $vendor_category->id, $location, $location_slug, $request);
-            $filtered_items = $this->applyVendorFilters($data, $request);
-            $total_items = $filtered_items->count();
+            $location = null;
+            if ($location_slug != 'all') {
+                $location = Location::where(['city_id' => $city->id, 'slug' => $location_slug])->first();
+                if (!$location) {
+                    throw new \Exception("Location not found");
+                }
+            }
 
-            $filtered_items = $this->paginateAndOrderData($filtered_items, $location, $offset, $items_per_page);
+            $slug = "$category_slug/$city_slug/$location_slug";
 
-            $vendor_ids = $filtered_items->pluck('id')->toArray();
-            $full_vendors = Vendor::whereIn('id', $vendor_ids)
-                ->with(['get_locality', 'get_city'])
-                ->get();
+            $venue_category = VenueCategory::where('slug', $category_slug)->first();
+            $vendor_category = VendorCategory::where('slug', $category_slug)->first();
 
-            $full_vendors = $this->mapVendorServicesAndOccasions($full_vendors);
+            $meta = null;
+            $tag = null;
+            $filtered_items = collect();
+            $total_items = 0;
 
-            $filtered_items = $full_vendors;
-            $tag = 'vendors';
-            $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
-                ->where('slug', $slug)->first();
+            if ($venue_category) {
+                $data = $this->fetchMinimalVenueData($city->id, $venue_category->id, $location, $location_slug, $request);
+                $filtered_items = $this->applyVenueFilters($data, $request);
+                $total_items = $filtered_items->count();
+
+                $filtered_items = $this->paginateAndOrderData($filtered_items, $location, $location_slug, $offset, $items_per_page);
+
+                $venue_ids = $filtered_items->pluck('id')->toArray();
+                $full_venues = Venue::whereIn('id', $venue_ids)
+                    ->with(['get_locality', 'get_city'])
+                    ->get();
+
+                foreach ($full_venues as $item) {
+                    $category_ids = explode(',', $item->venue_category_ids);
+                    $category_names = VenueCategory::whereIn('id', $category_ids)->pluck('name')->toArray();
+                    $item->venue_category_ids = implode(', ', $category_names);
+                }
+
+                $filtered_items = $full_venues;
+                $tag = 'venues';
+                $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                    ->where('slug', $slug)->first();
+            } elseif ($vendor_category) {
+                $data = $this->fetchMinimalVendorData($city->id, $vendor_category->id, $location, $location_slug, $request);
+                $filtered_items = $this->applyVendorFilters($data, $request);
+                $total_items = $filtered_items->count();
+
+                $filtered_items = $this->paginateAndOrderData($filtered_items, $location, $location_slug, $offset, $items_per_page);
+
+                $vendor_ids = $filtered_items->pluck('id')->toArray();
+                $full_vendors = Vendor::whereIn('id', $vendor_ids)
+                    ->with(['get_locality', 'get_city'])
+                    ->get();
+
+                $full_vendors = $this->mapVendorServicesAndOccasions($full_vendors);
+
+                $filtered_items = $full_vendors;
+                $tag = 'vendors';
+                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                    ->where('slug', $slug)->first();
+            } else {
+                throw new \Exception("Category not found");
+            }
+
+            $response = [
+                'success' => true,
+                'tag' => $tag,
+                'count' => $total_items,
+                'data' => $filtered_items,
+                'meta' => $meta,
+                'pagination' => [
+                    'current_page' => $page_no,
+                    'last_page' => ceil($total_items / $items_per_page),
+                    'per_page' => $items_per_page,
+                    'total' => $total_items,
+                ],
+                'message' => 'Data fetched successfully',
+            ];
+        } catch (\Throwable $th) {
+            Log::error("Error in venue_or_vendor_list: " . $th->getMessage());
+            $response = [
+                'success' => false,
+                'data' => [],
+                'message' => $th->getMessage(),
+            ];
+        }
+        return response()->json($response);
+    }
+
+    private function fetchMinimalVenueData($city_id, $venue_category_id, $location, $location_slug, $request)
+    {
+        if ($location_slug != 'all') {
+            $data = Venue::select(
+                'venues.id',
+                'venues.name',
+                'venues.venue_address',
+                'venues.veg_price',
+                'venues.nonveg_price',
+                'venues.min_capacity',
+                'venues.max_capacity',
+                'venues.popular',
+                'venues.wb_assured',
+                'venues.venue_category_ids',
+                'locations.name as location_name',
+                'cities.name as city_name',
+                'locations.id as locationid',
+                DB::raw("IF(venues.location_id = {$location->id}, 1, 0) as primary_location")
+            )
+                ->join('locations', 'locations.id', '=', 'venues.location_id')
+                ->join('cities', 'cities.id', '=', 'venues.city_id')
+                ->where('venues.status', 1)
+                ->where('venues.city_id', $city_id)
+                ->whereRaw("FIND_IN_SET(?, venues.venue_category_ids)", [$venue_category_id]);
+            $localityIds = [$location->id];
+
+            if ($location->is_group) {
+                $localityIds = array_merge($localityIds, explode(',', $location->locality_ids));
+            }
+
+            $data->whereIn('venues.location_id', array_unique($localityIds));
         } else {
-            throw new \Exception("Category not found");
+            $data = Venue::select(
+                'venues.id',
+                'venues.name',
+                'venues.venue_address',
+                'venues.veg_price',
+                'venues.nonveg_price',
+                'venues.min_capacity',
+                'venues.max_capacity',
+                'venues.popular',
+                'venues.wb_assured',
+                'venues.venue_category_ids',
+                'locations.name as location_name',
+                'cities.name as city_name',
+                'locations.id as locationid',
+            )
+                ->join('locations', 'locations.id', '=', 'venues.location_id')
+                ->join('cities', 'cities.id', '=', 'venues.city_id')
+                ->where('venues.status', 1)
+                ->where('venues.city_id', $city_id)
+                ->whereRaw("FIND_IN_SET(?, venues.venue_category_ids)", [$venue_category_id]);
         }
 
-        $response = [
-            'success' => true,
-            'tag' => $tag,
-            'count' => $total_items,
-            'data' => $filtered_items,
-            'meta' => $meta,
-            'pagination' => [
-                'current_page' => $page_no,
-                'last_page' => ceil($total_items / $items_per_page),
-                'per_page' => $items_per_page,
-                'total' => $total_items,
-            ],
-            'message' => 'Data fetched successfully',
+        return $data;
+    }
+
+    private function fetchMinimalVendorData($city_id, $vendor_category_id, $location, $location_slug, $request)
+    {
+
+
+        if ($location_slug != 'all') {
+            $data = Vendor::select(
+                'vendors.id',
+                'vendors.brand_name',
+                'vendors.vendor_address',
+                'vendors.package_price',
+                'vendors.popular',
+                'vendors.wb_assured',
+                'vendors.vendor_category_id',
+                'locations.name as location_name',
+                'cities.name as city_name',
+                'locations.id as locationid',
+                'vendors.services',
+                'vendors.occasions',
+                DB::raw("IF(vendors.location_id = {$location->id}, 1, 0) as primary_location")
+            )
+                ->join('cities', 'cities.id', '=', 'vendors.city_id')
+                ->join('locations', 'locations.id', '=', 'vendors.location_id')
+                ->where('vendors.status', 1)
+                ->where('vendors.city_id', $city_id)
+                ->where('vendors.vendor_category_id', $vendor_category_id);
+            $localityIds = [$location->id];
+
+            if ($location->is_group) {
+                $localityIds = array_merge($localityIds, explode(',', $location->locality_ids));
+            }
+
+            $data->whereIn('vendors.location_id', array_unique($localityIds));
+        } else {
+            $data = Vendor::select(
+                'vendors.id',
+                'vendors.brand_name',
+                'vendors.vendor_address',
+                'vendors.package_price',
+                'vendors.popular',
+                'vendors.wb_assured',
+                'vendors.vendor_category_id',
+                'locations.name as location_name',
+                'cities.name as city_name',
+                'locations.id as locationid',
+                'vendors.services',
+                'vendors.occasions',
+            )
+                ->join('cities', 'cities.id', '=', 'vendors.city_id')
+                ->join('locations', 'locations.id', '=', 'vendors.location_id')
+                ->where('vendors.status', 1)
+                ->where('vendors.city_id', $city_id)
+                ->where('vendors.vendor_category_id', $vendor_category_id);
+        }
+
+        return $data;
+    }
+
+    private function applyVenueFilters($data, $request)
+    {
+        if ($request->guest) {
+            $params = explode(',', $request->guest);
+            $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
+        }
+
+        if ($request->per_plate) {
+            $params = explode(',', $request->per_plate);
+            $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
+        }
+
+        if ($request->multi_localities) {
+            $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+            $arr = $request->multi_localities;
+            foreach ($group_locations as $list) {
+                $arr .= ',' . $list->locality_ids;
+            }
+            $params = explode(',', $arr);
+            $data->whereIn('venues.location_id', array_unique($params));
+        }
+
+        if ($request->food_type) {
+            $food_type = $request->food_type . '_price';
+            $data->whereNotNull($food_type);
+        }
+
+        return $data;
+    }
+
+    private function applyVendorFilters($data, $request)
+    {
+        $budget_filters = [
+            'makeup_bridal_budget',
+            'makeup_engagement_budget',
+            'photographer_service_budget',
+            'mehndi_package_budget',
+            'banquet_decor_package_budget',
+            'home_decor_package_budget',
+            'band_baja_ghodiwala_budget'
         ];
-    } catch (\Throwable $th) {
-        Log::error("Error in venue_or_vendor_list: " . $th->getMessage());
-        $response = [
-            'success' => false,
-            'data' => [],
-            'message' => $th->getMessage(),
-        ];
-    }
-    return response()->json($response);
-}
 
-private function fetchMinimalVenueData($city_id, $venue_category_id, $location, $location_slug, $request)
-{
-    $data = Venue::select(
-        'venues.id',
-        'venues.name',
-        'venues.venue_address',
-        'venues.veg_price',
-        'venues.nonveg_price',
-        'venues.min_capacity',
-        'venues.max_capacity',
-        'venues.popular',
-        'venues.wb_assured',
-        'venues.venue_category_ids',
-        'locations.name as location_name',
-        'cities.name as city_name',
-        'locations.id as locationid',
-        DB::raw("IF(venues.location_id = {$location->id}, 1, 0) as primary_location") // prioritize primary location
-    )
-        ->join('locations', 'locations.id', '=', 'venues.location_id')
-        ->join('cities', 'cities.id', '=', 'venues.city_id')
-        ->where('venues.status', 1)
-        ->where('venues.city_id', $city_id)
-        ->whereRaw("FIND_IN_SET(?, venues.venue_category_ids)", [$venue_category_id]);
-
-    if ($location) {
-        // Fetch from the primary location first
-        $localityIds = [$location->id];
-
-        // Fetch from locality_ids if is_group is set to 1
-        if ($location->is_group) {
-            $localityIds = array_merge($localityIds, explode(',', $location->locality_ids));
+        foreach ($budget_filters as $filter) {
+            if ($request->$filter) {
+                $budgetRange = explode(',', $request->$filter);
+                $data->where(function ($query) use ($budgetRange) {
+                    $query->whereBetween('vendors.package_price', $budgetRange)
+                        ->orWhereNull('vendors.package_price')
+                        ->orWhere('vendors.package_price', 0)
+                        ->orWhere('vendors.package_price', '');
+                });
+            }
         }
 
-        $data->whereIn('venues.location_id', array_unique($localityIds));
-    } elseif ($location_slug != 'all') {
-        $data->where('venues.location_id', $location->id);
-    }
-
-    return $data;
-}
-
-private function fetchMinimalVendorData($city_id, $vendor_category_id, $location, $location_slug, $request)
-{
-    $data = Vendor::select(
-        'vendors.id',
-        'vendors.brand_name',
-        'vendors.vendor_address',
-        'vendors.package_price',
-        'vendors.popular',
-        'vendors.wb_assured',
-        'vendors.vendor_category_id',
-        'locations.name as location_name',
-        'cities.name as city_name',
-        'locations.id as locationid',
-        'vendors.services',
-        'vendors.occasions',
-        DB::raw("IF(vendors.location_id = {$location->id}, 1, 0) as primary_location") // prioritize primary location
-    )
-        ->join('cities', 'cities.id', '=', 'vendors.city_id')
-        ->join('locations', 'locations.id', '=', 'vendors.location_id')
-        ->where('vendors.status', 1)
-        ->where('vendors.city_id', $city_id)
-        ->where('vendors.vendor_category_id', $vendor_category_id);
-
-    if ($location) {
-        // Fetch from the primary location first
-        $localityIds = [$location->id];
-
-        // Fetch from locality_ids if is_group is set to 1
-        if ($location->is_group) {
-            $localityIds = array_merge($localityIds, explode(',', $location->locality_ids));
-        }
-
-        $data->whereIn('vendors.location_id', array_unique($localityIds));
-    } elseif ($location_slug != 'all') {
-        $data->where('vendors.location_id', $location->id);
-    }
-
-    return $data;
-}
-
-private function applyVenueFilters($data, $request)
-{
-    if ($request->guest) {
-        $params = explode(',', $request->guest);
-        $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
-    }
-
-    if ($request->per_plate) {
-        $params = explode(',', $request->per_plate);
-        $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
-    }
-
-    if ($request->multi_localities) {
-        $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-        $arr = $request->multi_localities;
-        foreach ($group_locations as $list) {
-            $arr .= ',' . $list->locality_ids;
-        }
-        $params = explode(',', $arr);
-        $data->whereIn('venues.location_id', array_unique($params));
-    }
-
-    if ($request->food_type) {
-        $food_type = $request->food_type . '_price';
-        $data->whereNotNull($food_type);
-    }
-
-    return $data;
-}
-
-private function applyVendorFilters($data, $request)
-{
-    $budget_filters = [
-        'makeup_bridal_budget',
-        'makeup_engagement_budget',
-        'photographer_service_budget',
-        'mehndi_package_budget',
-        'banquet_decor_package_budget',
-        'home_decor_package_budget',
-        'band_baja_ghodiwala_budget'
-    ];
-
-    foreach ($budget_filters as $filter) {
-        if ($request->$filter) {
-            $budgetRange = explode(',', $request->$filter);
-            $data->where(function ($query) use ($budgetRange) {
-                $query->whereBetween('vendors.package_price', $budgetRange)
-                    ->orWhereNull('vendors.package_price')
-                    ->orWhere('vendors.package_price', 0)
-                    ->orWhere('vendors.package_price', '');
+        if ($request->experience) {
+            $expRange = explode(',', $request->experience);
+            $minExp = $expRange[0];
+            $maxExp = $expRange[1];
+            $data->where(function ($query) use ($minExp, $maxExp) {
+                $query->whereBetween('vendors.yrs_exp', [$minExp, $maxExp]);
+                if ($maxExp == 500) {
+                    $query->orWhere('vendors.yrs_exp', '>=', $maxExp);
+                }
+                $query->orWhereNull('vendors.yrs_exp')
+                    ->orWhere('vendors.yrs_exp', 0)
+                    ->orWhere('vendors.yrs_exp', '');
             });
         }
+
+        if ($request->events_completed) {
+            $eventCompletedRange = explode(',', $request->events_completed);
+            $minEvents = $eventCompletedRange[0];
+            $maxEvents = $eventCompletedRange[1];
+            $data->where(function ($query) use ($minEvents, $maxEvents) {
+                $query->whereBetween('vendors.event_completed', [$minEvents, $maxEvents]);
+                if ($maxEvents == 500) {
+                    $query->orWhere('vendors.event_completed', '>=', $maxEvents);
+                }
+                $query->orWhereNull('vendors.event_completed')
+                    ->orWhere('vendors.event_completed', 0)
+                    ->orWhere('vendors.event_completed', '');
+            });
+        }
+
+        if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
+            $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
+            $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
+            $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
+            $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
+
+            $data->where(function ($query) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
+                $query->where(function ($query) use ($photographerService) {
+                    foreach ($photographerService as $service) {
+                        $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$service\"')");
+                    }
+                });
+                $query->orWhere(function ($query) use ($photographerOccasion) {
+                    foreach ($photographerOccasion as $occasion) {
+                        $query->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$occasion\"')");
+                    }
+                });
+                $query->orWhere(function ($query) use ($makeupService) {
+                    foreach ($makeupService as $service) {
+                        $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$service\"')");
+                    }
+                });
+                $query->orWhere(function ($query) use ($makeupOccasion) {
+                    foreach ($makeupOccasion as $occasion) {
+                        $query->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$occasion\"')");
+                    }
+                });
+            });
+        }
+
+        return $data;
     }
 
-    if ($request->experience) {
-        $expRange = explode(',', $request->experience);
-        $minExp = $expRange[0];
-        $maxExp = $expRange[1];
-        $data->where(function ($query) use ($minExp, $maxExp) {
-            $query->whereBetween('vendors.yrs_exp', [$minExp, $maxExp]);
-            if ($maxExp == 500) {
-                $query->orWhere('vendors.yrs_exp', '>=', $maxExp);
+    private function paginateAndOrderData($data, $location, $location_slug, $offset, $items_per_page)
+    {
+        if ($location_slug != 'all') {
+            return $data->orderByRaw('primary_location DESC')
+                ->orderBy('popular', 'desc')
+                ->orderBy('id', 'desc')
+                ->skip($offset)
+                ->take($items_per_page)
+                ->get();
+        } else {
+            return $data->orderBy('popular', 'desc')
+                ->orderBy('id', 'desc')
+                ->skip($offset)
+                ->take($items_per_page)
+                ->get();
+        }
+    }
+
+    private function mapVendorServicesAndOccasions($vendors)
+    {
+        return $vendors->map(function ($vendor) {
+            $services = json_decode($vendor->services, true);
+            $occasions = json_decode($vendor->occasions, true);
+
+            if (is_array($services)) {
+                foreach ($services as $service) {
+                    $vendor->{$service} = 1;
+                }
             }
-            $query->orWhereNull('vendors.yrs_exp')
-                ->orWhere('vendors.yrs_exp', 0)
-                ->orWhere('vendors.yrs_exp', '');
+
+            if (is_array($occasions)) {
+                foreach ($occasions as $occasion) {
+                    $vendor->{$occasion} = 1;
+                }
+            }
+
+            return $vendor;
         });
     }
-
-    if ($request->events_completed) {
-        $eventCompletedRange = explode(',', $request->events_completed);
-        $minEvents = $eventCompletedRange[0];
-        $maxEvents = $eventCompletedRange[1];
-        $data->where(function ($query) use ($minEvents, $maxEvents) {
-            $query->whereBetween('vendors.event_completed', [$minEvents, $maxEvents]);
-            if ($maxEvents == 500) {
-                $query->orWhere('vendors.event_completed', '>=', $maxEvents);
-            }
-            $query->orWhereNull('vendors.event_completed')
-                ->orWhere('vendors.event_completed', 0)
-                ->orWhere('vendors.event_completed', '');
-        });
-    }
-
-    if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
-        $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
-        $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
-        $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
-        $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
-
-        $data->where(function ($query) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
-            $query->where(function ($query) use ($photographerService) {
-                foreach ($photographerService as $service) {
-                    $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$service\"')");
-                }
-            });
-            $query->orWhere(function ($query) use ($photographerOccasion) {
-                foreach ($photographerOccasion as $occasion) {
-                    $query->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$occasion\"')");
-                }
-            });
-            $query->orWhere(function ($query) use ($makeupService) {
-                foreach ($makeupService as $service) {
-                    $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$service\"')");
-                }
-            });
-            $query->orWhere(function ($query) use ($makeupOccasion) {
-                foreach ($makeupOccasion as $occasion) {
-                    $query->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$occasion\"')");
-                }
-            });
-        });
-    }
-
-    return $data;
-}
-
-private function paginateAndOrderData($data, $location, $offset, $items_per_page)
-{
-    if ($location->slug != 'all') {
-        return $data->orderByRaw('primary_location DESC')
-            ->orderBy('popular', 'desc')
-            ->orderBy('id', 'desc')
-            ->skip($offset)
-            ->take($items_per_page)
-            ->get();
-    } else {
-        return $data->orderBy('popular', 'desc')
-            ->orderBy('id', 'desc')
-            ->skip($offset)
-            ->take($items_per_page)
-            ->get();
-    }
-}
-
-private function mapVendorServicesAndOccasions($vendors)
-{
-    return $vendors->map(function ($vendor) {
-        $services = json_decode($vendor->services, true);
-        $occasions = json_decode($vendor->occasions, true);
-
-        if (is_array($services)) {
-            foreach ($services as $service) {
-                $vendor->{$service} = 1;
-            }
-        }
-
-        if (is_array($occasions)) {
-            foreach ($occasions as $occasion) {
-                $vendor->{$occasion} = 1;
-            }
-        }
-
-        return $vendor;
-    });
-}
-// listing ends
+    // listing ends
 
 
     public function venue_or_vendor_details(string $slug)
