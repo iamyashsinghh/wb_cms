@@ -308,46 +308,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 mb-3">
+                                <div class="col-sm-12 mb-3">
                                     <div class="form-group">
-                                        <label>Advance</label>
-                                        <textarea type="text" class="form-control summernote" name="advance">{{ $venue->advance }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 mb-3">
-                                    <div class="form-group">
-                                        <label>Cancellation Policy</label>
-                                        <textarea type="text" class="form-control summernote" name="cancellation_policy">{{ $venue->cancellation_policy }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 mb-3">
-                                    <div class="form-group">
-                                        <label>Parking At</label>
-                                        <textarea type="text" class="form-control summernote" name="parking_at">{{ $venue->parking_at }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 mb-3">
-                                    <div class="form-group">
-                                        <label>Tax Charges</label>
-                                        <textarea type="text" class="form-control summernote" name="tax_charges">{{ $venue->tax_charges }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 mb-3">
-                                    <div class="form-group">
-                                        <label>Alcohol</label>
-                                        <textarea type="text" class="form-control summernote" name="alcohol">{{ $venue->alcohol }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 mb-3">
-                                    <div class="form-group">
-                                        <label>Food</label>
-                                        <textarea type="text" class="form-control summernote" name="food">{{ $venue->food }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 mb-3">
-                                    <div class="form-group">
-                                        <label>Decoration</label>
-                                        <textarea type="text" class="form-control summernote" name="decoration">{{ $venue->decoration }}</textarea>
+                                        <label for="" class="">Parking Space <span class="text-danger">*</span></label>
+                                        <input class="form-control" id="" placeholder="Parking Space"
+                                            name="parking_space" value="{{ $venue->parking_space }}" required>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 mb-3">

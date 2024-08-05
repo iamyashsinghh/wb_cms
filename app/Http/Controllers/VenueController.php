@@ -90,12 +90,13 @@ class VenueController extends Controller {
                 'decoration' => '',
                 'location_map' => '',
                 'location_place_id' => '',
-                'start_time_morning' => '',
-                'end_time_morning' => '',
-                'start_time_evening' => '',
-                'end_time_evening' => '',
+                'start_time_morning' => '11:00:00',
+                'end_time_morning' => '16:00:00',
+                'start_time_evening' => '19:00:00',
+                'end_time_evening' => '23:59:00',
                 'place_rating'=> '',
                 'is_redirect'=> 0,
+                'parking_space'=> 'approx 50 - 100',
                 'area_capacity' => '{}',
             ]));
         }
@@ -115,8 +116,6 @@ class VenueController extends Controller {
             session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $msg]);
         }
         return redirect()->route('venue.list');
-
-        // return response()->json(['message' => '']);
     }
 
     public function manage_process(Request $request, $venue_id = 0) {
@@ -191,6 +190,7 @@ class VenueController extends Controller {
         $venue->decoration = $request->decoration;
         $venue->location_map = $request->location_map;
         $venue->location_place_id = $request->location_place_id;
+        $venue->parking_space = $request->parking_space;
         $venue->area_capacity = json_encode($area_capacities);
         $venue->save();
         $nextCompanyNumber = C_Number::where('is_next', 1)->first();
