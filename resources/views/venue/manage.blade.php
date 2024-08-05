@@ -311,7 +311,7 @@
                                 <div class="col-sm-12 mb-3">
                                     <div class="form-group">
                                         <label for="" class="">Parking Space <span class="text-danger">*</span></label>
-                                        <input class="form-control" id="" placeholder="Parking Space"
+                                        <input class="form-control" id="" placeholder="Parking Space ex.(approx 50 - 100)"
                                             name="parking_space" value="{{ $venue->parking_space }}" required>
                                     </div>
                                 </div>
