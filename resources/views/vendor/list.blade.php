@@ -55,6 +55,10 @@
             processing: true,
             searchable: true,
             ordering: true,
+            lengthMenu: [
+                    [10, 25, 50, 100, 200, 500, 1000],
+                    [10, 25, 50, 100, 200, 500, 1000]
+                ],
             language: {
                 "search": "_INPUT_", // Removes the 'Search' field label
                 "searchPlaceholder": "Type here to search..", // Placeholder for the search box

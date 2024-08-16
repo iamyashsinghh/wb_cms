@@ -67,6 +67,10 @@
                     "searchPlaceholder": "Type here to search..", // Placeholder for the search box
                 },
                 serverSide: true,
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, 500, 1000],
+                    [10, 25, 50, 100, 200, 500, 1000]
+                ],
                 ajax: `{{ route('venue.ajax_list') }}`,
                 order: [
                     [0, 'desc']
