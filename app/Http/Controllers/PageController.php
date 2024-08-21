@@ -102,7 +102,7 @@ class PageController extends Controller
         return redirect()->back();
     }
 
-    //for faq methods
+    // for faq methods
     public function fetch_faq($meta_id) {
         try {
             $faq = PageListingMeta::select('faq')->where('id', $meta_id)->first();

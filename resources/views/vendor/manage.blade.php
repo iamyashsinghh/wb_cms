@@ -232,18 +232,37 @@
                                                 }
                                                 $occasions = array_map('trim', $occasions);
                                             @endphp
-                                            <option value="roka" {{ in_array('roka', $occasions) ? 'selected' : '' }}>Roka</option>
-                                            <option value="sagan" {{ in_array('sagan', $occasions) ? 'selected' : '' }}>Sagan</option>
-                                            <option value="engagement" {{ in_array('engagement', $occasions) ? 'selected' : '' }}>Engagement</option>
-                                            <option value="haldi-mehndi" {{ in_array('haldi-mehndi', $occasions) ? 'selected' : '' }}>Haldi & Mehndi</option>
-                                            <option value="cocktail" {{ in_array('cocktail', $occasions) ? 'selected' : '' }}>Cocktail</option>
-                                            <option value="wedding" {{ in_array('wedding', $occasions) ? 'selected' : '' }}>Wedding</option>
-                                            <option value="reception" {{ in_array('reception', $occasions) ? 'selected' : '' }}>Reception</option>
-                                            <option value="anniversary" {{ in_array('anniversary', $occasions) ? 'selected' : '' }}>Anniversary</option>
-                                            <option value="mata-ki-chowki" {{ in_array('mata-ki-chowki', $occasions) ? 'selected' : '' }}>Mata ki Chowki</option>
-                                            <option value="birthday" {{ in_array('birthday', $occasions) ? 'selected' : '' }}>Birthday</option>
-                                            <option value="corporate-event" {{ in_array('corporate-event', $occasions) ? 'selected' : '' }}>Corporate Event</option>
-                                            <option value="baby-shower" {{ in_array('baby-shower', $occasions) ? 'selected' : '' }}>Baby Shower</option>
+                                            <option value="roka" {{ in_array('roka', $occasions) ? 'selected' : '' }}>
+                                                Roka</option>
+                                            <option value="sagan" {{ in_array('sagan', $occasions) ? 'selected' : '' }}>
+                                                Sagan</option>
+                                            <option value="engagement"
+                                                {{ in_array('engagement', $occasions) ? 'selected' : '' }}>Engagement
+                                            </option>
+                                            <option value="haldi-mehndi"
+                                                {{ in_array('haldi-mehndi', $occasions) ? 'selected' : '' }}>Haldi & Mehndi
+                                            </option>
+                                            <option value="cocktail"
+                                                {{ in_array('cocktail', $occasions) ? 'selected' : '' }}>Cocktail</option>
+                                            <option value="wedding"
+                                                {{ in_array('wedding', $occasions) ? 'selected' : '' }}>Wedding</option>
+                                            <option value="reception"
+                                                {{ in_array('reception', $occasions) ? 'selected' : '' }}>Reception
+                                            </option>
+                                            <option value="anniversary"
+                                                {{ in_array('anniversary', $occasions) ? 'selected' : '' }}>Anniversary
+                                            </option>
+                                            <option value="mata-ki-chowki"
+                                                {{ in_array('mata-ki-chowki', $occasions) ? 'selected' : '' }}>Mata ki
+                                                Chowki</option>
+                                            <option value="birthday"
+                                                {{ in_array('birthday', $occasions) ? 'selected' : '' }}>Birthday</option>
+                                            <option value="corporate-event"
+                                                {{ in_array('corporate-event', $occasions) ? 'selected' : '' }}>Corporate
+                                                Event</option>
+                                            <option value="baby-shower"
+                                                {{ in_array('baby-shower', $occasions) ? 'selected' : '' }}>Baby Shower
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -298,7 +317,7 @@
                                         <textarea type="text" class="form-control summernote" placeholder="Enter summary" name="summary">{{ $vendor->summary }}</textarea>
                                     </div>
                                 </div>
-                                <div class="col-sm-12 mb-3">
+                                <div class="col-sm-12 mb-3" id="package_option">
                                     <label>Package Option</label>
                                     <button type="button" class="btn btn-success btn-xs ml-3"
                                         onclick="handle_add_package_option(this)"><i class="fa fa-add"></i></button>
@@ -318,6 +337,86 @@
                                                 </div>
                                             </div>
                                         @endforeach
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div id="makeup_prices">
+                                        <div class="row">
+                                            <div class="col-3 mb-3">
+                                                <div class="form-group">
+                                                    <label>Air Brush Makeup Price</label>
+                                                    <input type="number" class="form-control" placeholder="Enter package price"
+                                                        name="air_brush_makeup_price" value="{{ $vendor->air_brush_makeup_price }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-3 mb-3">
+                                                <div class="form-group">
+                                                    <label>Hd Bridal Makeup Price</label>
+                                                    <input type="number" class="form-control" placeholder="Enter package price"
+                                                        name="hd_bridal_makeup_price" value="{{ $vendor->hd_bridal_makeup_price }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-3 mb-3">
+                                                <div class="form-group">
+                                                    <label>Engagement Makeup Price</label>
+                                                    <input type="number" class="form-control" placeholder="Enter package price"
+                                                        name="engagement_makeup_price" value="{{ $vendor->engagement_makeup_price }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-3 mb-3">
+                                                <div class="form-group">
+                                                    <label>Party Makeup Price</label>
+                                                    <input type="number" class="form-control" placeholder="Enter package price"
+                                                        name="party_makeup_price" value="{{ $vendor->party_makeup_price }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="photographer_prices">
+                                    <div class="row">
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label>Cinematography Price</label>
+                                                <input type="number" class="form-control" placeholder="Enter package price"
+                                                    name="cinematography_price" value="{{ $vendor->cinematography_price }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label>Candid Photography Price</label>
+                                                <input type="number" class="form-control" placeholder="Enter package price"
+                                                    name="candid_photography_price" value="{{ $vendor->candid_photography_price }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label>Traditional Photography Price</label>
+                                                <input type="number" class="form-control" placeholder="Enter package price"
+                                                    name="traditional_photography_price" value="{{ $vendor->traditional_photography_price }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label>Traditional Video Price</label>
+                                                <input type="number" class="form-control" placeholder="Enter package price"
+                                                    name="traditional_video_price" value="{{ $vendor->traditional_video_price }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label>Pre Wedding Photoshoot Price</label>
+                                                <input type="number" class="form-control" placeholder="Enter package price"
+                                                    name="pre_wedding_photoshoot_price" value="{{ $vendor->pre_wedding_photoshoot_price }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 mb-3">
+                                            <div class="form-group">
+                                                <label>Albums Price</label>
+                                                <input type="number" class="form-control" placeholder="Enter package price"
+                                                    name="albums_price" value="{{ $vendor->albums_price }}">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -367,25 +466,37 @@
             const photographerserviceSection = document.querySelector('.photographer_service');
             const makeupserviceSection = document.querySelector('.makeup_service');
             const occasionSection = document.querySelector('.occasion');
+            const photographer_prices = document.querySelector('#photographer_prices');
+            const makeup_prices = document.querySelector('#makeup_prices');
+            const package_option = document.querySelector('#package_option');
 
             photographerserviceSection.style.display = 'none';
             makeupserviceSection.style.display = 'none';
             occasionSection.style.display = 'none';
+            photographer_prices.style.display = 'none';
+            makeup_prices.style.display = 'none';
+            package_option.style.display = 'block';
+
             document.querySelectorAll('.photographer_service select, .makeup_service select, #occasions').forEach(
-            select => {
-                select.removeAttribute('required');
-            });
+                select => {
+                    select.removeAttribute('required');
+                });
 
             if (category_id == 1) {
                 photographerserviceSection.style.display = 'block';
                 occasionSection.style.display = 'block';
+                photographer_prices.style.display = 'block';
+                package_option.style.display = 'none';
                 document.querySelectorAll('.photographer_service select').forEach(select => {
                     select.setAttribute('required', 'required');
                 });
                 document.querySelector('#occasions').setAttribute('required', 'required');
+
             } else if (category_id == 2) {
                 makeupserviceSection.style.display = 'block';
                 occasionSection.style.display = 'block';
+                makeup_prices.style.display = 'block';
+                package_option.style.display = 'none';
                 document.querySelectorAll('.makeup_service select').forEach(select => {
                     select.setAttribute('required', 'required');
                 });

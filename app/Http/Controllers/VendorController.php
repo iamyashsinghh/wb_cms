@@ -104,6 +104,16 @@ class VendorController extends Controller
                 'meta_description' => '',
                 'summary' => '',
                 'similar_vendor_ids' => '',
+                'air_brush_makeup_price' => '',
+                'hd_bridal_makeup_price' => '',
+                'engagement_makeup_price' => '',
+                'party_makeup_price' => '',
+                'cinematography_price' => '',
+                'candid_photography_price' => '',
+                'traditional_photography_price' => '',
+                'traditional_video_price' => '',
+                'pre_wedding_photoshoot_price' => '',
+                'albums_price' => '',
                 'package_option' => null
             ]));
             $similar_vendors = [];
@@ -156,6 +166,16 @@ class VendorController extends Controller
                 $vendor->occasions = null;
             }
             $vendor->summary = $request->summary;
+            $vendor->albums_price = $request->albums_price;
+            $vendor->pre_wedding_photoshoot_price = $request->pre_wedding_photoshoot_price;
+            $vendor->traditional_video_price = $request->traditional_video_price;
+            $vendor->traditional_photography_price = $request->traditional_photography_price;
+            $vendor->candid_photography_price = $request->candid_photography_price;
+            $vendor->cinematography_price = $request->cinematography_price;
+            $vendor->party_makeup_price = $request->party_makeup_price;
+            $vendor->engagement_makeup_price = $request->engagement_makeup_price;
+            $vendor->hd_bridal_makeup_price = $request->hd_bridal_makeup_price;
+            $vendor->air_brush_makeup_price = $request->air_brush_makeup_price;
             $vendor->similar_vendor_ids = $request->similar_vendors ? implode(",", $request->similar_vendors) : null;
             $vendor->package_option = is_array($request->package_option) ? implode(",", $request->package_option) : null;
             $vendor->save();
