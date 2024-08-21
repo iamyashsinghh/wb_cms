@@ -82,18 +82,39 @@ class ApiController extends Controller
     public function locations(string $city_slug)
     {
         try {
-            if ($city_slug === 'all') {
-                $locations = Location::all();
-            } else {
-                $locations = Location::select('locations.id', 'locations.name', 'locations.slug', 'locations.is_group')
-                    ->join('cities', 'cities.id', 'locations.city_id')
-                    ->where('cities.slug', $city_slug)->get();
+            $locationsQuery = Location::select(
+                    'locations.id',
+                    'locations.name',
+                    'locations.slug',
+                    'locations.is_group'
+                )
+                ->leftJoin('venues', function($join) {
+                    $join->on('venues.location_id', '=', 'locations.id');
+                })
+                ->leftJoin('vendors', function($join) {
+                    $join->on('vendors.location_id', '=', 'locations.id');
+                })
+                ->selectRaw('COUNT(DISTINCT venues.id) as venue_count')
+                ->selectRaw('COUNT(DISTINCT vendors.id) as vendor_count')
+                ->groupBy('locations.id', 'locations.name', 'locations.slug', 'locations.is_group');
+
+            // Apply city filtering if the city_slug is not 'all'
+            if ($city_slug !== 'all') {
+                $locationsQuery->whereExists(function($query) use ($city_slug) {
+                    $query->select(DB::raw(1))
+                        ->from('cities')
+                        ->whereColumn('cities.id', 'locations.city_id')
+                        ->where('cities.slug', $city_slug);
+                });
             }
+
+            // Execute the query
+            $locations = $locationsQuery->get();
 
             $response = [
                 'success' => true,
                 'data' => $locations,
-                'message' => 'Data fetched succesfully',
+                'message' => 'Data fetched successfully',
             ];
         } catch (\Throwable $th) {
             $response = [
@@ -105,6 +126,7 @@ class ApiController extends Controller
 
         return $response;
     }
+
 
     public function get_json_reviews($place_id)
     {
