@@ -558,6 +558,17 @@ class ApiController extends Controller
             }
         }
 
+        if ($request->multi_localities) {
+            $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+            $arr = $request->multi_localities;
+            foreach ($group_locations as $list) {
+                $arr .= ',' . $list->locality_ids;
+            }
+            $params = explode(',', $arr);
+            $data->whereIn('vendors.location_id', array_unique($params));
+        }
+
+
         if ($request->experience) {
             $expRange = explode(',', $request->experience);
             $minExp = $expRange[0];
