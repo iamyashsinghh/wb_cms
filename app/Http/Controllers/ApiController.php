@@ -547,121 +547,95 @@ class ApiController extends Controller
     }
 
     private function applyVenueFilters($data, $request)
-    {
-        if ($request->guest) {
-            $params = explode(',', $request->guest);
-            $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
-        }
-
-        if ($request->per_plate) {
-            $params = explode(',', $request->per_plate);
-            $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
-        }
-
-        if ($request->multi_localities) {
-            $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-            $arr = $request->multi_localities;
-            foreach ($group_locations as $list) {
-                $arr .= ',' . $list->locality_ids;
-            }
-            $params = explode(',', $arr);
-            $data->whereIn('venues.location_id', array_unique($params));
-        }
-
-        if ($request->food_type) {
-            $food_type = $request->food_type . '_price';
-            $data->whereNotNull($food_type);
-        }
-
-        return $data;
+{
+    if ($request->guest) {
+        $params = explode(',', $request->guest);
+        $data->whereBetween('venues.max_capacity', [$params[0], $params[1]]);
     }
 
-    private function applyVendorFilters($data, $request)
-    {
-        $budget_filters = [
-            'makeup_bridal_budget',
-            'makeup_engagement_budget',
-            'photographer_service_budget',
-            'mehndi_package_budget',
-            'banquet_decor_package_budget',
-            'home_decor_package_budget',
-            'band_baja_ghodiwala_budget'
-        ];
-
-        foreach ($budget_filters as $filter) {
-            if ($request->$filter) {
-                $budgetRange = explode(',', $request->$filter);
-                $data->where(function ($query) use ($budgetRange) {
-                    $query->whereBetween('vendors.package_price', $budgetRange)
-                        ->orWhereNull('vendors.package_price')
-                        ->orWhere('vendors.package_price', 0)
-                        ->orWhere('vendors.package_price', '');
-                });
-            }
-        }
-
-        if ($request->experience) {
-            $expRange = explode(',', $request->experience);
-            $minExp = $expRange[0];
-            $maxExp = $expRange[1];
-            $data->where(function ($query) use ($minExp, $maxExp) {
-                $query->whereBetween('vendors.yrs_exp', [$minExp, $maxExp]);
-                if ($maxExp == 500) {
-                    $query->orWhere('vendors.yrs_exp', '>=', $maxExp);
-                }
-                $query->orWhereNull('vendors.yrs_exp')
-                    ->orWhere('vendors.yrs_exp', 0)
-                    ->orWhere('vendors.yrs_exp', '');
-            });
-        }
-
-        if ($request->events_completed) {
-            $eventCompletedRange = explode(',', $request->events_completed);
-            $minEvents = $eventCompletedRange[0];
-            $maxEvents = $eventCompletedRange[1];
-            $data->where(function ($query) use ($minEvents, $maxEvents) {
-                $query->whereBetween('vendors.event_completed', [$minEvents, $maxEvents]);
-                if ($maxEvents == 500) {
-                    $query->orWhere('vendors.event_completed', '>=', $maxEvents);
-                }
-                $query->orWhereNull('vendors.event_completed')
-                    ->orWhere('vendors.event_completed', 0)
-                    ->orWhere('vendors.event_completed', '');
-            });
-        }
-
-        if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
-            $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
-            $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
-            $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
-            $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
-
-            $data->where(function ($query) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
-                $query->where(function ($query) use ($photographerService) {
-                    foreach ($photographerService as $service) {
-                        $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$service\"')");
-                    }
-                });
-                $query->orWhere(function ($query) use ($photographerOccasion) {
-                    foreach ($photographerOccasion as $occasion) {
-                        $query->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$occasion\"')");
-                    }
-                });
-                $query->orWhere(function ($query) use ($makeupService) {
-                    foreach ($makeupService as $service) {
-                        $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$service\"')");
-                    }
-                });
-                $query->orWhere(function ($query) use ($makeupOccasion) {
-                    foreach ($makeupOccasion as $occasion) {
-                        $query->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$occasion\"')");
-                    }
-                });
-            });
-        }
-
-        return $data;
+    if ($request->per_plate) {
+        $params = explode(',', $request->per_plate);
+        $data->whereBetween('venues.veg_price', [$params[0], $params[1]]);
     }
+
+    if ($request->multi_localities) {
+        $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+        $localityIds = explode(',', $request->multi_localities);
+        foreach ($group_locations as $list) {
+            $localityIds = array_merge($localityIds, explode(',', $list->locality_ids));
+        }
+        $localityIds = array_unique($localityIds);
+        $data->whereIn('venues.location_id', $localityIds);
+    }
+
+    if ($request->food_type) {
+        $food_type = $request->food_type . '_price';
+        $data->whereNotNull($food_type);
+    }
+
+    return $data;
+}
+
+private function applyVendorFilters($data, $request)
+{
+    $budget_filters = [
+        'makeup_bridal_budget',
+        'makeup_engagement_budget',
+        'photographer_service_budget',
+        'mehndi_package_budget',
+        'banquet_decor_package_budget',
+        'home_decor_package_budget',
+        'band_baja_ghodiwala_budget'
+    ];
+
+    foreach ($budget_filters as $filter) {
+        if ($request->$filter) {
+            $budgetRange = explode(',', $request->$filter);
+            $data->whereBetween('vendors.package_price', $budgetRange);
+        }
+    }
+
+    if ($request->experience) {
+        $expRange = explode(',', $request->experience);
+        $data->whereBetween('vendors.yrs_exp', [$expRange[0], $expRange[1]]);
+    }
+
+    if ($request->events_completed) {
+        $eventRange = explode(',', $request->events_completed);
+        $data->whereBetween('vendors.event_completed', [$eventRange[0], $eventRange[1]]);
+    }
+
+    if ($request->multi_localities) {
+        // Process multi-localities filter
+        $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
+        $localityIds = explode(',', $request->multi_localities);
+        foreach ($group_locations as $list) {
+            $localityIds = array_merge($localityIds, explode(',', $list->locality_ids));
+        }
+        $localityIds = array_unique($localityIds);
+        $data->whereIn('vendors.location_id', $localityIds);
+    }
+
+    if ($request->photographer_service || $request->photographer_occation || $request->makeup_service || $request->makeup_occasion) {
+        $photographerService = $request->photographer_service ? explode(',', $request->photographer_service) : [];
+        $photographerOccasion = $request->photographer_occation ? explode(',', $request->photographer_occation) : [];
+        $makeupService = $request->makeup_service ? explode(',', $request->makeup_service) : [];
+        $makeupOccasion = $request->makeup_occasion ? explode(',', $request->makeup_occasion) : [];
+
+        $data->where(function ($query) use ($photographerService, $photographerOccasion, $makeupService, $makeupOccasion) {
+            foreach ([$photographerService, $photographerOccasion, $makeupService, $makeupOccasion] as $filter) {
+                foreach ($filter as $item) {
+                    $query->orWhereRaw("JSON_CONTAINS(vendors.services, '\"$item\"')")
+                        ->orWhereRaw("JSON_CONTAINS(vendors.occasions, '\"$item\"')");
+                }
+            }
+        });
+    }
+
+    return $data;
+}
+
+
 
     private function paginateAndOrderData($data, $location, $location_slug, $offset, $items_per_page)
     {
