@@ -113,6 +113,8 @@ class VendorController extends Controller
                 'traditional_photography_price' => '',
                 'traditional_video_price' => '',
                 'pre_wedding_photoshoot_price' => '',
+                'bridal_mehndi_price' => '',
+                'engagement_mehndi_price' => '',
                 'albums_price' => '',
                 'package_option' => null
             ]));
@@ -176,6 +178,8 @@ class VendorController extends Controller
             $vendor->engagement_makeup_price = $request->engagement_makeup_price;
             $vendor->hd_bridal_makeup_price = $request->hd_bridal_makeup_price;
             $vendor->air_brush_makeup_price = $request->air_brush_makeup_price;
+            $vendor->engagement_mehndi_price = $request->engagement_mehndi_price;
+            $vendor->bridal_mehndi_price = $request->bridal_mehndi_price;
             $vendor->similar_vendor_ids = $request->similar_vendors ? implode(",", $request->similar_vendors) : null;
             $vendor->package_option = is_array($request->package_option) ? implode(",", $request->package_option) : null;
             $vendor->save();

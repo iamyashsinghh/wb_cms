@@ -340,34 +340,60 @@
                                     </div>
                                 </div>
                                 <div class="col-12">
+                                    <div id="mehndi_prices">
+                                        <div class="row">
+                                            <div class="col-6 mb-3">
+                                                <div class="form-group">
+                                                    <label>Bridal Mehndi Price</label>
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package price" name="bridal_mehndi_price"
+                                                        value="{{ $vendor->bridal_mehndi_price }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-3">
+                                                <div class="form-group">
+                                                    <label>Engagement Mehndi Price</label>
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package price" name="engagement_mehndi_price"
+                                                        value="{{ $vendor->engagement_mehndi_price }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
                                     <div id="makeup_prices">
                                         <div class="row">
                                             <div class="col-3 mb-3">
                                                 <div class="form-group">
                                                     <label>Air Brush Makeup Price</label>
-                                                    <input type="number" class="form-control" placeholder="Enter package price"
-                                                        name="air_brush_makeup_price" value="{{ $vendor->air_brush_makeup_price }}">
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package price" name="air_brush_makeup_price"
+                                                        value="{{ $vendor->air_brush_makeup_price }}">
                                                 </div>
                                             </div>
                                             <div class="col-3 mb-3">
                                                 <div class="form-group">
                                                     <label>Hd Bridal Makeup Price</label>
-                                                    <input type="number" class="form-control" placeholder="Enter package price"
-                                                        name="hd_bridal_makeup_price" value="{{ $vendor->hd_bridal_makeup_price }}">
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package price" name="hd_bridal_makeup_price"
+                                                        value="{{ $vendor->hd_bridal_makeup_price }}">
                                                 </div>
                                             </div>
                                             <div class="col-3 mb-3">
                                                 <div class="form-group">
                                                     <label>Engagement Makeup Price</label>
-                                                    <input type="number" class="form-control" placeholder="Enter package price"
-                                                        name="engagement_makeup_price" value="{{ $vendor->engagement_makeup_price }}">
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package price" name="engagement_makeup_price"
+                                                        value="{{ $vendor->engagement_makeup_price }}">
                                                 </div>
                                             </div>
                                             <div class="col-3 mb-3">
                                                 <div class="form-group">
                                                     <label>Party Makeup Price</label>
-                                                    <input type="number" class="form-control" placeholder="Enter package price"
-                                                        name="party_makeup_price" value="{{ $vendor->party_makeup_price }}">
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package price" name="party_makeup_price"
+                                                        value="{{ $vendor->party_makeup_price }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -378,43 +404,49 @@
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label>Cinematography Price</label>
-                                                <input type="number" class="form-control" placeholder="Enter package price"
-                                                    name="cinematography_price" value="{{ $vendor->cinematography_price }}">
+                                                <input type="number" class="form-control"
+                                                    placeholder="Enter package price" name="cinematography_price"
+                                                    value="{{ $vendor->cinematography_price }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label>Candid Photography Price</label>
-                                                <input type="number" class="form-control" placeholder="Enter package price"
-                                                    name="candid_photography_price" value="{{ $vendor->candid_photography_price }}">
+                                                <input type="number" class="form-control"
+                                                    placeholder="Enter package price" name="candid_photography_price"
+                                                    value="{{ $vendor->candid_photography_price }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label>Traditional Photography Price</label>
-                                                <input type="number" class="form-control" placeholder="Enter package price"
-                                                    name="traditional_photography_price" value="{{ $vendor->traditional_photography_price }}">
+                                                <input type="number" class="form-control"
+                                                    placeholder="Enter package price" name="traditional_photography_price"
+                                                    value="{{ $vendor->traditional_photography_price }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label>Traditional Video Price</label>
-                                                <input type="number" class="form-control" placeholder="Enter package price"
-                                                    name="traditional_video_price" value="{{ $vendor->traditional_video_price }}">
+                                                <input type="number" class="form-control"
+                                                    placeholder="Enter package price" name="traditional_video_price"
+                                                    value="{{ $vendor->traditional_video_price }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label>Pre Wedding Photoshoot Price</label>
-                                                <input type="number" class="form-control" placeholder="Enter package price"
-                                                    name="pre_wedding_photoshoot_price" value="{{ $vendor->pre_wedding_photoshoot_price }}">
+                                                <input type="number" class="form-control"
+                                                    placeholder="Enter package price" name="pre_wedding_photoshoot_price"
+                                                    value="{{ $vendor->pre_wedding_photoshoot_price }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4 mb-3">
                                             <div class="form-group">
                                                 <label>Albums Price</label>
-                                                <input type="number" class="form-control" placeholder="Enter package price"
-                                                    name="albums_price" value="{{ $vendor->albums_price }}">
+                                                <input type="number" class="form-control"
+                                                    placeholder="Enter package price" name="albums_price"
+                                                    value="{{ $vendor->albums_price }}">
                                             </div>
                                         </div>
                                     </div>
@@ -468,6 +500,7 @@
             const occasionSection = document.querySelector('.occasion');
             const photographer_prices = document.querySelector('#photographer_prices');
             const makeup_prices = document.querySelector('#makeup_prices');
+            const mehndi_prices = document.querySelector('#mehndi_prices');
             const package_option = document.querySelector('#package_option');
 
             photographerserviceSection.style.display = 'none';
@@ -475,6 +508,7 @@
             occasionSection.style.display = 'none';
             photographer_prices.style.display = 'none';
             makeup_prices.style.display = 'none';
+            mehndi_prices.style.display = 'none';
             package_option.style.display = 'block';
 
             document.querySelectorAll('.photographer_service select, .makeup_service select, #occasions').forEach(
@@ -501,6 +535,9 @@
                     select.setAttribute('required', 'required');
                 });
                 document.querySelector('#occasions').setAttribute('required', 'required');
+            } else if (category_id == 3) {
+                mehndi_prices.style.display = 'block';
+                package_option.style.display = 'none';
             }
         }
 
