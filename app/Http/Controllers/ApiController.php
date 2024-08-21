@@ -82,39 +82,18 @@ class ApiController extends Controller
     public function locations(string $city_slug)
     {
         try {
-            $locationsQuery = Location::select(
-                    'locations.id',
-                    'locations.name',
-                    'locations.slug',
-                    'locations.is_group'
-                )
-                ->leftJoin('venues', function($join) {
-                    $join->on('venues.location_id', '=', 'locations.id');
-                })
-                ->leftJoin('vendors', function($join) {
-                    $join->on('vendors.location_id', '=', 'locations.id');
-                })
-                ->selectRaw('COUNT(DISTINCT venues.id) as venue_count')
-                ->selectRaw('COUNT(DISTINCT vendors.id) as vendor_count')
-                ->groupBy('locations.id', 'locations.name', 'locations.slug', 'locations.is_group');
-
-            // Apply city filtering if the city_slug is not 'all'
-            if ($city_slug !== 'all') {
-                $locationsQuery->whereExists(function($query) use ($city_slug) {
-                    $query->select(DB::raw(1))
-                        ->from('cities')
-                        ->whereColumn('cities.id', 'locations.city_id')
-                        ->where('cities.slug', $city_slug);
-                });
+            if ($city_slug === 'all') {
+                $locations = Location::all();
+            } else {
+                $locations = Location::select('locations.id', 'locations.name', 'locations.slug', 'locations.is_group')
+                    ->join('cities', 'cities.id', 'locations.city_id')
+                    ->where('cities.slug', $city_slug)->get();
             }
-
-            // Execute the query
-            $locations = $locationsQuery->get();
 
             $response = [
                 'success' => true,
                 'data' => $locations,
-                'message' => 'Data fetched successfully',
+                'message' => 'Data fetched succesfully',
             ];
         } catch (\Throwable $th) {
             $response = [
@@ -126,6 +105,69 @@ class ApiController extends Controller
 
         return $response;
     }
+
+    public function locations_cat(string $city_slug, $cat_slug)
+{
+    try {
+        $categories = VendorCategory::where('slug', $cat_slug)->first();
+        if (!$categories) {
+            $categories = VenueCategory::where('slug', $cat_slug)->first();
+        }
+
+        if (!$categories) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Category not found',
+            ];
+        }
+
+        $categoryId = $categories->id;
+
+        $locationsQuery = Location::select(
+                'locations.id',
+                'locations.name',
+                'locations.slug',
+                'locations.is_group'
+            )
+            ->leftJoin('venues', function ($join) use ($categoryId) {
+                $join->on('venues.location_id', '=', 'locations.id')
+                    ->whereRaw('FIND_IN_SET(?, venues.venue_category_ids)', [$categoryId]);
+            })
+            ->leftJoin('vendors', function ($join) use ($categoryId) {
+                $join->on('vendors.location_id', '=', 'locations.id')
+                    ->where('vendors.vendor_category_id', '=', $categoryId);
+            })
+            ->selectRaw('COUNT(DISTINCT venues.id) as venue_count')
+            ->selectRaw('COUNT(DISTINCT vendors.id) as vendor_count')
+            ->groupBy('locations.id', 'locations.name', 'locations.slug', 'locations.is_group');
+
+        if ($city_slug !== 'all') {
+            $locationsQuery->whereExists(function ($query) use ($city_slug) {
+                $query->select(DB::raw(1))
+                    ->from('cities')
+                    ->whereColumn('cities.id', 'locations.city_id')
+                    ->where('cities.slug', $city_slug);
+            });
+        }
+
+        $locations = $locationsQuery->get();
+
+        $response = [
+            'success' => true,
+            'data' => $locations,
+            'message' => 'Data fetched successfully',
+        ];
+    } catch (\Throwable $th) {
+        $response = [
+            'success' => false,
+            'data' => [],
+            'message' => $th->getMessage(),
+        ];
+    }
+
+    return $response;
+}
 
 
     public function get_json_reviews($place_id)
@@ -557,17 +599,6 @@ class ApiController extends Controller
                 });
             }
         }
-
-        if ($request->multi_localities) {
-            $group_locations = Location::whereIn('id', explode(',', $request->multi_localities))->where('is_group', 1)->get();
-            $arr = $request->multi_localities;
-            foreach ($group_locations as $list) {
-                $arr .= ',' . $list->locality_ids;
-            }
-            $params = explode(',', $arr);
-            $data->whereIn('vendors.location_id', array_unique($params));
-        }
-
 
         if ($request->experience) {
             $expRange = explode(',', $request->experience);

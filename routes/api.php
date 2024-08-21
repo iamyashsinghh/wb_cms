@@ -24,6 +24,7 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('venue_or_vendor_details/{slug}', 'venue_or_vendor_details');
     Route::get('cities', 'cities');
     Route::get('locations/{city_slug}', 'locations');
+    Route::get('locations_cat/{city_slug}/{cat_slug}', 'locations_cat');
     Route::get('/budgets', 'budgets');
     Route::get('/get_json_reviews/{place_id}', 'get_json_reviews');
     Route::get('/get_json_reviews_site/{product_id}', 'get_json_reviews_site');
