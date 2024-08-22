@@ -372,8 +372,12 @@ class ApiController extends Controller
 
                 $venue_ids = $filtered_items->pluck('id')->toArray();
                 $full_venues = Venue::whereIn('id', $venue_ids)
-                    ->with(['get_locality', 'get_city'])
-                    ->get();
+                ->with(['get_locality', 'get_city'])
+                ->get();
+
+            $full_venues->each(function ($venue) {
+                $venue->summary = substr(strip_tags($venue->summary), 0, 100);
+            });
 
                 foreach ($full_venues as $item) {
                     $category_ids = explode(',', $item->venue_category_ids);
@@ -396,7 +400,9 @@ class ApiController extends Controller
                 $full_vendors = Vendor::whereIn('id', $vendor_ids)
                     ->with(['get_locality', 'get_city'])
                     ->get();
-
+                    $full_vendors->each(function ($vendor){
+                        $vendor->summary = substr(strip_tags($vendor->summary), 0, 100);
+                    });
                 $full_vendors = $this->mapVendorServicesAndOccasions($full_vendors);
 
                 $filtered_items = $full_vendors;
