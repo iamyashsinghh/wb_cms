@@ -647,6 +647,14 @@ private function applyVendorFilters($data, $request)
     {
         if ($location_slug != 'all') {
             return $data->orderByRaw('primary_location DESC')
+            ->orderByRaw("
+                CASE
+                    WHEN popular = 1 AND wb_assured = 1 THEN 1
+                    WHEN wb_assured = 1 THEN 2
+                    WHEN popular = 1 THEN 3
+                    ELSE 4
+                END
+            ")
                 ->orderBy('popular', 'desc')
                 ->orderBy('id', 'desc')
                 ->skip($offset)
@@ -654,6 +662,14 @@ private function applyVendorFilters($data, $request)
                 ->get();
         } else {
             return $data->orderBy('popular', 'desc')
+            ->orderByRaw("
+            CASE
+                WHEN popular = 1 AND wb_assured = 1 THEN 1
+                WHEN wb_assured = 1 THEN 2
+                WHEN popular = 1 THEN 3
+                ELSE 4
+            END
+        ")
                 ->orderBy('id', 'desc')
                 ->skip($offset)
                 ->take($items_per_page)
