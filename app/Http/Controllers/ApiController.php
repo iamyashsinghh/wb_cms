@@ -645,36 +645,22 @@ private function applyVendorFilters($data, $request)
 
     private function paginateAndOrderData($data, $location, $location_slug, $offset, $items_per_page)
     {
-        if ($location_slug != 'all') {
-            return $data->orderByRaw('primary_location DESC')
-            ->orderByRaw("
-                CASE
-                    WHEN popular = 1 AND wb_assured = 1 THEN 1
-                    WHEN wb_assured = 1 THEN 2
-                    WHEN popular = 1 THEN 3
-                    ELSE 4
-                END
-            ")
-                ->orderBy('popular', 'desc')
-                ->orderBy('id', 'desc')
-                ->skip($offset)
-                ->take($items_per_page)
-                ->get();
-        } else {
-            return $data->orderBy('popular', 'desc')
-            ->orderByRaw("
-            CASE
-                WHEN popular = 1 AND wb_assured = 1 THEN 1
-                WHEN wb_assured = 1 THEN 2
-                WHEN popular = 1 THEN 3
-                ELSE 4
-            END
-        ")
-                ->orderBy('id', 'desc')
-                ->skip($offset)
-                ->take($items_per_page)
-                ->get();
-        }
+        $query = $data->orderByRaw("
+        CASE
+            WHEN wb_assured = 1 THEN 1
+            WHEN popular = 1 THEN 2
+            ELSE 3
+        END
+    ")
+    ->orderBy('id', 'desc')
+    ->skip($offset)
+    ->take($items_per_page);
+
+    if ($location_slug != 'all') {
+        $query->orderByRaw('primary_location DESC');
+    }
+
+    return $query->get();
     }
 
     private function mapVendorServicesAndOccasions($vendors)
