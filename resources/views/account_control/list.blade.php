@@ -39,8 +39,18 @@
 </div>
 @endsection
 @section('footer-script')
+@include('whatsapp.chat');
 <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script>
+
+function handle_whatsapp_msg(id) {
+            const form_title = document.querySelector(`#form_title_modal`);
+            form_title.innerHTML = `Whatsapp Messages of ${id}`;
+            const manageWhatsappChatModal = new bootstrap.Modal(document.getElementById('wa_msg'));
+            wamsg(id);
+            manageWhatsappChatModal.show();
+        }
+
     $(document).ready(function() {
         $('#serverTable').DataTable({
             pageLength: 10,
@@ -58,7 +68,8 @@
             ],
             rowCallback: function(row, data, index) {
                 const td_elements = row.querySelectorAll('td');
-
+                td_elements[3].innerHTML =
+                `<div class="d-flex"><div>${data[3]} </div>&nbsp;&nbsp;&nbsp;<i class="fab fa-whatsapp" onclick="handle_whatsapp_msg(${data[3]})" style="font-size: 25px; color: green;"></i></div>`;
                 td_elements[4].innerHTML = `<input type="time" class="form-control login-time" data-user-id="${data[0]}"
                                     data-type="start" value="${data[4]}">`;
                 td_elements[5].innerHTML = `<input type="time" class="form-control login-time" data-user-id="${data[0]}"

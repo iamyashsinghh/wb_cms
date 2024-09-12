@@ -32,7 +32,11 @@ Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']
 Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
 Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
 
-Route::get('run', [CommandController::class, 'runCommand']);
+// Route::get('run', [CommandController::class, 'runCommand']);
+
+Route::get('whatsapp_chat/{id}', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_get'])->name('whatsapp_chat.get');
+Route::get('whatsapp_chat_new/{id}', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_get_new'])->name('whatsapp_chat.get_new');
+Route::post('whatsapp_msg_send', [Controllers\WhatsappMsgController::class, 'whatsapp_msg_send'])->name('whatsapp_chat.send');
 
 
 Route::group(['middleware' => 'AuthCheck'], function () {
