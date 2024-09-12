@@ -54,8 +54,32 @@
                     "search": "_INPUT_",
                     "searchPlaceholder": "Type here to search..",
                 },
-                serverSide: true,
+                serverSide: false,
                 ajax: `{{ route('blog.ajax_list') }}`,
+                columns: [{
+                        data: 0
+                    },
+                    {
+                        data: 1
+                    },
+                    {
+                        data: 2
+                    },
+                    {
+                        data: 3
+                    },
+                    {
+                        data: 4
+                    },
+                    {
+                        data: 5
+                    },
+                    {
+                        data: 6,
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
                 order: [
                     [0, 'desc']
                 ],
