@@ -642,7 +642,6 @@ private function applyVendorFilters($data, $request)
 }
 
 
-
     private function paginateAndOrderData($data, $location, $location_slug, $offset, $items_per_page)
     {
         if ($location_slug != 'all') {
@@ -758,6 +757,7 @@ private function applyVendorFilters($data, $request)
         $blogs = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.excerpt', 'blogs.image', 'blogs.image_alt', 'blogs.author_id', 'blogs.publish_date', 'authors.name as author_name')
             ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
             ->where('blogs.status', 1)
+            ->orderBy('blogs.id',  'desc')
             ->paginate(5);
 
         return response()->json([
