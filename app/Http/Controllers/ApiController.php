@@ -304,20 +304,20 @@ class ApiController extends Controller
             }
 
             $popular_venues = $this->popular_venues('banquet-halls', $city_slug)['data'];
-            $blogs = DB::connection('mysql2')->table('wp_posts')->select(
-                'wp_posts.ID',
-                'wp_posts.post_title',
-                'wp_posts.post_name as post_slug',
-                'wp_posts.post_date',
-                DB::raw(
-                    '(select for_image.guid from wp_posts as for_image where for_image.post_parent = wp_posts.ID and for_image.post_type = "attachment" limit 1) as post_thumbnail'
-                ),
-            )->where([
-                'wp_posts.post_type' => 'post',
-                'wp_posts.post_status' => 'publish',
-            ])->orderBy('wp_posts.ID', 'desc')->limit(3)->get();
+            // $blogs = DB::connection('mysql2')->table('wp_posts')->select(
+            //     'wp_posts.ID',
+            //     'wp_posts.post_title',
+            //     'wp_posts.post_name as post_slug',
+            //     'wp_posts.post_date',
+            //     DB::raw(
+            //         '(select for_image.guid from wp_posts as for_image where for_image.post_parent = wp_posts.ID and for_image.post_type = "attachment" limit 1) as post_thumbnail'
+            //     ),
+            // )->where([
+            //     'wp_posts.post_type' => 'post',
+            //     'wp_posts.post_status' => 'publish',
+            // ])->orderBy('wp_posts.ID', 'desc')->limit(3)->get();
 
-            $data = compact('cities', 'venue_categories', 'vendor_categories', 'popular_venues', 'blogs');
+            $data = compact('cities', 'venue_categories', 'vendor_categories', 'popular_venues',);
             $response = [
                 'success' => true,
                 'data' => $data,
