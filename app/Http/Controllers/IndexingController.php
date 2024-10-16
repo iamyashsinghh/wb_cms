@@ -62,10 +62,11 @@ class IndexingController extends Controller
     {
         try {
             // Get the current quota status
-            $response = $this->service->urlNotifications->getMetadata();
-            return response()->json($response);
+            $quotaStatus = $this->service->urlNotifications->getMetadata([]);
+            return response()->json($quotaStatus);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 }
