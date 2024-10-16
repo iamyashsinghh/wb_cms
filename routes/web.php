@@ -48,8 +48,11 @@ Route::group(['middleware' => 'AuthCheck'], function () {
 Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
     Route::get('dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-    Route::post('/index-url', [Controllers\IndexingController::class, 'indexUrl'])->name('index_url');
-    Route::post('/delete-url', [Controllers\IndexingController::class, 'deleteUrl'])->name('delete_url');
+
+    Route::get('index-form', [Controllers\IndexingController::class, 'index_page'])->name('index_page');
+
+    Route::post('/index-url', [Controllers\IndexingController::class, 'indexUrl'])->name('index-url');
+    Route::post('/delete-url', [Controllers\IndexingController::class, 'deleteUrl'])->name('delete-url');
     Route::get('/get-quota', [Controllers\IndexingController::class, 'getQuota'])->name('get_quota');
 
 

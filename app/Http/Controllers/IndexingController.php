@@ -26,6 +26,10 @@ class IndexingController extends Controller
         $this->service = new Google_Service_Indexing($this->client);
     }
 
+    public function index_page(){
+        return view('indexing.indexpage');
+    }
+
     public function indexUrl(Request $request)
     {
         $url = $request->input('url');
