@@ -15,7 +15,7 @@ class IndexingController extends Controller
     public function __construct()
     {
         // Path to the JSON key file
-        $jsonKeyFilePath = storage_path('app/google-service-account.json');
+        $jsonKeyFilePath = storage_path('app/credentials.json');
 
         // Create the client and authorize it using the service account
         $this->client = new Google_Client();
