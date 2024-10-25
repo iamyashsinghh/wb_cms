@@ -17,7 +17,14 @@ class BlogController extends Controller
 
     public function ajax_list()
     {
-        $data = Blog::select('blogs.id', 'blogs.heading', 'authors.name as author_name', 'blogs.status', 'blogs.updated_at', 'blogs.created_at', 'blogs.popular')
+        $data = Blog::select('blogs.id',
+        'blogs.heading',
+        'authors.name as author_name',
+        'blogs.status',
+         'blogs.updated_at',
+         'blogs.created_at',
+         'blogs.popular',
+         'blogs.schedule_publish_date')
             ->join('authors', 'blogs.author_id', '=', 'authors.id')
             ->get();
 
@@ -57,7 +64,7 @@ class BlogController extends Controller
 
     public function manage_process(Request $request, $blog_id = 0)
     {
-        if($blog_id > 0){
+        if ($blog_id > 0) {
             $rules = [
                 'slug' => 'required|string',
                 'meta_title' => 'required|string',
@@ -67,7 +74,7 @@ class BlogController extends Controller
                 'image_alt' => 'required|string',
                 'summary' => 'required|string',
             ];
-        }else{
+        } else {
             $rules = [
                 'slug' => 'required|string|unique:blogs,slug',
                 'meta_title' => 'required|string',
@@ -168,5 +175,16 @@ class BlogController extends Controller
             $res = response()->json(['success' => false, 'alert_type' => 'danger', 'message' => 'Something went wrong!']);
         }
         return $res;
+    }
+
+    public function updateSchedule(Request $request)
+    {
+        $blog = Blog::find($request->id);
+        if ($blog) {
+            $blog->schedule_publish_date = $request->schedule_date;
+            $blog->save();
+            return response()->json(['success' => true, 'message' => 'Schedule date updated successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'Failed to update schedule date.']);
     }
 }

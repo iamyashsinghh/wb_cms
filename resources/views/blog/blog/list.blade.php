@@ -33,6 +33,7 @@
                                 <th>Status</th>
                                 <th>Popular</th>
                                 <th>Last Modified At</th>
+                                <th>Action</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -75,7 +76,10 @@
                         data: 5
                     },
                     {
-                        data: 6,
+                        data: 6
+                    },
+                    {
+                        data: 7,
                         orderable: false,
                         searchable: false
                     }
@@ -101,8 +105,10 @@
                         `<a data-id="${data[0]}" data-status="1" data-submit-url="{{ route('blog.popular') }}" href="javascript:void(0);" style="font-size: 22px;" onclick="handle_update_status(this)"><i class="fa fa-toggle-off text-danger"></i></a>`;
                     td_elements[3].innerHTML = status;
                     td_elements[4].innerHTML = popular;
-                    td_elements[5].innerText = data[5];
-                    td_elements[6].innerHTML = `
+                    td_elements[5].innerText = moment(data[5]).format("DD-MMM-YYYY hh:mm a");
+                    let shedule = `<input type="datetime-local" data-id="${data[0]}" value="${data[7]}" class="form-control schedule-input" placeholder="Schedule Date & Time">`;
+                    td_elements[6].innerHTML = shedule;
+                    td_elements[7].innerHTML = `
                         @canany(['edit blog', 'super power'])
                             <a href="{{ route('blog.manage') }}/${data[0]}" class="text-success mx-2" title="Edit">
                                 <i class="fa fa-edit" style="font-size: 15px;"></i>
@@ -116,6 +122,32 @@
                     `;
                 }
             });
+
+            $(document).on('change', '.schedule-input', function() {
+        const blogId = $(this).data('id');
+        const scheduleDate = $(this).val();
+
+        updateSchedule(blogId, scheduleDate);
+    });
+
+    function updateSchedule(blogId, scheduleDate) {
+        $.ajax({
+            url: `{{ route('blog.update_schedule') }}`,
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            data: { id: blogId, schedule_date: scheduleDate },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function() {
+                toastr.error('An error occurred while updating the schedule.');
+            }
+        });
+    }
         });
 
         function handle_update_status(elem) {
@@ -156,5 +188,9 @@
                 });
             }
         }
+
+
+
+
     </script>
 @endsection

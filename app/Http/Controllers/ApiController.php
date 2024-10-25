@@ -757,6 +757,7 @@ private function applyVendorFilters($data, $request)
         $blogs = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.excerpt', 'blogs.image', 'blogs.image_alt', 'blogs.author_id', 'blogs.publish_date', 'authors.name as author_name')
             ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
             ->where('blogs.status', 1)
+            ->where('blogs.schedule_publish_date', '<=', now()) // Check if publish_date is less than or equal to the current date and time
             ->orderBy('blogs.id',  'desc')
             ->paginate(5);
 
@@ -784,6 +785,8 @@ private function applyVendorFilters($data, $request)
             ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
             ->where('blogs.popular', 1)
             ->where('blogs.status', 1)
+            ->where('blogs.id', '!=', $blog->id)
+            ->where('blogs.schedule_publish_date', '<=', now()) // Check if publish_date is less than or equal to the current date and time
             ->orderBy('blogs.publish_date', 'desc')
             ->limit(4)
             ->get();
@@ -791,6 +794,7 @@ private function applyVendorFilters($data, $request)
         $latest = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.image', 'blogs.image_alt', 'blogs.publish_date', 'blogs.author_id', 'authors.name as author_name')
             ->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
             ->where('blogs.status', 1)
+            ->where('blogs.schedule_publish_date', '<=', now()) // Check if publish_date is less than or equal to the current date and time
             ->where('blogs.id', '!=', $blog->id)
             ->orderBy('blogs.publish_date', 'desc')
             ->limit(4)

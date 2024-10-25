@@ -307,6 +307,9 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
 
             // delete blog
             Route::post('/destroy/{id}', 'destroy')->name('blog.destroy');
+
+            Route::post('/blog/update-schedule', 'updateSchedule')->name('blog.update_schedule');
+
         });
 
         Route::post('froala/upload_image', [FroalaController::class, 'uploadImage'])->name('froala.upload_image');
