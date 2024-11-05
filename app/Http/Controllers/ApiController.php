@@ -305,7 +305,7 @@ class ApiController extends Controller
 
             $popular_venues = $this->popular_venues('banquet-halls', $city_slug)['data'];
 
-            $blogs = Blog::leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
+            $blogs = Blog::select('blogs.id', 'blogs.slug', 'blogs.heading', 'blogs.excerpt', 'blogs.image', 'blogs.image_alt', 'blogs.author_id', 'blogs.publish_date', 'authors.name as author_name')->leftJoin('authors', 'blogs.author_id', '=', 'authors.id')
             ->where('blogs.status', 1)
             ->where('blogs.schedule_publish_date', '<=', now())
             ->orderBy('blogs.publish_date', 'desc')
