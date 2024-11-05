@@ -203,6 +203,8 @@ class AuthController extends Controller
         if (env('TATA_WHATSAPP_MSG_STATUS') !== true) {
             return false;
         }
+        Log::info("wa send");
+        Log::info("91{$phone}");
         $url = "https://wb.omni.tatatelebusiness.com/whatsapp-cloud/messages";
         $token = env("TATA_AUTH_KEY");
         $authToken = "Bearer $token";
