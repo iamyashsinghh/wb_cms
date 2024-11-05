@@ -32,7 +32,7 @@
             <strong>Copyright &copy; {{ date('Y') }} <a href="javascript:void(0);">Wedding Banquets</a>.</strong>
             All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
-                {{-- <a target="_blank" href="https://www.tricoders.in">Developer Yash</a> --}}
+                {{-- <a target="_blank" href="https://codingkhazana.in">Developer Yash</a> --}}
             </div>
         </footer>
     </div>
