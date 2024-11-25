@@ -164,6 +164,7 @@ class VenueController extends Controller
         }
     }
 
+    
     // Process Non-Veg Foods
     $nonveg_food_arr = [];
     if (is_array($request->nonveg_foods)) {
