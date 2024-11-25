@@ -159,19 +159,18 @@ class VenueController extends Controller
         foreach ($request->veg_foods as $name => $data) {
             $veg_food_arr[$name] = [
                 'name' => $name,
-                'package' => $data['package'] ?? 0, // Default to 0 if not set
+                'package' => $data['package'] ?? 0, // Use old values or default to 0
             ];
         }
     }
 
-    
     // Process Non-Veg Foods
     $nonveg_food_arr = [];
     if (is_array($request->nonveg_foods)) {
         foreach ($request->nonveg_foods as $name => $data) {
             $nonveg_food_arr[$name] = [
                 'name' => $name,
-                'package' => $data['package'] ?? 0, // Default to 0 if not set
+                'package' => $data['package'] ?? 0, // Use old values or default to 0
             ];
         }
     }
