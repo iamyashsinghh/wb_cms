@@ -41,8 +41,8 @@ class VenueController extends Controller {
     public function manage($venue_id = 0) {
         $venue_categories = VenueCategory::select('id', 'name')->orderby('name', 'asc')->get();
         $cities = City::select('id', 'name')->orderby('name', 'asc')->get();
-        $veg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 1)->orderby('name', 'asc')->get();
-        $nonveg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 2)->orderby('name', 'asc')->get();
+        $veg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 1)->get();
+        $nonveg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 2)->get();
         $budgets = Budget::select('id', 'name')->orderby('name', 'asc')->get();
 
         if ($venue_id > 0) {
@@ -155,6 +155,7 @@ class VenueController extends Controller {
                 array_push($nonveg_food_arr, ['name' => $name, 'package' => $package]);
             }
         }
+
         $venue->venue_category_ids = implode(",", $request->venue_category);
         $venue->name = $request->venue_name;
         $venue->slug = $request->slug;
