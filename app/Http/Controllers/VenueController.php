@@ -16,9 +16,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
-class VenueController extends Controller {
+class VenueController extends Controller
+{
 
-    public function ajax_list() {
+    public function ajax_list()
+    {
         $venues = Venue::select(
             'venues.id',
             'venues.name',
@@ -38,11 +40,12 @@ class VenueController extends Controller {
             ->join('locations', 'locations.id', 'venues.location_id');
         return datatables($venues)->make(false);
     }
-    public function manage($venue_id = 0) {
+    public function manage($venue_id = 0)
+    {
         $venue_categories = VenueCategory::select('id', 'name')->orderby('name', 'asc')->get();
         $cities = City::select('id', 'name')->orderby('name', 'asc')->get();
-        $veg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 1)->get();
-        $nonveg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 2)->get();
+        $veg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 1)->orderby('name', 'asc')->get();
+        $nonveg_meals = Meal::select('id', 'category_id', 'name')->where('category_id', 2)->orderby('name', 'asc')->get();
         $budgets = Budget::select('id', 'name')->orderby('name', 'asc')->get();
 
         if ($venue_id > 0) {
@@ -65,7 +68,7 @@ class VenueController extends Controller {
                 'city_id' => '',
                 'meta_title' => '',
                 'meta_description' => '',
-                'meta_keywords'=>'',
+                'meta_keywords' => '',
                 'budget_id' => '',
                 'location_id' => '',
                 'venue_address' => '',
@@ -94,15 +97,16 @@ class VenueController extends Controller {
                 'end_time_morning' => '16:00:00',
                 'start_time_evening' => '19:00:00',
                 'end_time_evening' => '23:59:00',
-                'place_rating'=> '',
-                'is_redirect'=> 0,
-                'parking_space'=> 'approx 50 - 100',
+                'place_rating' => '',
+                'is_redirect' => 0,
+                'parking_space' => 'approx 50 - 100',
                 'area_capacity' => '{}',
             ]));
         }
         return view('venue.manage', compact('page_heading', 'venue_categories', 'cities', 'budgets', 'venue', 'locations', 'similar_venues', 'veg_meals', 'nonveg_meals'));
     }
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $venue = Venue::find($id);
 
         if (!$venue) {
@@ -118,7 +122,8 @@ class VenueController extends Controller {
         return redirect()->route('venue.list');
     }
 
-    public function manage_process(Request $request, $venue_id = 0) {
+    public function manage_process(Request $request, $venue_id = 0)
+    {
         $user = Auth::user();
         if ($venue_id > 0) {
             $venue = Venue::find($venue_id);
@@ -143,16 +148,29 @@ class VenueController extends Controller {
             }
         }
 
+        // $veg_food_arr = [];
+        // if (is_array($request->veg_foods)) {
+        //     foreach ($request->veg_foods as $name => $package) {
+        //         array_push($veg_food_arr, ['name' => $name, 'package' => $package]);
+        //     }
+        // }
         $veg_food_arr = [];
         if (is_array($request->veg_foods)) {
-            foreach ($request->veg_foods as $name => $package) {
-                array_push($veg_food_arr, ['name' => $name, 'package' => $package]);
+            foreach ($request->veg_foods as $food) {
+                $veg_food_arr[] = [
+                    'name' => $food['name'],
+                    'package' => $food['package']
+                ];
             }
         }
+
         $nonveg_food_arr = [];
         if (is_array($request->nonveg_foods)) {
-            foreach ($request->nonveg_foods as $name => $package) {
-                array_push($nonveg_food_arr, ['name' => $name, 'package' => $package]);
+            foreach ($request->nonveg_foods as $food) {
+                $nonveg_food_arr[] = [
+                    'name' => $food['name'],
+                    'package' => $food['package']
+                ];
             }
         }
 
@@ -235,9 +253,9 @@ class VenueController extends Controller {
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
         return redirect()->route('venue.list');
-
     }
-    public function update_status($venue_id, $status) {
+    public function update_status($venue_id, $status)
+    {
         try {
             $venue = Venue::find($venue_id);
             $venue->status = $status;
@@ -249,7 +267,8 @@ class VenueController extends Controller {
         return $res;
     }
 
-    public function update_popular_status($venue_id, $status) {
+    public function update_popular_status($venue_id, $status)
+    {
         try {
             $venue = Venue::find($venue_id);
             $venue->popular = $status;
@@ -261,7 +280,8 @@ class VenueController extends Controller {
         return $res;
     }
 
-    public function update_wb_assured_status($venue_id, $status) {
+    public function update_wb_assured_status($venue_id, $status)
+    {
         try {
             $venue = Venue::find($venue_id);
             $venue->wb_assured = $status;
@@ -273,7 +293,8 @@ class VenueController extends Controller {
         return $res;
     }
 
-    public function update_phone_number(Request $request, $venue_id) {
+    public function update_phone_number(Request $request, $venue_id)
+    {
         $validate = Validator::make($request->all(), [
             'phone_number' => 'required|int|min_digits:10|max_digits:11',
         ]);
@@ -290,7 +311,8 @@ class VenueController extends Controller {
     }
 
     //for seo methods
-    public function fetch_meta($venue_id) {
+    public function fetch_meta($venue_id)
+    {
         try {
             $meta = Venue::select('meta_title', 'meta_description', 'meta_keywords')->where('id', $venue_id)->first();
             if ($meta) {
@@ -303,7 +325,8 @@ class VenueController extends Controller {
         }
         return $response;
     }
-    public function update_meta(Request $request, $venue_id) {
+    public function update_meta(Request $request, $venue_id)
+    {
         $validate = Validator::make($request->all(), [
             'meta_title' => 'required|string|max:255',
             'meta_title' => 'required|string',
@@ -330,7 +353,8 @@ class VenueController extends Controller {
     }
 
     //for faq methods
-    public function fetch_faq($venue_id) {
+    public function fetch_faq($venue_id)
+    {
         try {
             $faq = Venue::select('faq')->where('id', $venue_id)->first();
             if ($faq) {
@@ -343,7 +367,8 @@ class VenueController extends Controller {
         }
         return $response;
     }
-    public function update_faq(Request $request, $venue_id) {
+    public function update_faq(Request $request, $venue_id)
+    {
         $validate = Validator::make($request->all(), [
             'faq_question' => 'required',
             'faq_answer' => 'required',
@@ -374,14 +399,16 @@ class VenueController extends Controller {
     }
 
     //for images
-    public function manage_images(int $venue_id) {
+    public function manage_images(int $venue_id)
+    {
         $data = Venue::select('id', 'name', 'images')->where('id', $venue_id)->first();
         $view_used_for = "venue";
         $page_heading = "Venue Images";
         return view('common.manage_images', compact('data', 'view_used_for', 'page_heading'));
     }
 
-    public function images_manage_process(Request $request, int $venue_id) {
+    public function images_manage_process(Request $request, int $venue_id)
+    {
         try {
             $user = Auth::user();
             if ($request->user_id > 0) {
@@ -430,7 +457,8 @@ class VenueController extends Controller {
         return redirect()->back();
     }
 
-    public function image_delete(Request $request, $venue_id) {
+    public function image_delete(Request $request, $venue_id)
+    {
         try {
             $venue = Venue::find($venue_id);
             $images_arr = explode(",", $venue->images);
@@ -451,7 +479,8 @@ class VenueController extends Controller {
         }
     }
 
-    public function update_images_sorting(Request $request, $venue_id) {
+    public function update_images_sorting(Request $request, $venue_id)
+    {
         try {
             $images = implode(",", $request->images);
             $venue = Venue::find($venue_id);
@@ -472,7 +501,8 @@ class VenueController extends Controller {
     }
 
     //Ajax function
-    public function get_similar_venues(int $city_id) {
+    public function get_similar_venues(int $city_id)
+    {
         try {
             $venues = Venue::select('id', 'city_id', 'name')->where('city_id', $city_id)->orderBy('name', 'asc')->get();
             return response()->json(['success' => true, 'venues' => $venues]);
@@ -481,7 +511,8 @@ class VenueController extends Controller {
         }
     }
 
-    public function update_redirect($venue_id, $value){
+    public function update_redirect($venue_id, $value)
+    {
         $venue = Venue::find($venue_id);
         $venue->is_redirect = $value;
         $venue->save();
