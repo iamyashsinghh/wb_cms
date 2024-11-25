@@ -155,24 +155,25 @@ class VenueController extends Controller
         //     }
         // }
         $veg_food_arr = [];
-        if (is_array($request->veg_foods)) {
-            foreach ($request->veg_foods as $food) {
-                $veg_food_arr[] = [
-                    'name' => $food['name'],
-                    'package' => $food['package']
-                ];
-            }
+    if (is_array($request->veg_foods)) {
+        foreach ($request->veg_foods as $name => $data) {
+            $veg_food_arr[$name] = [
+                'name' => $name,
+                'package' => $data['package'] ?? 0, // Default to 0 if not set
+            ];
         }
+    }
 
-        $nonveg_food_arr = [];
-        if (is_array($request->nonveg_foods)) {
-            foreach ($request->nonveg_foods as $food) {
-                $nonveg_food_arr[] = [
-                    'name' => $food['name'],
-                    'package' => $food['package']
-                ];
-            }
+    // Process Non-Veg Foods
+    $nonveg_food_arr = [];
+    if (is_array($request->nonveg_foods)) {
+        foreach ($request->nonveg_foods as $name => $data) {
+            $nonveg_food_arr[$name] = [
+                'name' => $name,
+                'package' => $data['package'] ?? 0, // Default to 0 if not set
+            ];
         }
+    }
 
         $venue->venue_category_ids = implode(",", $request->venue_category);
         $venue->name = $request->venue_name;

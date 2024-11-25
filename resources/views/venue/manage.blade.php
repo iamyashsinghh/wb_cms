@@ -194,41 +194,39 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 mb-3 border border-grey">
-                                    <label for="non_veg_price_inp">Veg Foods</label>
-                                    <div class="row">
-                                        @foreach ($veg_meals as $key => $list)
+                                    <label for="veg_foods_inp">Veg Foods</label>
+                                    <div class="row" id="veg_food_container">
+                                        @foreach ($veg_meals as $list)
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label for="" class="text-xs">{{ $list->name }}</label>
                                                     <input type="number" class="form-control"
                                                         placeholder="Enter package"
-                                                        name="veg_foods[{{ $key }}][package]"
-                                                        value="{{ isset($veg_foods[$key]) ? $veg_foods[$key]['package'] : '' }}">
-                                                    <input type="hidden" name="veg_foods[{{ $key }}][name]"
-                                                        value="{{ $list->name }}">
+                                                        name="veg_foods[{{ $list->name }}][package]"
+                                                        value="{{ isset($veg_foods[$list->name]) ? $veg_foods[$list->name]['package'] : '' }}">
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
+
                                 <div class="col-sm-6 mb-3 border border-grey">
-                                    <label for="non_veg_price_inp">Non Veg Foods</label>
-                                    <div class="row">
-                                        @foreach ($nonveg_meals as $key => $list)
+                                    <label for="non_veg_foods_inp">Non-Veg Foods</label>
+                                    <div class="row" id="non_veg_food_container">
+                                        @foreach ($nonveg_meals as $list)
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label for="" class="text-xs">{{ $list->name }}</label>
                                                     <input type="number" class="form-control"
                                                         placeholder="Enter package"
-                                                        name="nonveg_foods[{{ $key }}][package]"
-                                                        value="{{ isset($nonveg_foods[$key]) ? $nonveg_foods[$key]['package'] : '' }}">
-                                                    <input type="hidden" name="nonveg_foods[{{ $key }}][name]"
-                                                        value="{{ $list->name }}">
+                                                        name="nonveg_foods[{{ $list->name }}][package]"
+                                                        value="{{ isset($nonveg_foods[$list->name]) ? $nonveg_foods[$list->name]['package'] : '' }}">
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
+
                                 <div class="col-sm-4 mb-3">
                                     <div class="form-group">
                                         <label>Budget <span class="text-danger">*</span></label>
