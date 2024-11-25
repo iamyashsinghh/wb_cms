@@ -29,14 +29,10 @@
                 <div class="card text-sm">
                     <div class="card-header text-light" style="background-color: var(--wb-renosand)">
                         <h3 class="card-title">Venue Details</h3>
-                        @if ($venue->id >= 1)
-                            @canany(['super power', 'manage venue_vendor redirect'])
-                                <a class="float-right text-dark"
-                                    title="{{ $venue->is_redirect == 1 ? 'Diable redirect to listing page' : 'Enable redirect to listing page' }}"
-                                    href="{{ route('venue.update.redirect.manage', [$venue->id, $venue->is_redirect == 1 ? 0 : 1]) }}"
-                                    style="font-size: 22px;"><i
-                                        class="fa {{ $venue->is_redirect == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-light' }}"></i></a>
-                            @endcanany
+                        @if($venue->id >= 1)
+                        @canany(['super power', 'manage venue_vendor redirect'])
+                        <a class="float-right text-dark" title="{{$venue->is_redirect == 1 ? 'Diable redirect to listing page': 'Enable redirect to listing page'}}" href="{{route('venue.update.redirect.manage', [$venue->id, $venue->is_redirect == 1 ? 0 : 1])}}" style="font-size: 22px;"><i class="fa {{$venue->is_redirect == 1 ? 'fa-toggle-on text-success' : 'fa-toggle-off text-light'}}"></i></a>
+                        @endcanany
                         @endif
                     </div>
                     <form action="{{ route('venue.manage_process', $venue->id) }}" method="post"
@@ -152,8 +148,8 @@
                                 <div class="col-sm-3 mb-3">
                                     <div class="form-group">
                                         <label>Email</label>
-                                        <input type="text" class="form-control" placeholder="Enter email"
-                                            name="email" value="{{ $venue->email }}">
+                                        <input type="text" class="form-control" placeholder="Enter email" name="email"
+                                            value="{{ $venue->email }}">
                                         @error('email')
                                             <span class="ml-1 text-sm text-danger">{{ $message }}</span>
                                         @enderror
@@ -193,43 +189,37 @@
                                             name="non_veg_price" value="{{ $venue->nonveg_price }}">
                                     </div>
                                 </div>
-<!-- Veg Foods -->
-<div class="col-sm-6 mb-3 border border-grey">
-    <label for="veg_foods_inp">Veg Foods</label>
-    <div class="row" id="veg_food_container">
-        @foreach ($veg_meals as $list)
-            <div class="col-sm-3">
-                <div class="form-group">
-                    <label for="" class="text-xs">{{ $list->name }}</label>
-                    <input type="number" class="form-control"
-                           placeholder="Enter package"
-                           name="veg_foods[{{ $list->name }}][package]"
-                           value="{{ isset($veg_foods[$list->name]) ? $veg_foods[$list->name]['package'] : '' }}">
-                </div>
-            </div>
-        @endforeach
-    </div>
-</div>
-
-<!-- Non-Veg Foods -->
-<div class="col-sm-6 mb-3 border border-grey">
-    <label for="non_veg_foods_inp">Non-Veg Foods</label>
-    <div class="row" id="non_veg_food_container">
-        @foreach ($nonveg_meals as $list)
-            <div class="col-sm-3">
-                <div class="form-group">
-                    <label for="" class="text-xs">{{ $list->name }}</label>
-                    <input type="number" class="form-control"
-                           placeholder="Enter package"
-                           name="nonveg_foods[{{ $list->name }}][package]"
-                           value="{{ isset($nonveg_foods[$list->name]) ? $nonveg_foods[$list->name]['package'] : '' }}">
-                </div>
-            </div>
-        @endforeach
-    </div>
-</div>
-
-
+                                <div class="col-sm-6 mb-3 border border-grey">
+                                    <label for="non_veg_price_inp">Veg Foods</label>
+                                    <div class="row">
+                                        @foreach ($veg_meals as $key => $list)
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label for="" class="text-xs">{{ $list->name }}</label>
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package" name="veg_foods[{{ $list->name }}]"
+                                                        value="{{ isset($veg_foods[$key]) ? $veg_foods[$key]['package'] : '' }}">
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3 border border-grey">
+                                    <label for="non_veg_price_inp">Non Veg Foods</label>
+                                    <div class="row">
+                                        @foreach ($nonveg_meals as $key => $list)
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label for="" class="text-xs">{{ $list->name }}</label>
+                                                    <input type="number" class="form-control"
+                                                        placeholder="Enter package"
+                                                        name="nonveg_foods[{{ $list->name }}]"
+                                                        value="{{ isset($nonveg_foods[$key]) ? $nonveg_foods[$key]['package'] : '' }}">
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                                 <div class="col-sm-4 mb-3">
                                     <div class="form-group">
                                         <label>Budget <span class="text-danger">*</span></label>
@@ -320,11 +310,9 @@
                                 </div>
                                 <div class="col-sm-12 mb-3">
                                     <div class="form-group">
-                                        <label for="" class="">Parking Space <span
-                                                class="text-danger">*</span></label>
-                                        <input class="form-control" id=""
-                                            placeholder="Parking Space ex.(approx 50 - 100)" name="parking_space"
-                                            value="{{ $venue->parking_space }}" required>
+                                        <label for="" class="">Parking Space <span class="text-danger">*</span></label>
+                                        <input class="form-control" id="" placeholder="Parking Space ex.(approx 50 - 100)"
+                                            name="parking_space" value="{{ $venue->parking_space }}" required>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 mb-3">
@@ -529,10 +517,10 @@
                 const locality = localitySelect.options[localitySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
                 const city = citySelect.options[citySelect.selectedIndex]?.innerText.trim().toLowerCase() || '';
                 const newSlug = `${str}-${locality}`.replaceAll(" ", "-").toLowerCase();
-                const fixedSlug = newSlug.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .trim()
-                    .replace(/\s+/g, '-')
+                const fixedSlug= newSlug.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
                 document.getElementById('slug_inp').value = fixedSlug;
             }
 
