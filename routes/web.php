@@ -31,6 +31,7 @@ Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remov
 Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
 Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
 Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
+Route::get('remove_five_star', [MegaDatabaseChangeController::class, 'remove_five_star']);
 
 // Route::get('run', [CommandController::class, 'runCommand']);
 
