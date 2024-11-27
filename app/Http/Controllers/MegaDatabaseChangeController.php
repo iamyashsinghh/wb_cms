@@ -357,57 +357,36 @@ class MegaDatabaseChangeController extends Controller
     ];
 
     $venueIds = Venue::pluck('id')->toArray();
-
     if (!is_array($venueIds) || empty($venueIds)) {
         session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => 'No venues selected for update.']);
         return redirect()->back();
     }
-
     foreach ($venueIds as $venueId) {
         $venue = Venue::find($venueId);
         if (!$venue) {
             continue;
         }
-
         $rand_no = rand(0, 2);
         $selected_veg_template = $veg_templates[$rand_no];
         $selected_nonveg_template = $nonveg_templates[$rand_no];
 
-        $veg_food_arr = json_decode($venue->veg_foods, true) ?? [];
+        $veg_food_arr = [];
         foreach ($selected_veg_template as $name => $package) {
-            $found = false;
-            foreach ($veg_food_arr as &$meal) {
-                if ($meal['name'] === $name) {
-                    $meal['package'] = $package;
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $veg_food_arr[] = ['name' => $name, 'package' => $package];
-            }
+            $veg_food_arr[] = ['name' => $name, 'package' => $package];
         }
         $venue->veg_foods = json_encode($veg_food_arr);
 
-        $nonveg_food_arr = json_decode($venue->nonveg_foods, true) ?? [];
+        $nonveg_food_arr = [];
         foreach ($selected_nonveg_template as $name => $package) {
-            $found = false;
-            foreach ($nonveg_food_arr as &$meal) {
-                if ($meal['name'] === $name) {
-                    $meal['package'] = $package;
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $nonveg_food_arr[] = ['name' => $name, 'package' => $package];
-            }
+            $nonveg_food_arr[] = ['name' => $name, 'package' => $package];
         }
         $venue->nonveg_foods = json_encode($nonveg_food_arr);
+
         $venue->save();
     }
 
     return ['success' => true, 'alert_type' => 'success', 'message' => 'Venue meals updated successfully for selected venues.'];
+
 }
 
 }
