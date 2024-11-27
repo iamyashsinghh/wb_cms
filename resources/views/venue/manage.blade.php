@@ -195,14 +195,14 @@
                                         @foreach ($veg_meals as $meal)
                                             <div class="col-sm-3">
                                                 <div class="form-group">
-                                                    <label for="veg_food_{{ $meal->id }}">{{ $meal->name }}</label>
+                                                    <label for="veg_food_{{ $loop->index }}">{{ $meal['name'] }}</label>
                                                     <input
                                                         type="text"
                                                         class="form-control"
                                                         placeholder="Enter value"
-                                                        name="veg_foods[{{ $meal->name }}]"
-                                                        value="{{ $meal->value }}"
-                                                        id="veg_food_{{ $meal->id }}">
+                                                        name="veg_foods[{{ $meal['name'] }}]"
+                                                        value="{{ $meal['package'] }}"
+                                                        id="veg_food_{{ $loop->index }}">
                                                 </div>
                                             </div>
                                         @endforeach
@@ -215,19 +215,20 @@
                                         @foreach ($nonveg_meals as $meal)
                                             <div class="col-sm-3">
                                                 <div class="form-group">
-                                                    <label for="nonveg_food_{{ $meal->id }}">{{ $meal->name }}</label>
+                                                    <label for="nonveg_food_{{ $loop->index }}">{{ $meal['name'] }}</label>
                                                     <input
                                                         type="text"
                                                         class="form-control"
                                                         placeholder="Enter value"
-                                                        name="nonveg_foods[{{ $meal->name }}]"
-                                                        value="{{ $meal->value }}"
-                                                        id="nonveg_food_{{ $meal->id }}">
+                                                        name="nonveg_foods[{{ $meal['name'] }}]"
+                                                        value="{{ $meal['package'] }}"
+                                                        id="nonveg_food_{{ $loop->index }}">
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
+
                                 <div class="col-sm-4 mb-3">
                                     <div class="form-group">
                                         <label>Budget <span class="text-danger">*</span></label>

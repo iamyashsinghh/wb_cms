@@ -53,6 +53,9 @@ class VenueController extends Controller
             $locations = Location::select('id', 'name')->where('city_id', $venue->city_id)->get();
             $similar_venues = Venue::select('id', 'name')->where('city_id', $venue->city_id)->whereNot('id', $venue->id)->get();
             $page_heading = "Edit Venue";
+
+            $veg_meals = collect(json_decode($venue->veg_foods, true));
+            $nonveg_meals = collect(json_decode($venue->nonveg_foods, true));
         } else {
             $nextCompanyNumber = C_Number::where('is_next', 1)->first();
             if (!$nextCompanyNumber) {
@@ -149,16 +152,16 @@ class VenueController extends Controller
             ];
 
             $rand_no = rand(0, 2);
-            $selected_veg_template = $veg_templates[$rand_no];
-            $selected_nonveg_template = $nonveg_templates[$rand_no];
+        $selected_veg_template = $veg_templates[$rand_no];
+        $selected_nonveg_template = $nonveg_templates[$rand_no];
 
-            foreach ($veg_meals as $meal) {
-                $meal->value = $selected_veg_template[$meal->name] ?? null;
-            }
+        $veg_meals = collect($selected_veg_template)->map(function ($value, $name) {
+            return ['name' => $name, 'package' => $value];
+        });
+        $nonveg_meals = collect($selected_nonveg_template)->map(function ($value, $name) {
+            return ['name' => $name, 'package' => $value];
+        });
 
-            foreach ($nonveg_meals as $meal) {
-                $meal->value = $selected_nonveg_template[$meal->name] ?? null;
-            }
 
             $page_heading = "Add Venue";
             $locations = [];
