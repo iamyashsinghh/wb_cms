@@ -190,31 +190,39 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 mb-3 border border-grey">
-                                    <label for="non_veg_price_inp">Veg Foods</label>
+                                    <label for="veg_foods">Veg Foods</label>
                                     <div class="row">
-                                        @foreach ($veg_meals as $key => $list)
+                                        @foreach ($veg_meals as $meal)
                                             <div class="col-sm-3">
                                                 <div class="form-group">
-                                                    <label for="" class="text-xs">{{ $list->name }}</label>
-                                                    <input type="number" class="form-control"
-                                                        placeholder="Enter package" name="veg_foods[{{ $list->name }}]"
-                                                        value="{{ isset($veg_foods[$key]) ? $veg_foods[$key]['package'] : '' }}">
+                                                    <label for="veg_food_{{ $meal->id }}">{{ $meal->name }}</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        placeholder="Enter value"
+                                                        name="veg_foods[{{ $meal->name }}]"
+                                                        value="{{ $meal->value }}"
+                                                        id="veg_food_{{ $meal->id }}">
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
+
                                 <div class="col-sm-6 mb-3 border border-grey">
-                                    <label for="non_veg_price_inp">Non Veg Foods</label>
+                                    <label for="nonveg_foods">Non Veg Foods</label>
                                     <div class="row">
-                                        @foreach ($nonveg_meals as $key => $list)
+                                        @foreach ($nonveg_meals as $meal)
                                             <div class="col-sm-3">
                                                 <div class="form-group">
-                                                    <label for="" class="text-xs">{{ $list->name }}</label>
-                                                    <input type="number" class="form-control"
-                                                        placeholder="Enter package"
-                                                        name="nonveg_foods[{{ $list->name }}]"
-                                                        value="{{ isset($nonveg_foods[$key]) ? $nonveg_foods[$key]['package'] : '' }}">
+                                                    <label for="nonveg_food_{{ $meal->id }}">{{ $meal->name }}</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        placeholder="Enter value"
+                                                        name="nonveg_foods[{{ $meal->name }}]"
+                                                        value="{{ $meal->value }}"
+                                                        id="nonveg_food_{{ $meal->id }}">
                                                 </div>
                                             </div>
                                         @endforeach
