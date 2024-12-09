@@ -41,6 +41,9 @@ Route::controller(Controllers\ApiController::class)->group(function () {
     Route::get('blog_detail/{slug}', 'blog_detail');
 
 
+    Route::get('sitemap_location_venues/{city_id}', 'sitemap_location_venues');
+
+
 
     Route::get('superb', function() {
         return Venue::select('id', 'name')->whereNull('place_rating')->where('city_id', 1)->count();
@@ -64,10 +67,8 @@ Route::controller(Controllers\ApiController::class)->group(function () {
         return 'Reviews deleted successfully, leaving the first 5 for each product_id.';
     });
 
-    //For Web Analytcs
     Route::post('click_conversion_handle', 'click_conversion_handle');
 
-    //Vendor users routes
     Route::prefix('business/')->group(function () {
         Route::post('signup', 'business_signup');
         Route::post('login', 'business_login');

@@ -169,7 +169,6 @@ class ApiController extends Controller
         return $response;
     }
 
-
     public function get_json_reviews($place_id)
     {
         $get_json_reviews = Storage::get('public/uploads/all_reviews/' . $place_id . '_reviews.json');
@@ -636,7 +635,6 @@ class ApiController extends Controller
         return $data;
     }
 
-
     private function paginateAndOrderData($data, $location, $location_slug, $offset, $items_per_page)
     {
         if ($location_slug != 'all') {
@@ -678,7 +676,6 @@ class ApiController extends Controller
         });
     }
     // listing ends
-
 
     public function venue_or_vendor_details(string $slug)
     {
@@ -746,11 +743,12 @@ class ApiController extends Controller
         return $response;
     }
 
-    public function blog_sitmap(Request $request){
-        $blog = Blog::select('id', 'slug') ->where('blogs.status', 1)
-        ->where('blogs.schedule_publish_date', '<=', now())
-        ->orderBy('blogs.id', 'desc')
-        ->get();
+    public function blog_sitmap(Request $request)
+    {
+        $blog = Blog::select('id', 'slug')->where('blogs.status', 1)
+            ->where('blogs.schedule_publish_date', '<=', now())
+            ->orderBy('blogs.id', 'desc')
+            ->get();
         return $blog;
     }
 
@@ -768,7 +766,6 @@ class ApiController extends Controller
             'data' => $blogs,
         ]);
     }
-
 
     public function blog_detail($slug)
     {
@@ -1380,5 +1377,41 @@ class ApiController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to save review'], 500);
         }
+    }
+
+    public function sitemap_location_venues($city_id)
+    {
+        $city = City::where('id', $city_id)->first();
+        if (!$city) {
+            return response()->json(['error' => 'City not found'], 404);
+        }
+        $venue_categories = VenueCategory::all();
+        $locations = Location::where('city_id', $city->id)->get();
+        $sitemap = [];
+        foreach ($venue_categories as $venue_category) {
+            foreach ($locations as $location) {
+                $venue = Venue::where('location_id', $location->id)
+                    ->where('city_id', $city->id)
+                    ->whereRaw("FIND_IN_SET(?, venues.venue_category_ids)", [$venue_category->id])
+                    ->first();
+                if ($venue) {
+                    $images = explode(',', $venue->images);
+
+                    $title = ucwords(str_replace(['-', '_'], ' ', $venue_category->slug)) . ' in ' . ucwords(str_replace(['-', '_'], ' ', $location->slug));
+
+                    $sitemap[] = [
+                        'url' => $venue_category->slug . '/' . $city->slug . '/' . $location->slug,
+                        'images' => array_map(function ($image) use ($title) {
+                            return [
+                                'loc' => asset('storage/uploads/' . $image),
+                                'title' => $title,
+                                'caption' => 'Venue Image: ' . $image,
+                            ];
+                        }, $images),
+                    ];
+                }
+            }
+        }
+        return response()->json(['sitemap' => $sitemap]);
     }
 }
