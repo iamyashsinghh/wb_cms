@@ -42,6 +42,9 @@ Route::controller(Controllers\ApiController::class)->group(function () {
 
 
     Route::get('sitemap_location_venues/{city_id}', 'sitemap_location_venues');
+    Route::get('sitemap_location_vendor/{city_id}', 'sitemap_location_vendor');
+    Route::get('sitemap_vendor/{city_id}', 'sitemap_vendor');
+    Route::get('sitemap_venue/{city_id}', 'sitemap_venue');
 
 
 

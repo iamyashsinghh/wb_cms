@@ -1414,4 +1414,93 @@ class ApiController extends Controller
         }
         return response()->json(['sitemap' => $sitemap]);
     }
+
+    public function sitemap_location_vendor($city_id)
+    {
+        $city = City::where('id', $city_id)->first();
+        if (!$city) {
+            return response()->json(['error' => 'City not found'], 404);
+        }
+        $vendor_categories = VendorCategory::all();
+        $locations = Location::where('city_id', $city->id)->get();
+        $sitemap = [];
+        foreach ($vendor_categories as $vendor_category) {
+            foreach ($locations as $location) {
+                $vendor = Vendor::where('location_id', $location->id)
+                    ->where('city_id', $city->id)
+                    ->where('vendor_category_id', $vendor_category->id)
+                    ->first();
+                if ($vendor) {
+                    $images = explode(',', $vendor->images);
+
+                    $title = ucwords(str_replace(['-', '_'], ' ', $vendor_category->slug)) . ' in ' . ucwords(str_replace(['-', '_'], ' ', $location->slug));
+
+                    $sitemap[] = [
+                        'url' => $vendor_category->slug . '/' . $city->slug . '/' . $location->slug,
+                        'images' => array_map(function ($image) use ($title) {
+                            return [
+                                'loc' => asset('storage/uploads/' . $image),
+                                'title' => $title,
+                                'caption' => 'Venue Image: ' . $image,
+                            ];
+                        }, $images),
+                    ];
+                }
+            }
+        }
+        return response()->json(['sitemap' => $sitemap]);
+    }
+
+    public function sitemap_vendor($city_id){
+        $city = City::where('id', $city_id)->first();
+        if (!$city) {
+            return response()->json(['error' => 'City not found'], 404);
+        }
+        $vendors =  Vendor::where('city_id', $city->id)->get();
+        $sitemap = [];
+
+        foreach ($vendors as $vendor) {
+            if ($vendor->images) {
+                $images = explode(',', $vendor->images);
+                $title = $vendor->brand_name;
+                $sitemap[] = [
+                    'url' => $city->slug . '/' . $vendor->slug,
+                    'images' => array_map(function ($image) use ($title) {
+                        return [
+                            'loc' => asset('storage/uploads/' . $image),
+                            'title' => $title,
+                            'caption' => 'Venue Image: ' . $image,
+                        ];
+                    }, $images),
+                ];
+            }
+        }
+        return response()->json(['sitemap' => $sitemap]);
+    }
+    public function sitemap_venue($city_id){
+        $city = City::where('id', $city_id)->first();
+        if (!$city) {
+            return response()->json(['error' => 'City not found'], 404);
+        }
+        $venues =  Venue::where('city_id', $city->id)->get();
+        $sitemap = [];
+
+        foreach ($venues as $venue) {
+            if ($venue->images) {
+                $images = explode(',', $venue->images);
+                $title = $venue->name;
+                $sitemap[] = [
+                    'url' => $city->slug . '/' . $venue->slug,
+                    'images' => array_map(function ($image) use ($title) {
+                        return [
+                            'loc' => asset('storage/uploads/' . $image),
+                            'title' => $title,
+                            'caption' => 'Venue Image: ' . $image,
+                        ];
+                    }, $images),
+                ];
+            }
+        }
+        return response()->json(['sitemap' => $sitemap]);
+    }
 }
