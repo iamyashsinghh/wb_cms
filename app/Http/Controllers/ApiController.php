@@ -429,6 +429,16 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
+        function utf8_encode_recursive($data) {
+            if (is_array($data)) {
+                return array_map('utf8_encode_recursive', $data);
+            } elseif (is_string($data)) {
+                return utf8_encode($data);
+            }
+            return $data;
+        }
+
+        $response = utf8_encode_recursive($response);
         return response()->json($response);
     }
 
