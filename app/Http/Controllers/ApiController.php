@@ -34,17 +34,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
-
-    private function utf8_encode_recursive($data)
-    {
-        if (is_array($data)) {
-            return array_map([$this, 'utf8_encode_recursive'], $data);
-        } elseif (is_string($data)) {
-            return mb_convert_encoding($data, 'UTF-8', 'UTF-8');
-        }
-        return $data;
-    }
-
     public function cities()
     {
         try {
@@ -418,11 +407,6 @@ class ApiController extends Controller
                 throw new \Exception("Category not found");
             }
 
-
-            // if (!function_exists('utf8_encode_recursive')) {
-            //     dd('Function utf8_encode_recursive is not defined or accessible.');
-            // }
-
             $response = [
                 'success' => true,
                 'tag' => $tag,
@@ -445,8 +429,9 @@ class ApiController extends Controller
                 'message' => $th->getMessage(),
             ];
         }
-        $response = $this->utf8_encode_recursive($response);
-        return response()->json($response);
+        // return response()->json($response);
+        return response()->json($response, 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+
     }
 
     private function fetchMinimalVenueData($city_id, $venue_category_id, $location, $location_slug, $request)
