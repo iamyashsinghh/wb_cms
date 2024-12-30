@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Location;
+use App\Models\Vendor;
 use App\Models\Venue;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -387,6 +388,25 @@ class MegaDatabaseChangeController extends Controller
 
     return ['success' => true, 'alert_type' => 'success', 'message' => 'Venue meals updated successfully for selected venues.'];
 
+}
+
+    public function massUpdateVendorPricing()
+{
+    $vendor = Vendor::whereNull('cinematography_price')
+    ->whereNull('candid_photography_price')
+    ->whereNull('traditional_photography_price')
+    ->whereNull('traditional_video_price')
+    ->whereNull('pre_wedding_photoshoot_price')
+    ->whereNull('albums_price')
+    ->where('vendor_category_id', 1)
+    ->update([
+        'cinematography_price' => 'On Demand',
+        'candid_photography_price' => 'On Demand',
+        'traditional_photography_price' => 'On Demand',
+        'traditional_video_price' => 'On Demand',
+        'pre_wedding_photoshoot_price' => 'On Demand',
+        'albums_price' => 'On Demand',
+    ]);
 }
 
 }
