@@ -52,6 +52,8 @@
     <script src="{{ asset('adminlte/js/adminlte.js') }}"></script>
     <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
     <script>
+                let checkOtpInterval;
+
                                         const login_verify_form = document.getElementById('login_verify_form');
         toastr.options = {
             "closeButton": true,
