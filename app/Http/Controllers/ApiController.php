@@ -381,7 +381,7 @@ class ApiController extends Controller
 
                 $filtered_items = $full_venues;
                 $tag = 'venues';
-                $meta = VenueListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                $meta = VenueListingMeta::select('meta_title', 'meta_description','header_script', 'meta_keywords', 'caption', 'faq')
                     ->where('slug', $slug)->first();
             } elseif ($vendor_category) {
                 $data = $this->fetchMinimalVendorData($city->id, $vendor_category->id, $location, $location_slug, $request);
@@ -401,7 +401,7 @@ class ApiController extends Controller
 
                 $filtered_items = $full_vendors;
                 $tag = 'vendors';
-                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords', 'caption', 'faq')
+                $meta = VendorListingMeta::select('meta_title', 'meta_description', 'meta_keywords','header_script', 'caption', 'faq')
                     ->where('slug', $slug)->first();
             } else {
                 throw new \Exception("Category not found");
