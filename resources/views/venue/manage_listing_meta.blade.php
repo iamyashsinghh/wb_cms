@@ -81,6 +81,12 @@
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
+                                    <label for="desc_text">Header Script</label>
+                                    <textarea class="form-control" placeholder="Enter header script" name="header_script" rows="5">{{$meta->header_script}}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
                                     <label for="desc_text">Footer Caption</label>
                                     <textarea id="editor" class="form-control" placeholder="Enter footer caption" name="footer_caption" rows="3">{{$meta->caption}}</textarea>
                                 </div>
@@ -104,7 +110,7 @@
     $('.select2').select2({
         placeholder: 'Select an option'
     });
- 
+
     ClassicEditor.create(document.querySelector('#editor')).catch( error => {
         console.error(error);
     });
@@ -118,5 +124,5 @@
             location_select.innerHTML = elem;
         })
     }
-</script> 
+</script>
 @endsection

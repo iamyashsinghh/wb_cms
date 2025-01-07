@@ -77,6 +77,12 @@
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
+                                    <label for="desc_text">Header Script</label>
+                                    <textarea class="form-control" placeholder="Enter header script" name="header_script" rows="5">{{$meta->header_script}}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
                                     <label for="desc_text">Footer Caption</label>
                                     <textarea id="editor" class="form-control" name="caption" rows="3">{{$meta->caption}}</textarea>
                                 </div>

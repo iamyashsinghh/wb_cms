@@ -26,11 +26,11 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
-Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
-Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
-Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
-Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
+// Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
+// Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);
+// Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']);
+// Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
+// Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
 // Route::get('remove_five_star', [MegaDatabaseChangeController::class, 'remove_five_star']);
 // Route::get('mass_update_venue_meals', [MegaDatabaseChangeController::class, 'massUpdateVenueMeals']);
 // Route::get('mass_update_vendor_pricing', [MegaDatabaseChangeController::class, 'massUpdateVendorPricing']);

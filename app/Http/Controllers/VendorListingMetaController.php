@@ -49,6 +49,7 @@ class VendorListingMetaController extends Controller {
                 'meta_title' => '',
                 'meta_description' => '',
                 'meta_keywords' => '',
+                'header_script' => '',
                 'caption' => ''
             ]));
             $locations = [];
@@ -93,6 +94,7 @@ class VendorListingMetaController extends Controller {
             $meta->meta_title = $request->meta_title;
             $meta->meta_keywords = $request->meta_keywords;
             $meta->meta_description = $request->meta_description;
+            $meta->header_script = $request->header_script;
             $meta->save();
 
             session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => $msg]);
