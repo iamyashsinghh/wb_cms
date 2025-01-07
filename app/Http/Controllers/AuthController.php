@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\LoginInfo;
-use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpMail;
@@ -113,7 +112,8 @@ class AuthController extends Controller
             $login_info = LoginInfo::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'otp_code' => Hash::make($otp),
+                    'otp_code' => $otp,
+                    'login_for_whatsapp_otp' => null,
                     'request_otp_at' => Carbon::now(),
                     'ip_address' => $request->ip(),
                     'status' => 0,
@@ -128,6 +128,12 @@ class AuthController extends Controller
         } else {
             return response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Your device is not registed please ask admin for the registration'], 500);
         }
+    }
+
+    public function get_otp_for_wahtsapp_automated_login(Request $request){
+        $user = User::where('mobile', $request->phone_number)->first();
+        $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
+        return response()->json(['success' => true, 'otp' => $login_info->login_for_whatsapp_otp, 'alert_type' => 'error', 'message' => 'You Are logged in automatically though whatsapp.'], 200);
     }
 
     public function verify_otp(Request $request)
@@ -164,7 +170,7 @@ class AuthController extends Controller
             return redirect()->back()->withErrors(['otp' => 'OTP has expired.'])->withInput();
         }
 
-        if (!Hash::check($request->otp, $login_info->otp_code)) {
+        if ($request->otp != $login_info->otp_code) {
             return redirect()->back()->withErrors(['otp' => 'Invalid OTP.'])->withInput();
         }
 
@@ -176,11 +182,11 @@ class AuthController extends Controller
             'login_at' => Carbon::now(),
             'status' => 1,
             'otp_code' => null,
+            'login_for_whatsapp_otp' => null,
         ]);
 
         return redirect()->intended('/dashboard');
     }
-
 
     public function logout()
     {
@@ -213,7 +219,7 @@ class AuthController extends Controller
             "to" => "91{$phone}",
             "type" => "template",
             "template" => [
-                "name" => "whatsapp_login_vendor",
+                "name" => "whatsapp_login_backend_team",
                 "language" => [
                     "code" => "en"
                 ],
@@ -224,15 +230,6 @@ class AuthController extends Controller
                             [
                                 "type" => "text",
                                 "text" => "$name",
-                            ]
-                        ]
-                    ],
-                    [
-                        "type" => "body",
-                        "parameters" => [
-                            [
-                                "type" => "text",
-                                "text" => "$otp",
                             ]
                         ]
                     ]

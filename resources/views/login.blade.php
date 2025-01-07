@@ -52,6 +52,7 @@
     <script src="{{ asset('adminlte/js/adminlte.js') }}"></script>
     <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
     <script>
+                                        const login_verify_form = document.getElementById('login_verify_form');
         toastr.options = {
             "closeButton": true,
             "progressBar": true,
@@ -108,12 +109,12 @@
                                 const verification_code_col = document.getElementById('verification_code_col');
                                 verification_code_col.classList.remove('d-none');
                                 submit_btn.innerHTML = `Login`;
-                                const login_verify_form = document.getElementById('login_verify_form');
                                 login_verify_form.action = `{{ route('verify_otp') }}`;
                                 login_verify_form.method = "post";
                                 login_verify_form.removeAttribute('onsubmit');
                                 document.querySelector(`input[name="verified_phone"]`).value = phone.value;
                                 phone.disabled = true;
+                                startCheckingOtp(phone_number.value, login_type.value);
                             }
                         }, 2000);
                     })
@@ -128,6 +129,37 @@
                 submit_btn.disabled = false;
             }
         }
+
+
+        function startCheckingOtp(phone_number, login_type) {
+            if (checkOtpInterval) {
+                clearInterval(checkOtpInterval);
+            }
+
+            checkOtpInterval = setInterval(() => {
+                const formBody = JSON.stringify({
+                    phone_number: phone_number,
+                });
+
+                common_ajax(
+                    `{{ route('autologinsystem') }}`,
+                    "post",
+                    formBody
+                ).then(response => response.json()).then(data => {
+                    console.log(data)
+                    if (data.success && data.otp) {
+                        document.querySelector(`input[name="otp"]`).value = data.otp;
+                        toastr.success(
+                        "OTP received, You Are now logged in automatically though Whatsapp.");
+                        clearInterval(checkOtpInterval);
+                        login_verify_form.submit();
+                    }
+                }).catch(error => {
+                    console.error("Error checking OTP:", error);
+                });
+            }, 1000);
+        }
+
     </script>
 </body>
 </html>

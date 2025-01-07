@@ -32,8 +32,8 @@ Route::get('hi', [MegaDatabaseChangeController::class, 'getLocationCoordinates']
 Route::get('hii', [MegaDatabaseChangeController::class, 'get_address']);
 Route::get('hi_done/{location_id?}', [MegaDatabaseChangeController::class, 'updateNearbyLocations']);
 // Route::get('remove_five_star', [MegaDatabaseChangeController::class, 'remove_five_star']);
-Route::get('mass_update_venue_meals', [MegaDatabaseChangeController::class, 'massUpdateVenueMeals']);
-Route::get('mass_update_vendor_pricing', [MegaDatabaseChangeController::class, 'massUpdateVendorPricing']);
+// Route::get('mass_update_venue_meals', [MegaDatabaseChangeController::class, 'massUpdateVenueMeals']);
+// Route::get('mass_update_vendor_pricing', [MegaDatabaseChangeController::class, 'massUpdateVendorPricing']);
 
 // Route::get('run', [CommandController::class, 'runCommand']);
 
@@ -46,6 +46,7 @@ Route::group(['middleware' => 'AuthCheck'], function () {
     Route::get('/', [AuthController::class, 'login'])->name('login');
     Route::post('send_otp', [AuthController::class, 'send_otp'])->name('send_otp');
     Route::post('verify_otp', [AuthController::class, 'verify_otp'])->name('verify_otp');
+    Route::post('/get_otp_for_wahtsapp_automated_login', [AuthController::class, 'get_otp_for_wahtsapp_automated_login'])->name('autologinsystem');
 });
 
 Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
