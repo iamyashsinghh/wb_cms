@@ -113,7 +113,6 @@ class AuthController extends Controller
                 ['user_id' => $user->id],
                 [
                     'otp_code' => $otp,
-                    'login_for_whatsapp_otp' => null,
                     'request_otp_at' => Carbon::now(),
                     'ip_address' => $request->ip(),
                     'status' => 0,
@@ -122,6 +121,10 @@ class AuthController extends Controller
             if ($user->email) {
                 Mail::to($user->email)->send(new OtpMail($otp, $user));
             }
+
+            $login_info->login_for_whatsapp_otp = null;
+            $login_info->save();
+        
             $this->sendWhatsAppMessage($user->phone, $user->name, $otp);
 
             return response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'Verification code has been sent to your registered WhatsApp & Email.'], 200);
@@ -178,12 +181,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        $login_info->update([
-            'login_at' => Carbon::now(),
-            'status' => 1,
-            'otp_code' => null,
-            'login_for_whatsapp_otp' => null,
-        ]);
+        $login_info->login_at = Carbon::now();
+        $login_info->status = 1;
+        $login_info->otp_code = null;
+        $login_info->login_for_whatsapp_otp = null;
+        $login_info->save();
 
         return redirect()->intended('/dashboard');
     }
