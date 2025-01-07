@@ -131,8 +131,8 @@ class AuthController extends Controller
     }
 
     public function get_otp_for_wahtsapp_automated_login(Request $request){
-        $user = User::where('mobile', $request->phone_number)->first();
-        $login_info = LoginInfo::where(['login_type' => $request->login_type, 'user_id' => $user->id])->first();
+        $user = User::where('phone', $request->phone_number)->first();
+        $login_info = LoginInfo::where(['user_id' => $user->id])->first();
         return response()->json(['success' => true, 'otp' => $login_info->login_for_whatsapp_otp, 'alert_type' => 'error', 'message' => 'You Are logged in automatically though whatsapp.'], 200);
     }
 
