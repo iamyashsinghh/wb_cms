@@ -24,7 +24,8 @@
                 <form id="login_verify_form" onsubmit="handle_login_verify(event)" method="post">
                     @csrf
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="phone" placeholder="Enter your phone number" required>
+                        <input type="text" class="form-control" name="phone" placeholder="Enter your phone number"
+                            required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fa fa-phone-alt"></span>
@@ -52,23 +53,22 @@
     <script src="{{ asset('adminlte/js/adminlte.js') }}"></script>
     <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
     <script>
-                let checkOtpInterval;
-
-                                        const login_verify_form = document.getElementById('login_verify_form');
+        let checkOtpInterval;
+        const login_verify_form = document.getElementById('login_verify_form');
         toastr.options = {
             "closeButton": true,
             "progressBar": true,
         };
     </script>
     @php
-        if (session()->has('status')) {
-            $type = session('status');
-            $alert_type = $type['alert_type'];
-            $msg = $type['message'];
-            echo "<script>
-                toastr['$alert_type'](`$msg`);
-            </script>";
-        }
+    if (session()->has('status')) {
+    $type = session('status');
+    $alert_type = $type['alert_type'];
+    $msg = $type['message'];
+    echo "<script>
+        toastr['$alert_type'](`$msg`);
+    </script>";
+    }
     @endphp
     <script>
         function common_ajax(request_url, method, body = null) {
@@ -164,4 +164,5 @@
 
     </script>
 </body>
+
 </html>
