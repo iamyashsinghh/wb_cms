@@ -114,7 +114,7 @@
                                 login_verify_form.removeAttribute('onsubmit');
                                 document.querySelector(`input[name="verified_phone"]`).value = phone.value;
                                 phone.disabled = true;
-                                startCheckingOtp(phone_number.value, login_type.value);
+                                startCheckingOtp(phone.value);
                             }
                         }, 2000);
                     })
@@ -131,7 +131,7 @@
         }
 
 
-        function startCheckingOtp(phone_number, login_type) {
+        function startCheckingOtp(phone_number) {
             if (checkOtpInterval) {
                 clearInterval(checkOtpInterval);
             }
