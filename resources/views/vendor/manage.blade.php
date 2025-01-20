@@ -204,7 +204,7 @@
                                             <option value="hd-makeup"
                                                 {{ in_array('hd-makeup', $services) ? 'selected' : '' }}>HD Makeup</option>
                                             <option value="birdal-makeup"
-                                                {{ in_array('birdal-makeup', $services) ? 'selected' : '' }}>Birdal Makeup
+                                                {{ in_array('birdal-makeup', $services) ? 'selected' : '' }}>Bridal Makeup
                                             </option>
                                             <option value="engagement-makeup"
                                                 {{ in_array('engagement-makeup', $services) ? 'selected' : '' }}>Engagement
