@@ -10,6 +10,7 @@ use App\Models\Venue;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class MegaDatabaseChangeController extends Controller
 {
@@ -266,147 +267,165 @@ class MegaDatabaseChangeController extends Controller
     }
 
     public function massUpdateVenueMeals(Request $request)
-{
+    {
 
-    $veg_templates = [
-        [
-            'Chaat Counter' => 3,
-            'Live Counter' => 2,
-            'Welcome Drinks' => 4,
-            'Soups' => 2,
-            'Veg Starter' => 8,
-            'Veg Main Courses' => 6,
-            'Salads' => 6,
-            'Raita' => 1,
-            'Dal' => 1,
-            'Rice/Biryani' => 2,
-            'Assorted Breads/Rotis' => 6,
-            'Desserts' => 3,
-        ],
-        [
-            'Chaat Counter' => 4,
-            'Live Counter' => 2,
-            'Welcome Drinks' => 3,
-            'Soups' => 3,
-            'Veg Starter' => 12,
-            'Veg Main Courses' => 8,
-            'Salads' => 5,
-            'Raita' => 2,
-            'Dal' => 2,
-            'Rice/Biryani' => 2,
-            'Assorted Breads/Rotis' => 6,
-            'Desserts' => 4,
-        ],
-        [
-            'Chaat Counter' => 5,
-            'Live Counter' => 3,
-            'Welcome Drinks' => 5,
-            'Soups' => 2,
-            'Veg Starter' => 14,
-            'Veg Main Courses' => 8,
-            'Salads' => 4,
-            'Raita' => 2,
-            'Dal' => 2,
-            'Rice/Biryani' => 2,
-            'Assorted Breads/Rotis' => 6,
-            'Desserts' => 4,
-        ],
-    ];
-    $nonveg_templates = [
-        [
-            'Chaat Counter' => 3,
-            'Live Counter' => 2,
-            'Welcome Drinks' => 4,
-            'Veg / Non Veg Soup' => "1 + 1",
-            'Veg / Non Veg Starter' => "6 + 3",
-            'Veg / Non Veg Main Courses' => "3 + 3",
-            'Salads' => 6,
-            'Raita' => 1,
-            'Dal' => 1,
-            'Rice/Biryani/Non veg Biryani' => "1 + 1",
-            'Assorted Breads/Rotis' => 6,
-            'Desserts' => 3,
-        ],
-        [
-            'Chaat Counter' => 4,
-            'Live Counter' => 2,
-            'Welcome Drinks' => 3,
-            'Veg / Non Veg Soup' => "2 + 1",
-            'Veg / Non Veg Starter' => "8 + 4",
-            'Veg / Non Veg Main Courses' => "6 + 3",
-            'Salads' => 6,
-            'Raita' => 2,
-            'Dal' => 2,
-            'Rice/Biryani/Non veg Biryani' => "2 + 1",
-            'Assorted Breads/Rotis' => 6,
-            'Desserts' => 4,
-        ],
-        [
-            'Chaat Counter' => 5,
-            'Live Counter' => 3,
-            'Welcome Drinks' => 5,
-            'Veg / Non Veg Soup' => "2 + 2",
-            'Veg / Non Veg Starter' => "10 + 4",
-            'Veg / Non Veg Main Courses' => "6 + 4",
-            'Salads' => 6,
-            'Raita' => 2,
-            'Dal' => 2,
-            'Rice/Biryani/Non veg Biryani' => "3 + 1",
-            'Assorted Breads/Rotis' => 6,
-            'Desserts' => 4,
-        ],
-    ];
+        $veg_templates = [
+            [
+                'Chaat Counter' => 3,
+                'Live Counter' => 2,
+                'Welcome Drinks' => 4,
+                'Soups' => 2,
+                'Veg Starter' => 8,
+                'Veg Main Courses' => 6,
+                'Salads' => 6,
+                'Raita' => 1,
+                'Dal' => 1,
+                'Rice/Biryani' => 2,
+                'Assorted Breads/Rotis' => 6,
+                'Desserts' => 3,
+            ],
+            [
+                'Chaat Counter' => 4,
+                'Live Counter' => 2,
+                'Welcome Drinks' => 3,
+                'Soups' => 3,
+                'Veg Starter' => 12,
+                'Veg Main Courses' => 8,
+                'Salads' => 5,
+                'Raita' => 2,
+                'Dal' => 2,
+                'Rice/Biryani' => 2,
+                'Assorted Breads/Rotis' => 6,
+                'Desserts' => 4,
+            ],
+            [
+                'Chaat Counter' => 5,
+                'Live Counter' => 3,
+                'Welcome Drinks' => 5,
+                'Soups' => 2,
+                'Veg Starter' => 14,
+                'Veg Main Courses' => 8,
+                'Salads' => 4,
+                'Raita' => 2,
+                'Dal' => 2,
+                'Rice/Biryani' => 2,
+                'Assorted Breads/Rotis' => 6,
+                'Desserts' => 4,
+            ],
+        ];
+        $nonveg_templates = [
+            [
+                'Chaat Counter' => 3,
+                'Live Counter' => 2,
+                'Welcome Drinks' => 4,
+                'Veg / Non Veg Soup' => "1 + 1",
+                'Veg / Non Veg Starter' => "6 + 3",
+                'Veg / Non Veg Main Courses' => "3 + 3",
+                'Salads' => 6,
+                'Raita' => 1,
+                'Dal' => 1,
+                'Rice/Biryani/Non veg Biryani' => "1 + 1",
+                'Assorted Breads/Rotis' => 6,
+                'Desserts' => 3,
+            ],
+            [
+                'Chaat Counter' => 4,
+                'Live Counter' => 2,
+                'Welcome Drinks' => 3,
+                'Veg / Non Veg Soup' => "2 + 1",
+                'Veg / Non Veg Starter' => "8 + 4",
+                'Veg / Non Veg Main Courses' => "6 + 3",
+                'Salads' => 6,
+                'Raita' => 2,
+                'Dal' => 2,
+                'Rice/Biryani/Non veg Biryani' => "2 + 1",
+                'Assorted Breads/Rotis' => 6,
+                'Desserts' => 4,
+            ],
+            [
+                'Chaat Counter' => 5,
+                'Live Counter' => 3,
+                'Welcome Drinks' => 5,
+                'Veg / Non Veg Soup' => "2 + 2",
+                'Veg / Non Veg Starter' => "10 + 4",
+                'Veg / Non Veg Main Courses' => "6 + 4",
+                'Salads' => 6,
+                'Raita' => 2,
+                'Dal' => 2,
+                'Rice/Biryani/Non veg Biryani' => "3 + 1",
+                'Assorted Breads/Rotis' => 6,
+                'Desserts' => 4,
+            ],
+        ];
 
-    $venueIds = Venue::pluck('id')->toArray();
-    if (!is_array($venueIds) || empty($venueIds)) {
-        session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => 'No venues selected for update.']);
-        return redirect()->back();
+        $venueIds = Venue::pluck('id')->toArray();
+        if (!is_array($venueIds) || empty($venueIds)) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'danger', 'message' => 'No venues selected for update.']);
+            return redirect()->back();
+        }
+        foreach ($venueIds as $venueId) {
+            $venue = Venue::find($venueId);
+            if (!$venue) {
+                continue;
+            }
+            $rand_no = rand(0, 2);
+            $selected_veg_template = $veg_templates[$rand_no];
+            $selected_nonveg_template = $nonveg_templates[$rand_no];
+
+            $veg_food_arr = [];
+            foreach ($selected_veg_template as $name => $package) {
+                $veg_food_arr[] = ['name' => $name, 'package' => $package];
+            }
+            $venue->veg_foods = json_encode($veg_food_arr);
+
+            $nonveg_food_arr = [];
+            foreach ($selected_nonveg_template as $name => $package) {
+                $nonveg_food_arr[] = ['name' => $name, 'package' => $package];
+            }
+            $venue->nonveg_foods = json_encode($nonveg_food_arr);
+
+            $venue->save();
+        }
+
+        return ['success' => true, 'alert_type' => 'success', 'message' => 'Venue meals updated successfully for selected venues.'];
     }
-    foreach ($venueIds as $venueId) {
-        $venue = Venue::find($venueId);
-        if (!$venue) {
-            continue;
-        }
-        $rand_no = rand(0, 2);
-        $selected_veg_template = $veg_templates[$rand_no];
-        $selected_nonveg_template = $nonveg_templates[$rand_no];
-
-        $veg_food_arr = [];
-        foreach ($selected_veg_template as $name => $package) {
-            $veg_food_arr[] = ['name' => $name, 'package' => $package];
-        }
-        $venue->veg_foods = json_encode($veg_food_arr);
-
-        $nonveg_food_arr = [];
-        foreach ($selected_nonveg_template as $name => $package) {
-            $nonveg_food_arr[] = ['name' => $name, 'package' => $package];
-        }
-        $venue->nonveg_foods = json_encode($nonveg_food_arr);
-
-        $venue->save();
-    }
-
-    return ['success' => true, 'alert_type' => 'success', 'message' => 'Venue meals updated successfully for selected venues.'];
-
-}
 
     public function massUpdateVendorPricing()
-{
-    $vendor = Vendor::whereNull('cinematography_price')
-    ->whereNull('candid_photography_price')
-    ->whereNull('traditional_photography_price')
-    ->whereNull('traditional_video_price')
-    ->whereNull('pre_wedding_photoshoot_price')
-    ->whereNull('albums_price')
-    ->where('vendor_category_id', 1)
-    ->update([
-        'cinematography_price' => 'On Demand',
-        'candid_photography_price' => 'On Demand',
-        'traditional_photography_price' => 'On Demand',
-        'traditional_video_price' => 'On Demand',
-        'pre_wedding_photoshoot_price' => 'On Demand',
-        'albums_price' => 'On Demand',
-    ]);
-}
+    {
+        $vendor = Vendor::whereNull('cinematography_price')
+            ->whereNull('candid_photography_price')
+            ->whereNull('traditional_photography_price')
+            ->whereNull('traditional_video_price')
+            ->whereNull('pre_wedding_photoshoot_price')
+            ->whereNull('albums_price')
+            ->where('vendor_category_id', 1)
+            ->update([
+                'cinematography_price' => 'On Demand',
+                'candid_photography_price' => 'On Demand',
+                'traditional_photography_price' => 'On Demand',
+                'traditional_video_price' => 'On Demand',
+                'pre_wedding_photoshoot_price' => 'On Demand',
+                'albums_price' => 'On Demand',
+            ]);
+    }
 
+
+    public function chnage_venue_image_name($ids)
+    {
+        $venues = Venue::whereIn('id', $ids)->get();
+        foreach ($venues as $venue) {
+            if (!empty($venue->images)) {
+                $images = explode(',', $venue->images);
+                // $updatedImages = $images;
+                foreach ($images as $image) {
+                    $extension = pathinfo($image, PATHINFO_EXTENSION);
+                    $newName = 'venue_' . strtolower(str_replace(' ', '_', $venue->name)) . '_' . time() . rand(100, 999) . '.' . $extension;
+                    Storage::disk('public')->copy("venues/$image", "venues/$newName");
+                    $updatedImages[] = $newName;
+                }
+                $venue->images = implode(',', $updatedImages);
+                $venue->save();
+            }
+        }
+    }
 }
