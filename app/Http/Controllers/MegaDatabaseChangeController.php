@@ -410,13 +410,14 @@ class MegaDatabaseChangeController extends Controller
     }
 
 
-    public function changeVenueImageName(array $ids)
+    public function changeVenueImageName($ids)
     {
-        if (empty($ids)) {
+        $idArray = explode(',', $ids);
+        if (empty($idArray)) {
             return response()->json(['error' => 'No venue IDs provided.'], 400);
         }
 
-        $venues = Venue::whereIn('id', $ids)->get();
+        $venues = Venue::whereIn('id', $idArray)->get();
         foreach ($venues as $venue) {
             if (!empty($venue->images)) {
                 $images = explode(',', $venue->images);
