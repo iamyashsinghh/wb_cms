@@ -412,25 +412,36 @@ class MegaDatabaseChangeController extends Controller
 
     public function changeVenueImageName($ids)
     {
-        $idArray = explode(',', $ids);
+        $idArray = array_filter(explode(',', trim($ids)));
         if (empty($idArray)) {
             return response()->json(['error' => 'No venue IDs provided.'], 400);
         }
 
         $venues = Venue::whereIn('id', $idArray)->get();
+        if ($venues->isEmpty()) {
+            return response()->json(['error' => 'No venues found.'], 404);
+        }
+
         foreach ($venues as $venue) {
             if (!empty($venue->images)) {
                 $images = explode(',', $venue->images);
-                // $updatedImages = $images;
+                $updatedImages = [];
                 foreach ($images as $image) {
+                    if (!Storage::disk('public')->exists("uploads/$image")) {
+                        continue;
+                    }
                     $extension = pathinfo($image, PATHINFO_EXTENSION);
-                    $newName = 'venue_' . strtolower(str_replace(' ', '_', $venue->name)) . '_' . time() . rand(100, 999) . '.' . $extension;
+                    $newName = strtolower(str_replace(' ', '_', $venue->name)) . '_' . time() . rand(100, 999) . '.' . $extension;
                     Storage::disk('public')->copy("uploads/$image", "uploads/$newName");
                     $updatedImages[] = $newName;
                 }
-                $venue->images = implode(',', $updatedImages);
-                $venue->save();
+                if (!empty($updatedImages)) {
+                    $venue->images = implode(',', $updatedImages);
+                    $venue->save();
+                }
             }
         }
+
+        return response()->json(['success' => 'Venue images updated successfully.']);
     }
 }
