@@ -420,7 +420,7 @@ class MegaDatabaseChangeController extends Controller
                 foreach ($images as $image) {
                     $extension = pathinfo($image, PATHINFO_EXTENSION);
                     $newName = 'venue_' . strtolower(str_replace(' ', '_', $venue->name)) . '_' . time() . rand(100, 999) . '.' . $extension;
-                    Storage::disk('public')->copy("venues/$image", "venues/$newName");
+                    Storage::disk('public')->copy("uploads/$image", "uploads/$newName");
                     $updatedImages[] = $newName;
                 }
                 $venue->images = implode(',', $updatedImages);
