@@ -34,7 +34,7 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('remove_five_star', [MegaDatabaseChangeController::class, 'remove_five_star']);
 // Route::get('mass_update_venue_meals', [MegaDatabaseChangeController::class, 'massUpdateVenueMeals']);
 // Route::get('mass_update_vendor_pricing', [MegaDatabaseChangeController::class, 'massUpdateVendorPricing']);
-Route::get('chnage_venue_image_name/{ids}', [MegaDatabaseChangeController::class, 'chnage_venue_image_name']);
+Route::get('chnage_venue_image_name/{ids}', [MegaDatabaseChangeController::class, 'changeVenueImageName']);
 
 // Route::get('run', [CommandController::class, 'runCommand']);
 
