@@ -2,6 +2,7 @@
 @section('title', $page_heading)
 @section('header-css')
 <link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
+<link rel="stylesheet" href="{{ asset('plugins/summernote/summernote-lite.min.css') }}">
 @endsection
 @section('main')
 <div class="content-wrapper pb-5">
@@ -88,7 +89,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="desc_text">Footer Caption</label>
-                                    <textarea id="editor" class="form-control" placeholder="Enter footer caption" name="footer_caption" rows="3">{{$meta->caption}}</textarea>
+                                    <textarea id="summernote" class="form-control" placeholder="Enter footer caption" name="footer_caption" rows="3">{{$meta->caption}}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -105,15 +106,17 @@
 @endsection
 @section('footer-script')
 <script src="{{asset('plugins/select2/js/select2.min.js')}}"></script>
-<script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
+<script src="{{ asset('plugins/summernote/summernote-lite.min.js') }}"></script>
 <script>
     $('.select2').select2({
         placeholder: 'Select an option'
     });
 
-    ClassicEditor.create(document.querySelector('#editor')).catch( error => {
-        console.error(error);
-    });
+    $('#summernote').summernote({
+            placeholder: 'Type here content',
+            tabsize: 2,
+        });
+
 
     function fetch_locations(city_id, selected_id = null){
         fetch(`{{route('location.get_locations')}}/${city_id}`).then(response => response.json()).then(data => {
