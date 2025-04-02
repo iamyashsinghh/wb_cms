@@ -429,30 +429,29 @@ $area_capacity = json_decode($venue->area_capacity);
             placeholder: 'Select an option'
         });
 
-        $('.summernote').summernote({
-            placeholder: 'Type here content',
-            tabsize: 2,
-            callbacks: {
-                onKeyup: function(e) {
-                  setTimeout(function(){
-                updateTag();
-            },200);
-            },
-            onMouseUp: function(e) {
-                setTimeout(function(){
-                updateTag();
-            },200);
-            }
+            $('.summernote').summernote({
+                placeholder: 'Type here content',
+                tabsize: 2,
+                callbacks: {
+        onKeyup: function () {
+            setTimeout(updateTag, 200);
+        },
+        onMouseUp: function () {
+            setTimeout(updateTag, 200);
         }
-        });
-
-        function updateTag() {
-            console.log('updateTag');
-            var node = $('.summernote').summernote('editor.getSelectedNode');
-        var tagName = node ? node.nodeName : 'None';
-        $('#current-tag').text(tagName);
-
     }
+            });
+
+            function updateTag() {
+                console.log('updateTag');
+    var selection = document.getSelection(); // Get current selection
+    if (selection.rangeCount > 0) {
+        var node = selection.getRangeAt(0).commonAncestorContainer; // Find the parent node
+        var tagName = node.nodeType === 3 ? node.parentNode.nodeName : node.nodeName; // Handle text nodes
+        $('#current-tag').text(tagName); // Update the tag display
+    }
+}
+
 
         function handle_add_area_capacity() {
             const area_capacity_container = document.getElementById('area_capacity_container');
