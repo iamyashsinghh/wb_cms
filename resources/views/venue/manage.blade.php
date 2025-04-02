@@ -429,6 +429,11 @@ $area_capacity = json_decode($venue->area_capacity);
             placeholder: 'Select an option'
         });
 
+        $(document).on('click', function () {
+    setTimeout(updateTag, 200);
+});
+
+
             $('.summernote').summernote({
                 placeholder: 'Type here content',
                 tabsize: 2,
