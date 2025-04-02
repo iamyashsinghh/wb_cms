@@ -434,18 +434,17 @@
             tabsize: 2,
             callbacks: {
             onKeyup: function () {
-                updateTag(this);
+                updateTag($(this));
             },
             onMouseUp: function () {
-                updateTag(this);
+                updateTag($(this));
             }
         }
         });
 
-        function updateTag(editor) {
-            console.log(editor);
-            var node = $('.summernote').summernote('editor.getSelectedNode');
-        var tagName = node ? node.nodeName : 'None';
+        function updateTag($editor) {
+        var node = $editor.summernote('editor.getSelectedNode');
+        var tagName = node ? node.tagName : 'None';
         $('#current-tag').text(tagName);
     }
 
