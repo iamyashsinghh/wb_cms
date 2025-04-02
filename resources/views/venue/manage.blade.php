@@ -447,6 +447,7 @@ $area_capacity = json_decode($venue->area_capacity);
         });
 
         function updateTag() {
+            console.log('updateTag');
             var node = $('.summernote').summernote('editor.getSelectedNode');
         var tagName = node ? node.nodeName : 'None';
         $('#current-tag').text(tagName);
