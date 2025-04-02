@@ -281,7 +281,7 @@
                                 </div>
                                 <div class="col-sm-12 mb-3">
                                     <div class="form-group">
-                                        <label>Summary</label>
+                                        <label>Summary: <span id="current-tag">None</span></label>
                                         <textarea type="text" class="form-control summernote" placeholder="Enter summary" name="summary">{{ $venue->summary }}</textarea>
                                     </div>
                                 </div>
@@ -432,7 +432,17 @@
         $('.summernote').summernote({
             placeholder: 'Type here content',
             tabsize: 2,
+            callbacks: {
+                onKeyup: updateTag,
+                onMouseUp: updateTag
+            }
         });
+
+        function updateTag() {
+        var node = $('#summernote').summernote('editor.getSelectedNode');
+        var tagName = node.nodeName;
+        $('#current-tag').text(tagName); // Show tag name in frontend
+    }
 
         function handle_add_area_capacity() {
             const area_capacity_container = document.getElementById('area_capacity_container');

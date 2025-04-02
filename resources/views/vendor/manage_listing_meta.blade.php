@@ -84,7 +84,7 @@
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <label for="desc_text">Footer Caption</label>
+                                    <label for="desc_text">Footer Caption<span id="current-tag">None</span></label>
                                     <textarea id="editor" class="form-control" name="caption" rows="3">{{$meta->caption}}</textarea>
                                 </div>
                             </div>
@@ -111,7 +111,17 @@
     $('#editor').summernote({
             placeholder: 'Type here content',
             tabsize: 2,
+            callbacks: {
+            onKeyup: updateTag,
+            onMouseUp: updateTag
+        }
         });
+
+        function updateTag() {
+        var node = $('#editor').summernote('editor.getSelectedNode');
+        var tagName = node.nodeName;
+        $('#current-tag').text(tagName); // Show tag name in frontend
+    }
 
     function fetch_locations(city_id, selected_id = null){
         fetch(`{{route('location.get_locations')}}/${city_id}`).then(response => response.json()).then(data => {

@@ -88,7 +88,7 @@
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <label for="desc_text">Footer Caption</label>
+                                    <label for="desc_text">Footer Caption<span id="current-tag">None</span></label>
                                     <textarea id="summernote" class="form-control" placeholder="Enter footer caption" name="footer_caption" rows="3">{{$meta->caption}}</textarea>
                                 </div>
                             </div>
@@ -115,7 +115,17 @@
     $('#summernote').summernote({
             placeholder: 'Type here content',
             tabsize: 2,
+            callbacks: {
+            onKeyup: updateTag,
+            onMouseUp: updateTag
+        }
         });
+
+        function updateTag() {
+        var node = $('#summernote').summernote('editor.getSelectedNode');
+        var tagName = node.nodeName;
+        $('#current-tag').text(tagName); // Show tag name in frontend
+    }
 
 
     function fetch_locations(city_id, selected_id = null){
