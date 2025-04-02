@@ -489,15 +489,19 @@ $package_option = $vendor->package_option != null ? explode(',', $vendor->packag
                 tabsize: 2,
                 height: 200,
                 callbacks: {
-            onKeyup: updateTag,
-            onMouseUp: updateTag
+                    onKeyup: function () {
+                updateTag(this);
+            },
+            onMouseUp: function () {
+                updateTag(this);
+            }
         }
             });
 
-            function updateTag() {
-        var node = $('#summernote').summernote('editor.getSelectedNode');
-        var tagName = node.nodeName;
-        $('#current-tag').text(tagName); // Show tag name in frontend
+            function updateTag(editor) {
+        var node = $(editor).summernote('editor.getSelectedNode');
+        var tagName = node ? node.nodeName : 'None';
+        $('#current-tag').text(tagName);
     }
 
             handle_category($('select[name="vendor_category"]').val());

@@ -112,15 +112,19 @@
             placeholder: 'Type here content',
             tabsize: 2,
             callbacks: {
-            onKeyup: updateTag,
-            onMouseUp: updateTag
-        }
+            onKeyup: function () {
+                updateTag(this);
+            },
+            onMouseUp: function () {
+                updateTag(this);
+            }
+         }
         });
 
-        function updateTag() {
-        var node = $('#editor').summernote('editor.getSelectedNode');
-        var tagName = node.nodeName;
-        $('#current-tag').text(tagName); // Show tag name in frontend
+        function updateTag(editor) {
+        var node = $(editor).summernote('editor.getSelectedNode');
+        var tagName = node ? node.nodeName : 'None';
+        $('#current-tag').text(tagName);
     }
 
     function fetch_locations(city_id, selected_id = null){
