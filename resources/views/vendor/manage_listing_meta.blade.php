@@ -84,7 +84,7 @@
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <label for="desc_text">Footer Caption<span id="current-tag">None</span></label>
+                                    <label for="desc_text">Footer <span id="current-tag">None</span></label>
                                     <textarea id="editor" class="form-control" name="caption" rows="3">{{$meta->caption}}</textarea>
                                 </div>
                             </div>
