@@ -484,26 +484,32 @@ $package_option = $vendor->package_option != null ? explode(',', $vendor->packag
                 placeholder: 'Select an option'
             });
 
+            $(document).on('click', function () {
+    setTimeout(updateTag, 200);
+});
+
             $('.summernote').summernote({
                 placeholder: 'Type here content',
                 tabsize: 2,
                 height: 200,
                 callbacks: {
-                    onKeyup: function () {
-                updateTag(this);
-            },
-            onMouseUp: function () {
-                updateTag(this);
-            }
+        onKeyup: function () {
+            setTimeout(updateTag, 200);
+        },
+        onMouseUp: function () {
+            setTimeout(updateTag, 200);
         }
-            });
+    }            });
 
-            function updateTag(editor) {
-        var node = $(editor).summernote('editor.getSelectedNode');
-        var tagName = node ? node.nodeName : 'None';
-        $('#current-tag').text(tagName);
+    function updateTag() {
+
+    var selection = document.getSelection(); // Get current selection
+    if (selection.rangeCount > 0) {
+        var node = selection.getRangeAt(0).commonAncestorContainer; // Find the parent node
+        var tagName = node.nodeType === 3 ? node.parentNode.nodeName : node.nodeName; // Handle text nodes
+        $('#current-tag').text(tagName); // Update the tag display
     }
-
+}
             handle_category($('select[name="vendor_category"]').val());
         });
 

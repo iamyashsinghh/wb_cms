@@ -429,7 +429,7 @@ $area_capacity = json_decode($venue->area_capacity);
             placeholder: 'Select an option'
         });
 
-        $('.summernote').on('click', function () {
+        $(document).on('click', function () {
     setTimeout(updateTag, 200);
 });
 
@@ -448,7 +448,7 @@ $area_capacity = json_decode($venue->area_capacity);
             });
 
             function updateTag() {
-                console.log('updateTag');
+
     var selection = document.getSelection(); // Get current selection
     if (selection.rangeCount > 0) {
         var node = selection.getRangeAt(0).commonAncestorContainer; // Find the parent node
