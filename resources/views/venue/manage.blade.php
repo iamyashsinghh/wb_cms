@@ -443,7 +443,7 @@
         });
 
         function updateTag(editor) {
-        var node = $(editor).summernote('editor.getSelectedNode');
+            var node = $('.summernote').summernote('editor.getSelectedNode');
         var tagName = node ? node.nodeName : 'None';
         $('#current-tag').text(tagName);
     }
