@@ -27,6 +27,6 @@ class BusinessUser extends Model {
     }
 
     public function getCity() {
-        return $this->hasOne(City::class, 'id', 'city_id');
+        return $this->hasOne(City::class, 'id', 'city_id')->withTrashed();
     }
 }
