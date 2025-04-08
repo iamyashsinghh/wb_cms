@@ -63,7 +63,7 @@ $package_option = $vendor->package_option != null ? explode(',', $vendor->packag
                                 <div class="form-group">
                                     <label>Brand Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" placeholder="Enter brand name"
-                                        name="brand_name" required oninput="generate_slug(this.value)"
+                                        name="brand_name" required oninput="{{$vendor->id > 0 ? '' : 'generate_slug(this.value)'}}"
                                         value="{{ $vendor->brand_name }}">
                                     @error('vendor_name')
                                     <span class="ml-1 text-sm text-danger">{{ $message }}</span>
