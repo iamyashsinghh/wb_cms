@@ -479,7 +479,7 @@ class ApiController extends Controller
                 'venues.venue_category_ids',
                 'locations.name as location_name',
                 'cities.name as city_name',
-                'locations.id as locationid',
+                'locations.id as locationid'
             )
                 ->join('locations', 'locations.id', '=', 'venues.location_id')
                 ->join('cities', 'cities.id', '=', 'venues.city_id')
@@ -644,9 +644,10 @@ class ApiController extends Controller
         }
         $query = $data->orderByRaw("
             CASE
-                WHEN wb_assured = 1 THEN 0
-                WHEN popular = 1 THEN 1
-                ELSE 2
+                WHEN wb_assured = 1 AND popular = 1 THEN 0
+                WHEN wb_assured = 1 THEN 1
+                WHEN popular = 1 THEN 2
+                ELSE 3
             END
         ")
             ->orderBy('id', 'DESC')
