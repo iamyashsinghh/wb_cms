@@ -642,7 +642,6 @@ class ApiController extends Controller
         if ($location_slug != 'all') {
             $data = $data->orderBy('primary_location', 'DESC');
         }
-
         $query = $data->orderByRaw("
             CASE
                 WHEN wb_assured = 1 AND popular = 1 THEN 0
