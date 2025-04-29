@@ -54,7 +54,7 @@ class MegaDatabaseChangeController extends Controller
 
     public function getLocationCoordinates()
     {
-        $apiKey = 'AIzaSyBrWQqxRrVwgEDFYZdiC_nHlBE0pn5cjTw';
+        $apiKey = '';
 
         $locations = Location::where('latitude', '')->get();
         $client = new Client();
@@ -151,7 +151,7 @@ class MegaDatabaseChangeController extends Controller
     private function getDistanceByRoad($lat1, $lon1, $lat2, $lon2)
     {
         $client = new Client();
-        $apiKey = 'AIzaSyBrWQqxRrVwgEDFYZdiC_nHlBE0pn5cjTw';
+        $apiKey = '';
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins={$lat1},{$lon1}&destinations={$lat2},{$lon2}&key={$apiKey}";
         Log::info($url);
         try {
