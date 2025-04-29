@@ -639,9 +639,7 @@ class ApiController extends Controller
 
     private function paginateAndOrderData($data, $location, $location_slug, $offset, $items_per_page)
     {
-        if ($location_slug != 'all') {
-            $data = $data->orderBy('primary_location', 'DESC');
-        }
+
         $query = $data->orderByRaw("
             CASE
                 WHEN wb_assured = 1 AND popular = 1 THEN 0
@@ -653,6 +651,10 @@ class ApiController extends Controller
             ->orderBy('id', 'DESC')
             ->skip($offset)
             ->take($items_per_page);
+
+            if ($location_slug != 'all') {
+                $data = $data->orderBy('primary_location', 'DESC');
+            }
 
         return $query->get();
     }
