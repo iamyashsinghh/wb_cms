@@ -642,15 +642,12 @@ class ApiController extends Controller
         if ($location_slug != 'all') {
             $data = $data->orderBy('primary_location', 'DESC');
         }
-        $query = $data->orderByRaw("
-            CASE
-                WHEN wb_assured = 1 AND popular = 1 THEN 0
-                WHEN wb_assured = 1 THEN 1
-                WHEN popular = 1 THEN 2
-                ELSE 3
-            END
-        ")
-            ->orderBy('id', 'DESC')
+
+        // First ordering by wb_assured and popular flags with stronger weighting
+        $data = $data->orderByRaw('(wb_assured * 2 + popular) DESC');
+
+        // Then order by id as a tiebreaker
+        $query = $data->orderBy('id', 'DESC')
             ->skip($offset)
             ->take($items_per_page);
 
