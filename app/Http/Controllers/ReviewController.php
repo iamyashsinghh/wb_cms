@@ -93,6 +93,25 @@ class ReviewController extends Controller
         $review->c_number = $request->c_number;
         $review->is_read = 1;
         $review->save();
+
+        $totalReviews = Review::where('product_id', $review->product_id)
+            ->where('product_for', $review->product_for)
+            ->count();
+
+        if ($review->product_for === 'venue') {
+            $venue = Venue::find($review->product_id);
+            if ($venue) {
+                $venue->review_count = $totalReviews;
+                $venue->save();
+            }
+        } elseif ($review->product_for === 'vendor') {
+            $vendor = Vendor::find($review->product_id);
+            if ($vendor) {
+                $vendor->review_count = $totalReviews;
+                $vendor->save();
+            }
+        }
+
         session()->flash('status', [
             'success' => true,
             'alert_type' => 'success',
