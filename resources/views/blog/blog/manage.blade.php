@@ -53,7 +53,7 @@
                                         <label for="blog_title">Blog Title <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('heading') is-invalid @enderror"
                                             placeholder="Enter Blog Title" id="blog_title" name="heading"
-                                            value="{{ old('heading', $data->heading) }}" required onkeyup="generateSlug()">
+                                            value="{{ old('heading', $data->heading) }}" required oninput="{{$data->id > 0 ? '' : 'generateSlug()'}}">
                                         @error('heading')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror

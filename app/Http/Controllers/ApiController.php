@@ -644,6 +644,7 @@ class ApiController extends Controller
         }
         $query = $data->orderByRaw("
             CASE
+                WHEN wb_assured = 1 AND popular = 1 THEN 0
                 WHEN wb_assured = 1 THEN 1
                 WHEN popular = 1 THEN 2
                 ELSE 3

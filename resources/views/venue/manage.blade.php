@@ -65,7 +65,7 @@ $area_capacity = json_decode($venue->area_capacity);
                                 <div class="form-group">
                                     <label>Venue Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" placeholder="Enter venue name"
-                                        name="venue_name" required oninput="generate_slug(this.value)"
+                                        name="venue_name" required oninput="{{$venue->id > 0 ? '' : 'generate_slug(this.value)'}}"
                                         value="{{ $venue->name }}">
                                     @error('venue_name')
                                     <span class="ml-1 text-sm text-danger">{{ $message }}</span>
