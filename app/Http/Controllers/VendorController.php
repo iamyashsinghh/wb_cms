@@ -72,7 +72,7 @@ class VendorController extends Controller
         if ($vendor_id > 0) {
             $page_heading = "Edit Vendor";
             $vendor = Vendor::find($vendor_id);
-            $similar_vendors = Vendor::select('vendors.id', 'cities.name as city', 'vendors.brand_name', 'vendor_categories.name as vendor_category')
+            $similar_vendors = Vendor::select('vendors.id', 'vendors.place_rating', 'cities.name as city', 'vendors.brand_name', 'vendor_categories.name as vendor_category')
                 ->join('vendor_categories', 'vendor_categories.id', 'vendors.vendor_category_id')
                 ->join('cities', 'cities.id', 'vendors.city_id')
                 ->where(['vendor_category_id' => $vendor->vendor_category_id, 'city_id' => $vendor->city_id])->orderBy('brand_name', 'asc')->get();
@@ -88,6 +88,7 @@ class VendorController extends Controller
                 'id' => 0,
                 'city_id' => '',
                 'vendor_category_id' => '',
+                'place_rating' => '',
                 'yrs_exp' => '',
                 'event_completed' => '',
                 'location_id' => '',
@@ -168,6 +169,7 @@ class VendorController extends Controller
                 $vendor->occasions = null;
             }
             $vendor->summary = $request->summary;
+            $vendor->place_rating = $request->place_rating;
             $vendor->albums_price = $request->albums_price;
             $vendor->pre_wedding_photoshoot_price = $request->pre_wedding_photoshoot_price;
             $vendor->traditional_video_price = $request->traditional_video_price;
