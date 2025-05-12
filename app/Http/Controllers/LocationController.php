@@ -126,4 +126,17 @@ class LocationController extends Controller {
             return response()->json(['success' => true, 'alert_type' => 'error', 'message' => 'Something went wrong.', 'error' => $th->getMessage()]);
         }
     }
+
+    public function convert_to_group(Request $request, $location_id) {
+        $location = Location::find($location_id);
+        if (!$location) {
+            return response()->json(['success' => false, 'message' => 'Location not found.']);
+        }
+        if ($location->is_group) {
+            return response()->json(['success' => false, 'message' => 'Location is already a group.']);
+        }
+        $location->is_group = 1;
+        $location->save();
+        return response()->json(['success' => true]);
+    }
 }

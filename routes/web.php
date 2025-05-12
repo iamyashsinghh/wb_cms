@@ -128,6 +128,7 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
             Route::get('/edit_ajax/{location_id?}', 'edit_ajax')->name('location.edit');
             Route::post('/manage_process/{location_id?}', 'manage_process')->name('location.manage_process');
             Route::get('/delete/{city_id}', 'delete')->name('location.delete');
+            Route::get('/convert_to_group/{location_id?}', 'convert_to_group')->name('location.convert_to_group');
 
             //Location group routes
             Route::get('/group/add', 'group_manage')->name('location.add_group');

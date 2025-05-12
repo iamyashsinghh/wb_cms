@@ -69,11 +69,19 @@
                     edit_action_btn = `<a href="javascript:void(0);" class="text-success mx-2" title="Edit" onclick="handle_location_edit(${data[0]})">
                         <i class="fa fa-edit" style="font-size: 15px;"></i>
                     </a>`;
+                    convert_to_group_btn = `<a href="javascript:void(0);" class="text-primary mx-2" title="Convert to Group" onclick="convert_to_group(${data[0]})">
+                        <i class="fa fa-object-group" style="font-size: 15px;"></i>
+                    </a>`;
                 }
                 delete_action_elem = `<a href="javascript:void(0);" onclick="return confirm('Are you sure want to delete?')" class="text-danger mx-2" title="Delete">
                     <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                 </a>`;
-                td_elements[4].innerHTML = edit_action_btn+delete_action_elem;
+
+                if(data[4] == 1){
+                    td_elements[4].innerHTML = edit_action_btn + delete_action_elem;
+                } else {
+                    td_elements[4].innerHTML = edit_action_btn + convert_to_group_btn + delete_action_elem;
+                }
             }
         });
     });
@@ -81,7 +89,7 @@
     const manageLocationModal = document.getElementById("manageLocationModal");
     const locationModalHeading = manageLocationModal.querySelector('.modal-title');
     const location_name_inp = manageLocationModal.querySelector('input[name="location_name"]');
-    const location_form = manageLocationModal.querySelector('form'); 
+    const location_form = manageLocationModal.querySelector('form');
     const locationModal = new bootstrap.Modal(manageLocationModal);
 
     function handle_location_add() {
@@ -106,6 +114,21 @@
                 toastr.error(data.message);
             }
         })
+    }
+
+    function convert_to_group(location_id) {
+        if(confirm('Are you sure you want to convert this location to a group?')) {
+            fetch(`{{route('location.convert_to_group')}}/${location_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success('Location converted to group successfully');
+                        $('#serverTable').DataTable().ajax.reload();
+                    } else {
+                        toastr.error(data.message);
+                    }
+                });
+        }
     }
 </script>
 
