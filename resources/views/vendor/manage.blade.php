@@ -335,6 +335,13 @@
                                         <textarea type="text" class="form-control summernote" placeholder="Enter summary" name="summary">{{ $vendor->summary }}</textarea>
                                     </div>
                                 </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="form-group">
+                                        <label for="" class="">Review</label>
+                                        <input class="form-control" id="" placeholder="Enter Average Review"
+                                            name="place_rating" value="{{ $vendor->place_rating }}">
+                                    </div>
+                                </div>
                                 <div class="col-sm-12 mb-3" id="package_option">
                                     <label>Package Option</label>
                                     <button type="button" class="btn btn-success btn-xs ml-3"
@@ -412,14 +419,6 @@
                                                     <input type="number" class="form-control"
                                                         placeholder="Enter package price" name="party_makeup_price"
                                                         value="{{ $vendor->party_makeup_price }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6 mb-3">
-                                                <div class="form-group">
-                                                    <label for="" class="">Review</label>
-                                                    <input class="form-control" id=""
-                                                        placeholder="Enter Average Review" name="place_rating"
-                                                        value="{{ $vendor->place_rating }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -533,7 +532,7 @@
                 if (selection.rangeCount > 0) {
                     var node = selection.getRangeAt(0).commonAncestorContainer; // Find the parent node
                     var tagName = node.nodeType === 3 ? node.parentNode.nodeName : node
-                    .nodeName; // Handle text nodes
+                        .nodeName; // Handle text nodes
                     $('#current-tag').text(tagName); // Update the tag display
                 }
             }
