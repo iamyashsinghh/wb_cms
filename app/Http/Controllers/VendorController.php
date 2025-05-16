@@ -149,8 +149,8 @@ class VendorController extends Controller
             $vendor->meta_title = $request->meta_title;
             $vendor->meta_description = $request->meta_description;
             $vendor->meta_keywords = $request->meta_keywords;
-            if ($request->vendor_category == 1 || $request->vendor_category == 2) {
-                if ($vendor_id == 0) { // New vendor
+            if ($request->vendor_category == 1 || $request->vendor_category == 2 || $request->vendor_category == 3) {
+                if ($vendor_id == 0) {
                     if ($request->vendor_category == 1) {
                         $vendor->services = json_encode(['traditional', 'candid', 'pre-wedding', 'cinematographic', 'drone-shoots', 'photobooth', 'live-screening']);
                     } else if ($request->vendor_category == 2) {
