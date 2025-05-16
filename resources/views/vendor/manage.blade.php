@@ -229,6 +229,47 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="mehendi_service col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label>Services <span class="text-danger">*</span></label>
+                                        <select class="form-control col-12 select2" id="mehendi_service"
+                                            name="services[]" multiple style="width: 100% !important;">
+                                            @php
+                                                $services = isset($vendor->services)
+                                                    ? json_decode($vendor->services, true)
+                                                    : [];
+                                                if (is_string($services)) {
+                                                    $services = json_decode($services, true);
+                                                }
+                                                $services = array_map('trim', $services);
+                                            @endphp
+                                            <option value="traditional-mehndi"
+                                                {{ in_array('traditional-mehndi', $services) ? 'selected' : '' }}>
+                                                Traditional Mehendi
+                                            </option>
+                                            <option value="portrait-mehndi"
+                                                {{ in_array('portrait-mehndi', $services) ? 'selected' : '' }}>
+                                                Portrait Mehendi
+                                            </option>
+                                            <option value="arabic-mehndi"
+                                                {{ in_array('arabic-mehndi', $services) ? 'selected' : '' }}>
+                                                Arabic Mehendi
+                                            </option>
+                                            <option value="bridal-mehndi"
+                                                {{ in_array('bridal-mehndi', $services) ? 'selected' : '' }}>
+                                                Bridal Mehendi
+                                            </option>
+                                            <option value="groom-mehndi"
+                                                {{ in_array('groom-mehndi', $services) ? 'selected' : '' }}>
+                                                Groom Mehendi
+                                            </option>
+                                            <option value="western-mehndi"
+                                                {{ in_array('western-mehndi', $services) ? 'selected' : '' }}>
+                                                Western Mehendi
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="occasion col-sm-6 mb-3">
                                     <div class="form-group">
                                         <label>Occasions <span class="text-danger">*</span></label>
@@ -544,6 +585,7 @@
 
             const photographerserviceSection = document.querySelector('.photographer_service');
             const makeupserviceSection = document.querySelector('.makeup_service');
+            const mehendiserviceSection = document.querySelector('.mehendi_service');
             const occasionSection = document.querySelector('.occasion');
             const photographer_prices = document.querySelector('#photographer_prices');
             const makeup_prices = document.querySelector('#makeup_prices');
@@ -552,13 +594,15 @@
 
             photographerserviceSection.style.display = 'none';
             makeupserviceSection.style.display = 'none';
+            mehendiserviceSection.style.display = 'none';
             occasionSection.style.display = 'none';
             photographer_prices.style.display = 'none';
             makeup_prices.style.display = 'none';
             mehndi_prices.style.display = 'none';
             package_option.style.display = 'block';
 
-            document.querySelectorAll('.photographer_service select, .makeup_service select, #occasions').forEach(
+            document.querySelectorAll(
+                '.photographer_service select, .makeup_service select, .mehendi_service select, #occasions').forEach(
                 select => {
                     select.removeAttribute('required');
                 });
@@ -583,8 +627,14 @@
                 });
                 document.querySelector('#occasions').setAttribute('required', 'required');
             } else if (category_id == 3) {
+                mehendiserviceSection.style.display = 'block';
+                occasionSection.style.display = 'block';
                 mehndi_prices.style.display = 'block';
                 package_option.style.display = 'none';
+                document.querySelectorAll('.mehendi_service select').forEach(select => {
+                    select.setAttribute('required', 'required');
+                });
+                document.querySelector('#occasions').setAttribute('required', 'required');
             }
         }
 
