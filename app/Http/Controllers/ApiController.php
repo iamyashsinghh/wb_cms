@@ -37,7 +37,7 @@ class ApiController extends Controller
     public function cities()
     {
         try {
-            $cities = City::select('id', 'name', 'slug')->get();
+            $cities = City::select('id', 'name', 'slug')->where('status', 1)->get();
             $response = [
                 'success' => true,
                 'data' => $cities,
@@ -254,7 +254,7 @@ class ApiController extends Controller
     {
         try {
             $category_id = VenueCategory::where('slug', $category_slug)->first()->id;
-            $city_id = City::where('slug', $city_slug)->first()->id;
+            $city_id = City::where('slug', $city_slug)->where('status', 1)->first()->id;
 
             $popular_venues = Venue::select(
                 'id',
@@ -334,7 +334,7 @@ class ApiController extends Controller
             $items_per_page = 9;
             $offset = ($page_no - 1) * $items_per_page;
 
-            $city = City::where('slug', $city_slug)->first();
+            $city = City::where('slug', $city_slug)->where('status', 1)->first();
             if (!$city) {
                 throw new \Exception("City not found");
             }
@@ -694,7 +694,7 @@ class ApiController extends Controller
                 $data['venue'] = $venue;
                 $data['similar_packages'] = $similar_packages;
                 $tag = 'venue';
-                $city = City::where('id', $venue->city_id)->first();
+                $city = City::where('id', $venue->city_id)->where('status', 1)->first();
                 $reviews = Review::where(['product_id'=> $venue->id, 'product_for' => 'venue'])->get();
                 $is_redirect = $venue->is_redirect;
 
@@ -715,7 +715,7 @@ class ApiController extends Controller
                 $data['similar_vendors'] = $similar_vendors;
                 $tag = 'vendor';
                 $reviews = Review::where(['product_id' => $vendor->id, 'product_for' => 'vendor'])->get();
-                $city = City::where('id', $vendor->city_id)->first();
+                $city = City::where('id', $vendor->city_id)->where('status', 1)->first();
                 $is_redirect = $vendor->is_redirect;
 
                 $city_slug = $vendor->get_city ? $vendor->get_city->slug : '';
@@ -830,7 +830,7 @@ class ApiController extends Controller
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'message' => $validate->errors()->first()]);
             }
-            $city = City::where('slug', $request->city)->first();
+            $city = City::where('slug', $request->city)->where('status', 1)->first();
             if ($request->business_type == 1) {
                 $business_category = VenueCategory::where('slug', $request->business_category)->first();
             } else {
@@ -1006,7 +1006,7 @@ class ApiController extends Controller
         }
 
         try {
-            $city_id = City::where('slug', $request->city)->first()->id;
+            $city_id = City::where('slug', $request->city)->where('status', 1)->first()->id;
             $location_id = Location::where('slug', $request->location)->first()->id;
 
             // $slug = str_replace(" ", "-", strtolower($request->business_name));
@@ -1127,7 +1127,7 @@ class ApiController extends Controller
             } elseif (count($exist_with_email) > 0) {
                 return response()->json(['success' => false, 'message' => 'invalid email.']);
             }
-            $city_id = City::where('slug', $request->city)->first()->id;
+            $city_id = City::where('slug', $request->city)->where('status', 1)->first()->id;
             $user->name = $request->name;
             $user->city_id = $city_id;
             $user->email = $request->email;
@@ -1224,7 +1224,7 @@ class ApiController extends Controller
             }
 
             $user = new User();
-            $city_id = City::where('slug', $request->city)->first()->id;
+            $city_id = City::where('slug', $request->city)->where('status', 1)->first()->id;
             $location_id = Location::where('slug', $request->location)->first()->id;
 
             $user->city_id = $city_id;
@@ -1384,7 +1384,7 @@ class ApiController extends Controller
 
     public function sitemap_location_venues($city_id)
     {
-        $city = City::where('id', $city_id)->first();
+        $city = City::where('id', $city_id)->where('status', 1)->first();
         if (!$city) {
             return response()->json(['error' => 'City not found'], 404);
         }
@@ -1420,7 +1420,7 @@ class ApiController extends Controller
 
     public function sitemap_location_vendor($city_id)
     {
-        $city = City::where('id', $city_id)->first();
+        $city = City::where('id', $city_id)->where('status', 1)->first();
         if (!$city) {
             return response()->json(['error' => 'City not found'], 404);
         }
@@ -1455,7 +1455,7 @@ class ApiController extends Controller
     }
 
     public function sitemap_vendor($city_id){
-        $city = City::where('id', $city_id)->first();
+        $city = City::where('id', $city_id)->where('status', 1)->first();
         if (!$city) {
             return response()->json(['error' => 'City not found'], 404);
         }
@@ -1481,7 +1481,7 @@ class ApiController extends Controller
         return response()->json(['sitemap' => $sitemap]);
     }
     public function sitemap_venue($city_id){
-        $city = City::where('id', $city_id)->first();
+        $city = City::where('id', $city_id)->where('status', 1)->first();
         if (!$city) {
             return response()->json(['error' => 'City not found'], 404);
         }
