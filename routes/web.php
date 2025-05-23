@@ -118,6 +118,7 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
         Route::prefix('city')->controller(Controllers\CityController::class)->group(function () {
             Route::get('/list', 'list')->name('city.list');
             Route::post('/manage_process', 'manage_process')->name('city.manage_process');
+            Route::get('/update_status/{city_id?}/{status?}', 'update_status')->name('city.update_status');
             Route::get('/delete/{city_id}', 'delete')->name('city.delete');
         });
 

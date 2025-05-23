@@ -49,6 +49,19 @@ class CityController extends Controller {
         return redirect()->back();
     }
 
+    public function update_status($city_id, $status)
+    {
+        try {
+            $city = City::find($city_id);
+            $city->status = $status;
+            $city->save();
+            $res = response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'City status updated!']);
+        } catch (\Throwable $th) {
+            $res = response()->json(['success' => false, 'alert_type' => 'danger', 'message' => 'Someting went wrong!']);
+        }
+        return $res;
+    }
+
     // public function db_refactor_process() {
 
     //     $old_data = DB::connection('mysql2')->table('budget')->get();
