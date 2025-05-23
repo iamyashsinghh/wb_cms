@@ -91,12 +91,12 @@
                 fetch(`${submit_url}/${data_id}/${data_status}`).then(response => response.json()).then(data => {
                     if (data.success === true) {
                         const icon = elem.firstChild;
-                        if (data_status == 0) {
+                        if (data_status == 1) {
                             icon.classList = `fa fa-toggle-off text-danger`;
-                            elem.setAttribute('data-status', 1);
+                            elem.setAttribute('data-status', 0);
                         } else {
                             icon.classList = `fa fa-toggle-on text-success`;
-                            elem.setAttribute('data-status', 0);
+                            elem.setAttribute('data-status', 1);
                         }
                     }
                     toastr[data.alert_type](data.message);
