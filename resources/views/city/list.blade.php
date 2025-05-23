@@ -90,13 +90,13 @@
                 const data_status = elem.getAttribute('data-status');
                 fetch(`${submit_url}/${data_id}/${data_status}`).then(response => response.json()).then(data => {
                     if (data.success === true) {
-                        const icon = elem.firstChild;
-                        if (data_status == 1) {
-                            icon.classList = `fa fa-toggle-off text-danger`;
-                            elem.setAttribute('data-status', 0);
-                        } else {
-                            icon.classList = `fa fa-toggle-on text-success`;
+                        const icon = elem.querySelector('i');
+                        if (data_status == 0) {
+                            icon.className = 'fa fa-toggle-off text-danger';
                             elem.setAttribute('data-status', 1);
+                        } else {
+                            icon.className = 'fa fa-toggle-on text-success';
+                            elem.setAttribute('data-status', 0);
                         }
                     }
                     toastr[data.alert_type](data.message);
