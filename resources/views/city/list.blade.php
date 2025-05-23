@@ -43,13 +43,13 @@
                                     <td>
                                         @canany(['publish city', 'super power'])
                                             @if ($list->status == 1)
-                                                <a href="javascript:void(0);" data-id="{{ $list->status }}" data-status="0"
+                                                <a href="javascript:void(0);" data-id="{{ $list->id }}" data-status="0"
                                                     data-submit-url="{{ route('city.update_status') }}"
                                                     onclick="handle_update_status(this)" style="font-size: 22px;">
                                                     <i class="fa fa-toggle-on text-success"></i>
                                                 </a>
                                             @else
-                                                <a href="javascript:void(0);" data-id="{{ $list->status }}" data-status="1"
+                                                <a href="javascript:void(0);" data-id="{{ $list->id }}" data-status="1"
                                                     data-submit-url="{{ route('city.update_status') }}"
                                                     onclick="handle_update_status(this)" style="font-size: 22px;">
                                                     <i class="fa fa-toggle-off text-danger"></i>
