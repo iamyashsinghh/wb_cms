@@ -52,10 +52,16 @@ class CityController extends Controller {
     public function update_status($city_id, $status)
     {
         try {
-            $city = City::find($city_id);
+            $city = City::where('id', $city_id)->first();
+            if (!$city) {
+                return response()->json(['success' => false, 'alert_type' => 'danger', 'message' => 'City not found!']);
+            }
             $city->status = $status;
-            $city->save();
-            $res = response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'City status updated!']);
+            if ($city->save()) {
+                $res = response()->json(['success' => true, 'alert_type' => 'success', 'message' => 'City status updated!']);
+            } else {
+                $res = response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Internal server error!']);
+            }
         } catch (\Throwable $th) {
             $res = response()->json(['success' => false, 'alert_type' => 'danger', 'message' => 'Someting went wrong!']);
         }
