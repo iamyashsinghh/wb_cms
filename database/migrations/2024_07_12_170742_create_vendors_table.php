@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('package_price')->nullable();
             $table->char('yrs_exp')->nullable();
             $table->char('event_completed')->nullable();
+            $table->string('related_location_ids')->nullable();
             $table->mediumText('summary')->nullable();
             $table->mediumText('images')->nullable();
             $table->string('similar_vendor_ids')->nullable()->comment('Contains array');

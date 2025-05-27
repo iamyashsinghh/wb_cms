@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->foreign('location_id')->references('id')->on('locations');
             $table->unsignedBigInteger('vendor_category_id');
             $table->foreign('vendor_category_id')->references('id')->on('vendor_categories');
+            $table->string('related_location_ids')->comment('Contains array')->nullable();
             $table->string('brand_name');
             $table->string('slug');
             $table->string('phone');

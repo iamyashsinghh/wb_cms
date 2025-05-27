@@ -7,6 +7,7 @@
 @endsection
 @section('main')
     @php
+        $related_location_ids = explode(',', $vendor->related_location_ids);
         $similar_vendor_id_arr = explode(',', $vendor->similar_vendor_ids);
         $package_option = $vendor->package_option != null ? explode(',', $vendor->package_option) : [];
     @endphp
@@ -134,6 +135,22 @@
                                         <input type="number" class="form-control"
                                             placeholder="Enter no. of event completed" name="event_completed"
                                             value="{{ $vendor->event_completed }}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-group">
+                                        <label>Related Location</label>
+                                        <select class="form-control select2" name="related_locations[]"
+                                            id="related_location_select" multiple>
+                                            @foreach ($locations as $list)
+                                                <option value="{{ $list->id }}"
+                                                    {{ array_search($list->id, $related_location_ids) !== false ? 'selected' : '' }}>
+                                                    {{ $list->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('related_location')
+                                            <span class="ml-1 text-sm text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="col-sm-9 mb-3">

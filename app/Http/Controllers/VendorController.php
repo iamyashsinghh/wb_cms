@@ -88,6 +88,7 @@ class VendorController extends Controller
                 'id' => 0,
                 'city_id' => '',
                 'vendor_category_id' => '',
+                'related_location_ids' => '',
                 'place_rating' => '',
                 'yrs_exp' => '',
                 'event_completed' => '',
@@ -138,6 +139,7 @@ class VendorController extends Controller
         try {
             $vendor->city_id = $request->city;
             $vendor->location_id = $request->location;
+            $vendor->related_location_ids = is_array($request->related_locations) ? implode(",", $request->related_locations) : null;
             $vendor->vendor_category_id = $request->vendor_category;
             $vendor->brand_name = $request->brand_name;
             $vendor->slug = $request->slug;
