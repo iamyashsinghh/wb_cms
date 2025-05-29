@@ -686,8 +686,11 @@ class ApiController extends Controller
     {
         try {
             $data = [];
+            $is_404 = false;
 
             $venue = Venue::where('slug', $slug)->first();
+
+
             if ($venue) {
                 $similar_packages = Venue::select('id', 'name', 'images', 'venue_address', 'phone', 'slug', 'min_capacity', 'max_capacity', 'veg_price', 'nonveg_price', 'wb_assured')
                     ->whereIn('id', explode(',', $venue->similar_venue_ids))
@@ -705,6 +708,9 @@ class ApiController extends Controller
                 $category = $venue->get_category ? $venue->get_category->slug : '';
 
                 $redirect_url = "$category/$city_slug/$locality";
+                if ($venue->status == 0) {
+                    $is_404 = true;
+                }
             } else {
 
                 $vendor = Vendor::where('slug', $slug)->first();
@@ -725,18 +731,26 @@ class ApiController extends Controller
                 $category = $vendor->get_category ? $vendor->get_category->slug : '';
 
                 $redirect_url = "$category/$city_slug/all";
+                if ($vendor->status == 0) {
+                    $is_404 = true;
+                }
             }
 
-            $response = [
-                'success' => true,
-                'tag' => $tag,
-                'data' => $data,
-                'city' => $city,
-                'reviews' => $reviews,
-                'is_redirect' => $is_redirect,
-                'redirect_url' => $redirect_url,
-                'message' => 'Data fetched successfully',
-            ];
+            if($is_404){
+                $response['success'] = false;
+                $response['message'] = 'Data not found';
+            }else{
+                $response = [
+                    'success' => true,
+                    'tag' => $tag,
+                    'data' => $data,
+                    'city' => $city,
+                    'reviews' => $reviews,
+                    'is_redirect' => $is_redirect,
+                    'redirect_url' => $redirect_url,
+                    'message' => 'Data fetched successfully',
+                ];
+            }
         } catch (\Throwable $th) {
             $response = [
                 'success' => false,
