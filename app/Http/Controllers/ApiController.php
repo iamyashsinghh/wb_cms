@@ -198,7 +198,7 @@ class ApiController extends Controller
     public function state_management()
     {
         try {
-            $cities = City::select('id', 'name', 'slug')->get();
+            $cities = City::select('id', 'name', 'slug')->where('status', 1)->get();
             $venue_categories = VenueCategory::select('id', 'name', 'slug')->get();
             foreach ($venue_categories as $venuecat) {
                 $venue_count = Vendor::where('vendor_category_id', $venuecat->id)->count();
