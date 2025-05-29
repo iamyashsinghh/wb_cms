@@ -44,6 +44,7 @@
     @include('includes.update_phone_no_modal')
     @include('includes.delete_vendor_venue_modal')
     @include('includes.update_meta_modal')
+    @include('includes.update_faq_modal')
 </div>
 @endsection
 @section('footer-script')
@@ -131,6 +132,7 @@
                         <li><a class="dropdown-item" href="{{route('vendor.manage_images')}}/${data[0]}">Update Images</a></li>
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_phone_no('vendor', ${data[0]})">Update Phone Number</a></li>
                         <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_meta('vendor', ${data[0]})">Update Meta</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_faq(${data[0]})">Update FAQ</a></li>
                     </ul>
                 </div>
                 @endcanany`;
@@ -146,6 +148,61 @@
     deleteVendorForm.action = actionUrl;
     deleteVendorModal.show();
 }
+
+ function handle_update_faq(vendor_id) {
+            fetch(`{{ route('vendor.fetch_faq') }}/${vendor_id}`).then(response => response.json()).then(data => {
+                const faqs = JSON.parse(data.faq);
+                const updateFaqModal = document.getElementById("updateFaqModal");
+                const modal = new bootstrap.Modal(updateFaqModal);
+
+                updateFaqModal.querySelector('form').action = `{{ route('venue.update_faq') }}/${vendor_id}`;
+                updateFaqModal.querySelector('#faq_modal_body').innerHTML = "";
+
+                if (faqs != null && faqs.length > 0) {
+                    for (let faq of faqs) {
+                        const faqElem = `<div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label for="desc_text">FAQ Question <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="desc_text" placeholder="Enter faq question" name="faq_question[]" required rows="1">${faq.question}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="desc_text">FAQ Answer <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="desc_text" placeholder="Enter meta description" name="faq_answer[]" required rows="1">${faq.answer}</textarea>
+                            </div>
+                        </div>
+                        <div class="col m-auto">
+                            <button type="button" class="btn btn-sm text-danger" onclick="handle_remove_faq(this)"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>`;
+                        updateFaqModal.querySelector('#faq_modal_body').innerHTML += faqElem;
+                    }
+                } else {
+                    const faqElem = `<div class="row">
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <label for="desc_text">FAQ Question <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="desc_text" placeholder="Enter faq question" name="faq_question[]" required rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="desc_text">FAQ Answer <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="desc_text" placeholder="Enter meta description" name="faq_answer[]" required rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <button type="button" class="btn btn-sm text-danger" onclick="handle_remove_faq(this)"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>`;
+                    updateFaqModal.querySelector('#faq_modal_body').innerHTML = faqElem;
+                }
+
+                modal.show();
+            });
+        }
 
     function handle_update_phone_no(vendor_id){
         const action_url = `{{route('vendor.update_phoneNumber')}}/${vendor_id}`;

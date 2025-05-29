@@ -355,6 +355,7 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
             Route::delete('/destroy/{id}', 'destroy')->name('vendor.destroy');
             //ajax route
             Route::get('/fetch_meta/{vendor_id?}', 'fetch_meta')->name('vendor.fetch_meta');
+            Route::get('/fetch_faq/{vendor_id?}', 'fetch_faq')->name('vendor.fetch_faq');
             Route::get('/get_similar_vendors/{category_id?}/{city_id?}', 'get_similar_vendors')->name('vendor.get_similar_vendors');
             Route::get('/update_status/{vendor_id?}/{status?}', 'update_status')->name('vendor.update_status');
             Route::get('/update_popular_status/{vendor_id?}/{status?}', 'update_popular_status')->name('vendor.update_popular_status');
