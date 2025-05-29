@@ -185,16 +185,16 @@ class ApiController extends Controller
 
     public function search_form_result_venue()
     {
-        $city = City::where('status', 1)->pluck('id');
-        $venue = Venue::Select('id', 'name', 'slug')->where('city_id', $city->id)->get();
-        return $venue;
+        $cityIds = City::where('status', 1)->pluck('id');
+        $venues = Venue::select('id', 'name', 'slug')->whereIn('city_id', $cityIds)->get();
+        return $venues;
     }
 
     public function search_form_result_vendor()
     {
-        $city = City::where('status', 1)->pluck('id');
-        $vendor = Vendor::Select('id', 'brand_name', 'slug')->where('city_id', $city->id)->get();
-        return $vendor;
+        $cityIds = City::where('status', 1)->pluck('id');
+        $vendors = Vendor::select('id', 'brand_name', 'slug')->whereIn('city_id', $cityIds)->get();
+        return $vendors;
     }
 
     public function state_management()
