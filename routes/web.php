@@ -308,6 +308,8 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
             Route::post('/manage_process/{blog_id?}', 'manage_process')->name('blog.manage_process');
             Route::get('/update_popular_status/{blog_id?}/{status?}', 'update_popular_status')->name('blog.popular');
             Route::get('/update_blog_status/{blog_id?}/{status?}', 'update_blog_status')->name('blog.status');
+            Route::get('/fetch_faq/{blog_id?}', 'fetch_faq')->name('blog.fetch_faq');
+            Route::post('/update_faq/{blog_id?}', 'update_faq')->name('blog.update_faq');
 
 
             Route::get('/check-slug/{slug?}', 'checkSlug')->name('check-slug');
@@ -356,6 +358,7 @@ Route::group(['middleware' => ['admin', 'checkLoginTime']], function () {
             //ajax route
             Route::get('/fetch_meta/{vendor_id?}', 'fetch_meta')->name('vendor.fetch_meta');
             Route::get('/fetch_faq/{vendor_id?}', 'fetch_faq')->name('vendor.fetch_faq');
+            Route::post('/update_faq/{vendor_id?}', 'update_faq')->name('vendor.update_faq');
             Route::get('/get_similar_vendors/{category_id?}/{city_id?}', 'get_similar_vendors')->name('vendor.get_similar_vendors');
             Route::get('/update_status/{vendor_id?}/{status?}', 'update_status')->name('vendor.update_status');
             Route::get('/update_popular_status/{vendor_id?}/{status?}', 'update_popular_status')->name('vendor.update_popular_status');

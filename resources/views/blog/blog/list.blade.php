@@ -3,6 +3,7 @@
 
 @section('header-css')
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 @endsection
 @section('main')
     <div class="content-wrapper pb-5">
@@ -42,6 +43,7 @@
                 </div>
             </div>
         </section>
+        @include('includes.update_faq_modal')
     </div>
 @endsection
 @section('footer-script')
@@ -106,7 +108,8 @@
                     td_elements[3].innerHTML = status;
                     td_elements[4].innerHTML = popular;
                     td_elements[5].innerText = moment(data[5]).format("DD-MMM-YYYY hh:mm a");
-                    let shedule = `<input type="datetime-local" data-id="${data[0]}" value="${data[7]}" class="form-control schedule-input" placeholder="Schedule Date & Time">`;
+                    let shedule =
+                        `<input type="datetime-local" data-id="${data[0]}" value="${data[7]}" class="form-control schedule-input" placeholder="Schedule Date & Time">`;
                     td_elements[6].innerHTML = shedule;
                     td_elements[7].innerHTML = `
                         @canany(['edit blog', 'super power'])
@@ -119,35 +122,48 @@
                                 <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                             </a>
                         @endcanany
+                         <div class="dropdown d-inline-block mx-2" style=>
+                            <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-caret-down text-dark"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_faq(${data[0]})">Update FAQ</a></li>
+                            </ul>
+                        </div>
                     `;
                 }
             });
 
             $(document).on('change', '.schedule-input', function() {
-        const blogId = $(this).data('id');
-        const scheduleDate = $(this).val();
+                const blogId = $(this).data('id');
+                const scheduleDate = $(this).val();
 
-        updateSchedule(blogId, scheduleDate);
-    });
+                updateSchedule(blogId, scheduleDate);
+            });
 
-    function updateSchedule(blogId, scheduleDate) {
-        $.ajax({
-            url: `{{ route('blog.update_schedule') }}`,
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            data: { id: blogId, schedule_date: scheduleDate },
-            success: function(response) {
-                if (response.success) {
-                    toastr.success(response.message);
-                } else {
-                    toastr.error(response.message);
-                }
-            },
-            error: function() {
-                toastr.error('An error occurred while updating the schedule.');
+            function updateSchedule(blogId, scheduleDate) {
+                $.ajax({
+                    url: `{{ route('blog.update_schedule') }}`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        id: blogId,
+                        schedule_date: scheduleDate
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('An error occurred while updating the schedule.');
+                    }
+                });
             }
-        });
-    }
         });
 
         function handle_update_status(elem) {
@@ -189,8 +205,59 @@
             }
         }
 
+        function handle_update_faq(blog_id) {
+            fetch(`{{ route('blog.fetch_faq') }}/${blog_id}`).then(response => response.json()).then(data => {
+                const faqs = JSON.parse(data.faq);
+                const updateFaqModal = document.getElementById("updateFaqModal");
+                const modal = new bootstrap.Modal(updateFaqModal);
 
+                updateFaqModal.querySelector('form').action = `{{ route('blog.update_faq') }}/${blog_id}`;
+                updateFaqModal.querySelector('#faq_modal_body').innerHTML = "";
 
+                if (faqs != null && faqs.length > 0) {
+                    for (let faq of faqs) {
+                        const faqElem = `<div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label for="desc_text">FAQ Question <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="desc_text" placeholder="Enter faq question" name="faq_question[]" required rows="1">${faq.question}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="desc_text">FAQ Answer <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="desc_text" placeholder="Enter meta description" name="faq_answer[]" required rows="1">${faq.answer}</textarea>
+                            </div>
+                        </div>
+                        <div class="col m-auto">
+                            <button type="button" class="btn btn-sm text-danger" onclick="handle_remove_faq(this)"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>`;
+                        updateFaqModal.querySelector('#faq_modal_body').innerHTML += faqElem;
+                    }
+                } else {
+                    const faqElem = `<div class="row">
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <label for="desc_text">FAQ Question <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="desc_text" placeholder="Enter faq question" name="faq_question[]" required rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="desc_text">FAQ Answer <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="desc_text" placeholder="Enter meta description" name="faq_answer[]" required rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="col m-auto">
+                        <button type="button" class="btn btn-sm text-danger" onclick="handle_remove_faq(this)"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>`;
+                    updateFaqModal.querySelector('#faq_modal_body').innerHTML = faqElem;
+                }
 
+                modal.show();
+            });
+        }
     </script>
 @endsection

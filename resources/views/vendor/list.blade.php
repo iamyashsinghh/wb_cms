@@ -149,13 +149,13 @@
     deleteVendorModal.show();
 }
 
- function handle_update_faq(vendor_id) {
+  function handle_update_faq(vendor_id) {
             fetch(`{{ route('vendor.fetch_faq') }}/${vendor_id}`).then(response => response.json()).then(data => {
                 const faqs = JSON.parse(data.faq);
                 const updateFaqModal = document.getElementById("updateFaqModal");
                 const modal = new bootstrap.Modal(updateFaqModal);
 
-                updateFaqModal.querySelector('form').action = `{{ route('venue.update_faq') }}/${vendor_id}`;
+                updateFaqModal.querySelector('form').action = `{{ route('vendor.update_faq') }}/${vendor_id}`;
                 updateFaqModal.querySelector('#faq_modal_body').innerHTML = "";
 
                 if (faqs != null && faqs.length > 0) {
@@ -212,17 +212,6 @@
         updatePhoneNoModal.querySelector('input[name="phone_number"]').value = "";
         modal.show();
     }
-
-    function handle_update_phone_no(vendor_id){
-        const action_url = `{{route('vendor.update_phoneNumber')}}/${vendor_id}`;
-        const updatePhoneNoModal = document.getElementById('updatePhoneNoModal');
-        const modal = new bootstrap.Modal(updatePhoneNoModal);
-        updatePhoneNoModal.querySelector('form').action = action_url;
-        updatePhoneNoModal.querySelector('input[name="phone_number"]').value = "";
-        modal.show();
-    }
-
-
 
     function handle_update_status(elem){
         if(confirm("Are you sure want to update the status")){

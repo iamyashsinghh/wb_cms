@@ -310,7 +310,53 @@ class VendorController extends Controller
         return redirect()->back();
     }
 
-    //for faq methods
+    // //for faq methods
+    // public function fetch_faq($vendor_id)
+    // {
+    //     try {
+    //         $faq = Vendor::select('faq')->where('id', $vendor_id)->first();
+    //         if ($faq) {
+    //             $response = response()->json(['success' => true, 'alert_type' => 'success', 'faq' => $faq->faq]);
+    //         } else {
+    //             $response = response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Data not found.']);
+    //         }
+    //     } catch (\Throwable $th) {
+    //         $response = response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong. ' . $th->getMessage()]);
+    //     }
+    //     return $response;
+    // }
+    // public function update_faq(Request $request, $vendor_id)
+    // {
+    //     $validate = Validator::make($request->all(), [
+    //         'faq_question' => 'required',
+    //         'faq_answer' => 'required',
+    //     ]);
+
+    //     if ($validate->fails()) {
+    //         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
+    //         return redirect()->back();
+    //     }
+
+    //     $faq_arr = [];
+    //     for ($i = 0; $i < sizeof($request->faq_question); $i++) {
+    //         $data = ['question' => $request->faq_question[$i], 'answer' => $request->faq_answer[$i]];
+    //         array_push($faq_arr, $data);
+    //     }
+
+    //     $vendor = Vendor::find($vendor_id);
+    //     if (!$vendor) {
+    //         session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+    //         return redirect()->back();
+    //     }
+
+    //     $vendor->faq = $faq_arr;
+    //     $vendor->save();
+
+    //     session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'FAQ updated.']);
+    //     return redirect()->back();
+    // }
+
+        //for faq methods
     public function fetch_faq($vendor_id)
     {
         try {

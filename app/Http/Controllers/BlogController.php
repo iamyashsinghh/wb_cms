@@ -187,4 +187,49 @@ class BlogController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Failed to update schedule date.']);
     }
+    //for faq methods
+    public function fetch_faq($blog_id)
+    {
+        try {
+            $faq = Blog::select('faq')->where('id', $blog_id)->first();
+            if ($faq) {
+                $response = response()->json(['success' => true, 'alert_type' => 'success', 'faq' => $faq->faq]);
+            } else {
+                $response = response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Data not found.']);
+            }
+        } catch (\Throwable $th) {
+            $response = response()->json(['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong. ' . $th->getMessage()]);
+        }
+        return $response;
+    }
+    public function update_faq(Request $request, $blog_id)
+    {
+        $validate = Validator::make($request->all(), [
+            'faq_question' => 'required',
+            'faq_answer' => 'required',
+        ]);
+
+        if ($validate->fails()) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => $validate->errors()->first()]);
+            return redirect()->back();
+        }
+
+        $faq_arr = [];
+        for ($i = 0; $i < sizeof($request->faq_question); $i++) {
+            $data = ['question' => $request->faq_question[$i], 'answer' => $request->faq_answer[$i]];
+            array_push($faq_arr, $data);
+        }
+
+        $blog = Blog::find($blog_id);
+        if (!$blog) {
+            session()->flash('status', ['success' => false, 'alert_type' => 'error', 'message' => 'Something went wrong.']);
+            return redirect()->back();
+        }
+
+        $blog->faq = $faq_arr;
+        $blog->save();
+
+        session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'FAQ updated.']);
+        return redirect()->back();
+    }
 }
