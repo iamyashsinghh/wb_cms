@@ -15,7 +15,7 @@ class AdminAuth {
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next) {
-        return view('maintenance');
+        return response()->view('maintenance');
         if (Auth::guard('admin')->check()) {
             return $next($request);
         }  else {
