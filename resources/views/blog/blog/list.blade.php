@@ -112,6 +112,7 @@
                         `<input type="datetime-local" data-id="${data[0]}" value="${data[7]}" class="form-control schedule-input" placeholder="Schedule Date & Time">`;
                     td_elements[6].innerHTML = shedule;
                     td_elements[7].innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center;">
                         @canany(['edit blog', 'super power'])
                             <a href="{{ route('blog.manage') }}/${data[0]}" class="text-success mx-2" title="Edit">
                                 <i class="fa fa-edit" style="font-size: 15px;"></i>
@@ -122,13 +123,14 @@
                                 <i class="fa fa-trash-alt" style="font-size: 15px;"></i>
                             </a>
                         @endcanany
-                         <div class="dropdown d-inline-block mx-2" style=>
+                        <div class="dropdown d-inline-block mx-2" style=>
                             <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-caret-down text-dark"></i>
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="javascript:void(0);" onclick="handle_update_faq(${data[0]})">Update FAQ</a></li>
                             </ul>
+                        </div>
                         </div>
                     `;
                 }
