@@ -13,6 +13,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Models\Venue;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ExcelImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
  */
+
+Route::get('/import-meta', [ExcelImportController::class, 'importMeta']);
 
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);

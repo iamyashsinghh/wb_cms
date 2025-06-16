@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Location extends Model {
     use HasFactory, SoftDeletes;
+    protected $table = 'locations';
 
     // public function get_group_localities(){ //not in use
     //     $locality_id_arr = explode(",", $this->locality_ids);

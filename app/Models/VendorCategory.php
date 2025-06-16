@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class VendorCategory extends Model {
     use HasFactory, SoftDeletes;
+    protected $table = 'vendor_categories';
+    protected $guarded = [];
 }
