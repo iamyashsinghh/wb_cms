@@ -26,7 +26,8 @@ use App\Http\Controllers\ExcelImportController;
 |
  */
 
-Route::get('/import-meta', [ExcelImportController::class, 'importMeta']);
+Route::post('/vendor/import-meta', [App\Http\Controllers\ExcelImportController::class, 'uploadMeta'])->name('vendor.import.meta');
+
 
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);

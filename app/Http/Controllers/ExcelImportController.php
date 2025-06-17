@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Imports\MetaImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 
 class ExcelImportController extends Controller
 {
-    public function importMeta()
-    {
-        $import = new MetaImport();
+    public function uploadMeta(Request $request)
+{
+    $request->validate([
+        'excel_file' => 'required|mimes:xlsx,xls,csv|max:2048',
+    ]);
 
-        // Excel file should be in: storage/app/meta.xlsx
-        Excel::import($import, storage_path('app/meta.xlsx'));
+    try {
+        $import = new \App\Imports\MetaImport();
+        Excel::import($import, $request->file('excel_file'));
 
-        return response()->json([
-            'message' => 'Data imported successfully!',
-            'rows' => $import->data,
-        ]);
+        return redirect()->back()->with('success', 'File uploaded and data imported successfully!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Upload failed: ' . $e->getMessage());
     }
+}
 }
