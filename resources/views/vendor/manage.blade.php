@@ -36,7 +36,7 @@
                             @endcanany
                         @endif
                     </div>
-                    <form action="{{ route('vendor.manage_process', $vendor->id) }}" method="post"
+                    <form id="vendorForm" method="post" action="{{ route('vendor.manage_process', $vendor->id) }}"
                         enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="business_user_id"
@@ -546,6 +546,8 @@
                                 </div>
                                 <div class="col text-right">
                                     <a href="{{ route('vendor.list') }}" class="btn btn-sm bg-secondary m-1">Back</a>
+                                    <button type="button" class="btn btn-warning m-1" id="revertButton">Revert</button>
+                                    <button type="button" class="btn btn-info" id="draftButton">Draft Saved</button>
                                     <button type="submit" class="btn btn-sm m-1 text-light"
                                         style="background-color: var(--wb-dark-red);">Submit</button>
                                 </div>
@@ -583,6 +585,121 @@
                     }
                 }
             });
+
+            // --- CAPTURE ORIGINAL FORM DATA ---
+            function getFormData($form) {
+                // Sync Summernote editors into textareas
+                $('.summernote').each(function() {
+                    $(this).val($(this).summernote('code'));
+                });
+                const formData = $form.serializeArray();
+                let data = {};
+                formData.forEach(function(item) {
+                    if (data[item.name]) {
+                        if (Array.isArray(data[item.name])) {
+                            data[item.name].push(item.value);
+                        } else {
+                            data[item.name] = [data[item.name], item.value];
+                        }
+                    } else {
+                        data[item.name] = item.value;
+                    }
+                });
+                return data;
+            }
+            originalData = getFormData($('#vendorForm'));
+
+            // --- LOAD DRAFT DATA IF EXISTS ---
+            @if ($vendor->draft_data)
+                try {
+                    let draft = JSON.parse(@json($vendor->draft_data));
+                    for (let key in draft) {
+                        let $el = $('[name="' + key + '"]');
+                        if ($el.length) {
+                            if ($el.attr('type') === 'checkbox' || $el.attr('type') === 'radio') {
+                                $el.each(function() {
+                                    if ($(this).val() == draft[key]) $(this).prop('checked', true);
+                                });
+                            } else if ($el.is('select[multiple]')) {
+                                $el.val(draft[key]).trigger('change');
+                            } else {
+                                $el.val(draft[key]);
+                            }
+                        }
+                    }
+                    // For summernote
+                    if (draft['summary']) {
+                        $('.summernote').summernote('code', draft['summary']);
+                    }
+                } catch (e) {}
+            @endif
+
+            // --- AUTO-SAVE ON CHANGE ---
+            let autoSaveTimer;
+            $('#vendorForm').on('input change', 'input, select, textarea', function() {
+                clearTimeout(autoSaveTimer);
+                $('#draftButton').text('Saving...');
+                autoSaveTimer = setTimeout(() => {
+                    saveDraft();
+                }, 1000);
+            });
+
+            // --- SAVE DRAFT FUNCTION ---
+            function saveDraft() {
+                let data = getFormData($('#vendorForm'));
+                $.ajax({
+                    url: "{{ route('vendor.saveDraft', $vendor->id) }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        draft_data: JSON.stringify(data)
+                    },
+                    success: function() {
+                        $('#draftButton').text('Draft Saved');
+                    },
+                    error: function() {
+                        $('#draftButton').text('Error');
+                    }
+                });
+            }
+
+            // --- REVERT BUTTON FUNCTION ---
+            $('#revertButton').on('click', function() {
+                for (let key in originalData) {
+                    let $el = $('[name="' + key + '"]');
+                    if ($el.length) {
+                        if ($el.attr('type') === 'checkbox' || $el.attr('type') === 'radio') {
+                            $el.each(function() {
+                                if ($(this).val() == originalData[key]) $(this).prop('checked',
+                                    true);
+                                else $(this).prop('checked', false);
+                            });
+                        } else if ($el.is('select[multiple]')) {
+                            $el.val(originalData[key]).trigger('change');
+                        } else {
+                            $el.val(originalData[key]);
+                        }
+                    }
+                }
+                // For summernote
+                if (originalData['summary']) {
+                    $('.summernote').summernote('code', originalData['summary']);
+                }
+                // Remove draft from DB
+                $.ajax({
+                    url: "{{ route('vendor.saveDraft', $vendor->id) }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        draft_data: ''
+                    },
+                    success: function() {
+                        toastr.success('Form reverted to original values.');
+                        $('#draftButton').text('Draft Cleared');
+                    }
+                });
+            });
+
 
             function updateTag() {
 

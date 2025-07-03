@@ -152,15 +152,15 @@ class VenueController extends Controller
             ];
 
             $rand_no = rand(0, 2);
-        $selected_veg_template = $veg_templates[$rand_no];
-        $selected_nonveg_template = $nonveg_templates[$rand_no];
+            $selected_veg_template = $veg_templates[$rand_no];
+            $selected_nonveg_template = $nonveg_templates[$rand_no];
 
-        $veg_meals = collect($selected_veg_template)->map(function ($value, $name) {
-            return ['name' => $name, 'package' => $value];
-        });
-        $nonveg_meals = collect($selected_nonveg_template)->map(function ($value, $name) {
-            return ['name' => $name, 'package' => $value];
-        });
+            $veg_meals = collect($selected_veg_template)->map(function ($value, $name) {
+                return ['name' => $name, 'package' => $value];
+            });
+            $nonveg_meals = collect($selected_nonveg_template)->map(function ($value, $name) {
+                return ['name' => $name, 'package' => $value];
+            });
 
 
             $page_heading = "Add Venue";
@@ -613,5 +613,13 @@ class VenueController extends Controller
         $venue->save();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Redirect Updated successfully.']);
         return redirect()->back();
+    }
+
+    public function saveDraft(Request $request, $venue_id)
+    {
+        $venue = \App\Models\Venue::findOrFail($venue_id);
+        $venue->draft_data = $request->draft_data ?? '';
+        $venue->save();
+        return response()->json(['success' => true]);
     }
 }

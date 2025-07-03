@@ -26,8 +26,19 @@ use App\Http\Controllers\ExcelImportController;
 |
  */
 
+ //Excel Import Data Routes
 Route::post('/vendor/import-meta', [App\Http\Controllers\ExcelImportController::class, 'uploadMeta'])->name('vendor.import.meta');
 
+//Draft Save Routes for Venue
+Route::post('/venue/save-draft/{venue_id}', [\App\Http\Controllers\VenueController::class, 'saveDraft'])->name('venue.saveDraft');
+Route::post('/venue/listing-meta/save-draft/{meta_id}', [\App\Http\Controllers\VenueListingMetaController::class, 'saveDraft'])->name('venue.listing_meta.saveDraft');
+
+//Draft Save Routes for Vendor
+Route::post('/vendor/save-draft/{vendor_id}', [\App\Http\Controllers\VendorController::class, 'saveDraft'])->name('vendor.saveDraft');
+Route::post('/vendor/listing-meta/save-draft/{meta_id}', [\App\Http\Controllers\VendorListingMetaController::class, 'saveDraft'])->name('vendor.listing_meta.saveDraft');
+
+//Draft Save Routes for Blog
+Route::post('/blog/save-draft/{blog_id}', [\App\Http\Controllers\BlogController::class, 'saveDraft'])->name('blog.saveDraft');
 
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);

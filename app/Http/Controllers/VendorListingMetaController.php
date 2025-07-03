@@ -166,4 +166,12 @@ class VendorListingMetaController extends Controller {
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'FAQ updated.']);
         return redirect()->back();
     }
+    
+     public function saveDraft(Request $request, $meta_id)
+    {
+        $meta = \App\Models\VendorListingMeta::findOrFail($meta_id);
+        $meta->draft_data = $request->draft_data ?? '';
+        $meta->save();
+        return response()->json(['success' => true]);
+    }
 }

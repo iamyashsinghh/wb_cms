@@ -10,6 +10,9 @@ class Venue extends Model
 {
     use HasFactory, SoftDeletes;
     protected $guarded = [];
+    protected $casts = [
+        'draft_data' => 'array', 
+    ];
     public function reviews()
     {
         return $this->belongsToMany(Review::class, 'vendor_venue_review', 'venue_id', 'review_id');

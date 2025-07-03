@@ -9,8 +9,10 @@ use App\Models\VenueListingMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class VenueListingMetaController extends Controller {
-    public function ajax_list() {
+class VenueListingMetaController extends Controller
+{
+    public function ajax_list()
+    {
         $data = VenueListingMeta::select(
             'venue_listing_metas.id',
             'venue_listing_metas.slug',
@@ -25,7 +27,8 @@ class VenueListingMetaController extends Controller {
         return datatables($data)->make(false);
     }
 
-    public function manage($meta_id = 0) {
+    public function manage($meta_id = 0)
+    {
         $categories = VenueCategory::select('id', 'name')->orderBy('name', 'asc')->get();
         $cities = City::select('id', 'name')->orderBy('name', 'asc')->get();
         if ($meta_id > 0) {
@@ -51,7 +54,8 @@ class VenueListingMetaController extends Controller {
         return view('venue.manage_listing_meta', compact('meta', 'page_heading', 'categories', 'cities', 'locations'));
     }
 
-    public function manage_process(Request $request, $meta_id = 0) {
+    public function manage_process(Request $request, $meta_id = 0)
+    {
         $validate = Validator::make($request->all(), [
             'category' => 'required|int|exists:venue_categories,id',
             'city' => 'required|int|exists:cities,id',
@@ -98,7 +102,8 @@ class VenueListingMetaController extends Controller {
         return redirect()->back();
     }
 
-    public function update_status($meta_id, $status) {
+    public function update_status($meta_id, $status)
+    {
         try {
             $meta = VenueListingMeta::find($meta_id);
             $meta->status = $status;
@@ -110,7 +115,8 @@ class VenueListingMetaController extends Controller {
         return $res;
     }
 
-    public function meta_delete($meta_id) {
+    public function meta_delete($meta_id)
+    {
         $meta = VenueListingMeta::find($meta_id);
         $meta->delete();
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Meta status updated.']);
@@ -118,7 +124,8 @@ class VenueListingMetaController extends Controller {
     }
 
     //for faq methods
-    public function fetch_faq($meta_id) {
+    public function fetch_faq($meta_id)
+    {
         try {
             $faq = VenueListingMeta::select('faq')->where('id', $meta_id)->first();
             if ($faq) {
@@ -131,7 +138,8 @@ class VenueListingMetaController extends Controller {
         }
         return $response;
     }
-    public function update_faq(Request $request, $meta_id) {
+    public function update_faq(Request $request, $meta_id)
+    {
         $validate = Validator::make($request->all(), [
             'faq_question' => 'required',
             'faq_answer' => 'required'
@@ -159,5 +167,13 @@ class VenueListingMetaController extends Controller {
 
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'FAQ updated.']);
         return redirect()->back();
+    }
+
+    public function saveDraft(Request $request, $meta_id)
+    {
+        $meta = \App\Models\VenueListingMeta::findOrFail($meta_id);
+        $meta->draft_data = $request->draft_data ?? '';
+        $meta->save();
+        return response()->json(['success' => true]);
     }
 }

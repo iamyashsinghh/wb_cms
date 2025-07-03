@@ -53,7 +53,8 @@
                                         <label for="blog_title">Blog Title <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('heading') is-invalid @enderror"
                                             placeholder="Enter Blog Title" id="blog_title" name="heading"
-                                            value="{{ old('heading', $data->heading) }}" required oninput="{{$data->id > 0 ? '' : 'generateSlug()'}}">
+                                            value="{{ old('heading', $data->heading) }}" required
+                                            oninput="{{ $data->id > 0 ? '' : 'generateSlug()' }}">
                                         @error('heading')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -215,6 +216,8 @@
                         </div>
                         <div class="modal-footer text-sm">
                             <a href="{{ route('blog.list') }}" class="btn btn-sm bg-secondary m-1">Back</a>
+                            <button type="button" class="btn btn-warning m-1" id="revertButton">Revert</button>
+                            <button type="button" class="btn btn-info" id="draftButton">Draft Saved</button>
                             <button type="submit" class="btn btn-sm text-light m-1"
                                 style="background-color: var(--wb-dark-red);">Submit</button>
                         </div>
@@ -290,6 +293,148 @@
     <script type="text/javascript" src="{{ asset('plugins/flora/word_paste.min.js') }}"></script>
 
     <script>
+        let originalData;
+
+        function getFormData($form) {
+            // Sync Froala editors into their textareas
+            if (typeof FroalaEditor !== 'undefined') {
+                $form.find('textarea').each(function() {
+                    const instance = FroalaEditor.INSTANCES.find(e => e.el === this);
+                    if (instance) {
+                        $(this).val(instance.html.get());
+                    }
+                });
+            }
+
+            const formData = $form.serializeArray();
+            let data = {};
+            formData.forEach(function(item) {
+                if (data[item.name]) {
+                    if (Array.isArray(data[item.name])) {
+                        data[item.name].push(item.value);
+                    } else {
+                        data[item.name] = [data[item.name], item.value];
+                    }
+                } else {
+                    data[item.name] = item.value;
+                }
+            });
+            return data;
+        }
+
+        $(document).ready(function() {
+            const $form = $('#blog-form');
+
+            // Store original form data
+            originalData = getFormData($form);
+
+            // --- LOAD DRAFT IF EXISTS ---
+            @if ($data->draft_data)
+                try {
+                    let draft = JSON.parse(@json($data->draft_data));
+                    for (let key in draft) {
+                        let $el = $('[name="' + key + '"]');
+                        if ($el.length) {
+                            if ($el.attr('type') === 'checkbox' || $el.attr('type') === 'radio') {
+                                $el.each(function() {
+                                    if ($(this).val() == draft[key]) $(this).prop('checked', true);
+                                });
+                            } else if ($el.is('select[multiple]')) {
+                                $el.val(draft[key]).trigger('change');
+                            } else {
+                                $el.val(draft[key]);
+                            }
+                        }
+                    }
+
+                    // Froala summary
+                    if (draft['summary'] && typeof FroalaEditor !== 'undefined') {
+                        const editor = FroalaEditor.INSTANCES.find(e => e.el.id === 'blog_summary');
+                        if (editor) {
+                            editor.html.set(draft['summary']);
+                        }
+                    }
+
+                    toastr.info('Draft data loaded');
+
+                } catch (e) {
+                    console.error('Invalid draft JSON', e);
+                }
+            @endif
+
+            // --- AUTO SAVE ON CHANGE ---
+            let autoSaveTimer;
+            $form.on('input change', 'input, select, textarea', function() {
+                clearTimeout(autoSaveTimer);
+                $('#draftButton').text('Saving...');
+                autoSaveTimer = setTimeout(() => {
+                    saveDraft();
+                }, 1000);
+            });
+
+            // --- SAVE DRAFT FUNCTION ---
+            function saveDraft() {
+                const data = getFormData($form);
+                $.ajax({
+                    url: "{{ route('blog.saveDraft', $data->id) }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        draft_data: JSON.stringify(data)
+                    },
+                    success: function() {
+                        $('#draftButton').text('Draft Saved');
+                    },
+                    error: function() {
+                        $('#draftButton').text('Error');
+                    }
+                });
+            }
+
+            // --- REVERT FUNCTION ---
+            $('#revertButton').on('click', function() {
+                for (let key in originalData) {
+                    let $el = $('[name="' + key + '"]');
+                    if ($el.length) {
+                        if ($el.attr('type') === 'checkbox' || $el.attr('type') === 'radio') {
+                            $el.each(function() {
+                                if ($(this).val() == originalData[key]) $(this).prop('checked',
+                                    true);
+                                else $(this).prop('checked', false);
+                            });
+                        } else if ($el.is('select[multiple]')) {
+                            $el.val(originalData[key]).trigger('change');
+                        } else {
+                            $el.val(originalData[key]);
+                        }
+                    }
+                }
+
+                // Revert Froala summary
+                if (originalData['summary'] && typeof FroalaEditor !== 'undefined') {
+                    const editor = FroalaEditor.INSTANCES.find(e => e.el.id === 'blog_summary');
+                    if (editor) {
+                        editor.html.set(originalData['summary']);
+                    }
+                }
+
+                // Clear draft from DB
+                $.ajax({
+                    url: "{{ route('blog.saveDraft', $data->id) }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        draft_data: ''
+                    },
+                    success: function() {
+                        toastr.success('Form reverted to original values');
+                        $('#draftButton').text('Draft Cleared');
+                    }
+                });
+            });
+        });
+
+
         function setImagePreview(event) {
             const reader = new FileReader();
             reader.onload = function() {
@@ -325,7 +470,7 @@
                 });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             new FroalaEditor('#blog_summary', {
                 attribution: false,
                 imageUploadURL: '{{ route('froala.upload_image') }}',
@@ -347,20 +492,25 @@
                 },
                 pluginsEnabled: [
                     'image', 'imageManager', 'video', 'align', 'charCounter', 'codeBeautifier',
-                    'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily', 'fontSize',
-                    'fullscreen', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                    'codeView', 'colors', 'draggable', 'emoticons', 'entities', 'file', 'fontFamily',
+                    'fontSize',
+                    'fullscreen', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat',
+                    'paragraphStyle',
                     'quickInsert', 'quote', 'table', 'url', 'wordPaste'
                 ],
-                fontSize: ['8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '36', '40', '44', '48', '54', '60', '72', '96'],
+                fontSize: ['8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32',
+                    '36', '40', '44', '48', '54', '60', '72', '96'
+                ],
                 events: {
-                    'imageManager.beforeLoad': function () { },
-                    'imageManager.loaded': function (data) { },
-                    'imageManager.error': function (error) { }
+                    'imageManager.beforeLoad': function() {},
+                    'imageManager.loaded': function(data) {},
+                    'imageManager.error': function(error) {}
                 }
             });
         });
     </script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> --}}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 @endsection

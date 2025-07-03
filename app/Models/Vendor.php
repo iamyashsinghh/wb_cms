@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Vendor extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $guarded = [];
+    protected $casts = [
+        'draft_data' => 'array',
+    ];
     public function reviews()
     {
         return $this->belongsToMany(Review::class, 'vendor_venue_review', 'vendor_id', 'review_id');

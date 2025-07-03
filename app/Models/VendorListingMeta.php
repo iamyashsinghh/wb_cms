@@ -10,5 +10,9 @@ class VendorListingMeta extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'draft_data' => 'array',
+    ];
+
     public $timestamps = true; // to allow created_at and updated_at to auto-fill
 }

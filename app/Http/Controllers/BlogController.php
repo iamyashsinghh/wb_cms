@@ -232,4 +232,12 @@ class BlogController extends Controller
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'FAQ updated.']);
         return redirect()->back();
     }
+
+        public function saveDraft(Request $request, $blog_id)
+    {
+        $blog = \App\Models\Blog::findOrFail($blog_id);
+        $blog->draft_data = $request->draft_data ?? '';
+        $blog->save();
+        return response()->json(['success' => true]);
+    }
 }

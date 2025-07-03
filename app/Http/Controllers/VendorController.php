@@ -512,4 +512,12 @@ class VendorController extends Controller
         session()->flash('status', ['success' => true, 'alert_type' => 'success', 'message' => 'Redirect Updated successfully.']);
         return redirect()->back();
     }
+
+    public function saveDraft(Request $request, $vendor_id)
+    {
+        $venue = \App\Models\Vendor::findOrFail($vendor_id);
+        $venue->draft_data = $request->draft_data ?? '';
+        $venue->save();
+        return response()->json(['success' => true]);
+    }
 }
