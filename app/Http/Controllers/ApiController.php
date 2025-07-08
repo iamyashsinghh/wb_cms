@@ -715,7 +715,7 @@ class ApiController extends Controller
 
                 $vendor = Vendor::where('slug', $slug)->first();
 
-                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured')
+                $similar_vendors = Vendor::select('id', 'brand_name', 'package_price', 'vendor_address', 'phone', 'slug', 'images', 'wb_assured', 'yrs_exp', 'event_completed')
                     ->whereIn('id', explode(',', trim($vendor->similar_vendor_ids)))
                     ->get();
 
