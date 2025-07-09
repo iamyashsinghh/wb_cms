@@ -13,12 +13,26 @@
     <div class="content-wrapper pb-5">
         <section class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row mb-4">
                     <div class="col-sm-6">
                         <h1 class="m-0">Review List</h1>
                     </div>
                 </div>
-                <div class="button-group my-4">
+                <div class="row">
+                    <div class="col-lg-3 col-6">
+                        <!-- small box -->
+                        <div class="small-box text-sm text-light" style="background: var(--wb-dark-red);">
+                            <div class="inner">
+                                <h3>{{ $disabledReviewsCount }}</h3>
+                                <p>Pending Reviews</p>
+                            </div>
+                            <a href="{{ route('review.pending') }}" class="small-box-footer">
+                                More info <i class="fas fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group my-2">
                     @canany(['create review', 'super power'])
                         <a href="{{ route('review.add') }}" class="btn btn-sm text-light buttons-print"
                             style="background-color: var(--wb-renosand)"><i class="fa fa-plus mr-1"></i>Add New</a>
@@ -97,7 +111,7 @@
                         const status = (data[5] == 1) ?
                             `<a href="javascript:void(0);" style="font-size: 22px;"">
                                 <i class="fa fa-toggle-on text-success"></i>
-                            </a>`:
+                            </a>` :
                             `<a href="javascript:void(0);" style="font-size: 22px;">
                                 <i class="fa fa-toggle-off text-danger"></i>
                             </a>`;

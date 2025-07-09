@@ -13,8 +13,24 @@ class ReviewController extends Controller
     {
         $venue = Venue::select('id', 'name')->get();
         $vendor = Vendor::select('id', 'brand_name')->get();
-        return view('review.list', compact('venue', 'vendor'));
+
+        // ✅ NEW CODE — Count pending reviews
+        $disabledReviewsCount = Review::where('status', 0)->count();
+
+        // ✅ Pass it to blade view
+        return view('review.list', compact('venue', 'vendor', 'disabledReviewsCount'));
     }
+
+    public function pending()
+    {
+        $pendingReviews = Review::where('status', 0)->get();
+        $venues = Venue::select('id', 'name')->get();
+        $vendors = Vendor::select('id', 'brand_name')->get();
+
+        return view('review.pending_list', compact('pendingReviews', 'venues', 'vendors'));
+    }
+
+
     public function ajax_list()
     {
         $reviews = Review::select(

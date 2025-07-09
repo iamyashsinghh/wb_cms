@@ -40,6 +40,10 @@ Route::post('/vendor/listing-meta/save-draft/{meta_id}', [\App\Http\Controllers\
 //Draft Save Routes for Blog
 Route::post('/blog/save-draft/{blog_id}', [\App\Http\Controllers\BlogController::class, 'saveDraft'])->name('blog.saveDraft');
 
+//Pending Reviews Count
+Route::get('/review/pending', [\App\Http\Controllers\ReviewController::class, 'pending'])->name('review.pending');
+
+
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('convert_all_the_localities_into_group', [MegaDatabaseChangeController::class, 'convert_all_the_localities_into_group']);
 // Route::get('yash', [MegaDatabaseChangeController::class, 'rename_all_venue_remove_locality_and_city_from_venue_name']);

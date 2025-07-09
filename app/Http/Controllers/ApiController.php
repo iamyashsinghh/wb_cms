@@ -700,7 +700,7 @@ class ApiController extends Controller
                 $data['similar_packages'] = $similar_packages;
                 $tag = 'venue';
                 $city = City::where('id', $venue->city_id)->where('status', 1)->first();
-                $reviews = Review::where(['product_id'=> $venue->id, 'product_for' => 'venue'])->get();
+                $reviews = Review::where(['product_id'=> $venue->id, 'product_for' => 'venue', 'status' => 1])->get();
                 $is_redirect = $venue->is_redirect;
 
                 $city_slug = $venue->get_city ? $venue->get_city->slug : '';
@@ -722,7 +722,7 @@ class ApiController extends Controller
                 $data['vendor'] = $vendor;
                 $data['similar_vendors'] = $similar_vendors;
                 $tag = 'vendor';
-                $reviews = Review::where(['product_id' => $vendor->id, 'product_for' => 'vendor'])->get();
+                $reviews = Review::where(['product_id' => $vendor->id, 'product_for' => 'vendor', 'status' => 1])->get();
                 $city = City::where('id', $vendor->city_id)->where('status', 1)->first();
                 $is_redirect = $vendor->is_redirect;
 
